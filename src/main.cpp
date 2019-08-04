@@ -34,7 +34,7 @@ int main() {
 
   } while (emulator->Running());
 
-  delete(emulator);
+  SafeDelete(emulator);
 
   return 0;
 }
@@ -44,7 +44,7 @@ Emulator::Emulator() {
 }
 
 Emulator::~Emulator() {
-  delete(m_pAtariVCS);
+  SafeDelete(m_pAtariVCS);
 }
 
 void Emulator::Init()
@@ -55,7 +55,7 @@ void Emulator::Init()
 
 void Emulator::RunToVBlank(CRGBA* pFrameBuffer) {
   m.lock();
-
+  m_pAtariVCS->RunToVBlank(pFrameBuffer, nullptr, nullptr);
   m.unlock();
 }
 
