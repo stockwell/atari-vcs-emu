@@ -60,7 +60,7 @@ bool Cartridge::LoadFromFile(const char *path) {
     m_bLoaded = LoadFromBuffer(reinterpret_cast<uint8_t *> (memblock), size);
 
     if (m_bLoaded) {
-      Log("ROM loaded", path);
+      Log("ROM loaded");
     } else {
       Log("There was a problem loading the memory for file %s...", path);
     }
