@@ -13,7 +13,8 @@ add_executable(atari-vcs-emu
         src/MOS6502Core.cpp
         src/TIACore.cpp
         src/HexDump.cpp
-        src/Memory.cpp)
+        src/Memory.cpp
+        src/RIOTCore.cpp)
 
 # subproject for unit tests
 add_subdirectory(vendor/googletest)
