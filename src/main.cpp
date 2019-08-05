@@ -23,7 +23,7 @@ private:
 int main() {
   auto emulator = new Emulator();
   emulator->Init();
-  emulator->LoadRom("pacman.bin");
+  emulator->LoadRom("adventure.bin");
 
   // NTSC Resolution
   auto *framebuffer = new CRGBA[160*192];
@@ -44,7 +44,7 @@ Emulator::Emulator() {
 }
 
 Emulator::~Emulator() {
-  SafeDelete(m_pAtariVCS);
+  SafeDelete(m_pAtariVCS)
 }
 
 void Emulator::Init()
@@ -62,6 +62,7 @@ void Emulator::RunToVBlank(CRGBA* pFrameBuffer) {
 void Emulator::LoadRom(const char *szFilePath) {
   m.lock();
   m_pAtariVCS->LoadROM(szFilePath);
+  m_pAtariVCS->Reset();
   m.unlock();
 }
 
