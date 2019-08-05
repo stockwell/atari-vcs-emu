@@ -12,7 +12,7 @@ Cartridge::Cartridge() {
 }
 
 Cartridge::~Cartridge() {
-  SafeDeleteArray(m_pTheROM);
+  SafeDeleteArray(m_pROM)
 }
 
 void Cartridge::Init() {
@@ -82,18 +82,21 @@ bool Cartridge::LoadFromBuffer(const uint8_t *buffer, int size) {
   if (buffer != nullptr) {
     Log("Loading from buffer... Size: %d", size);
     m_iTotalSize = size;
-    m_pTheROM = new uint8_t[m_iTotalSize];
-    memcpy(m_pTheROM, buffer, m_iTotalSize);
+    m_pROM = new uint8_t[m_iTotalSize];
+    memcpy(m_pROM, buffer, m_iTotalSize);
     m_bLoaded = true;
-    return GatherMetadata();
+    return true;
   } else {
     return false;
   }
 }
 
-bool Cartridge::GatherMetadata()
-{
-  return true;
+uint8_t* Cartridge::GetROM() {
+  if (m_bLoaded) {
+    return m_pROM;
+  }
+
+  return m_bLoaded ?  m_pROM : nullptr;
 }
 
 void Cartridge::Reset() {

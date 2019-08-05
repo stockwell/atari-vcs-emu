@@ -13,12 +13,13 @@ public:
   void Reset();
   bool LoadFromFile(const char* path);
   bool LoadFromBuffer(const uint8_t* buffer, int size);
+  uint8_t* GetROM();
 
 private:
   bool GatherMetadata();
 
 private:
-  uint8_t* m_pTheROM;
+  uint8_t* m_pROM;
   int m_iTotalSize;
   bool m_bLoaded;
   char m_szFilePath[512];
