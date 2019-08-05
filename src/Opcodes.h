@@ -1,7 +1,7 @@
 #ifndef ATARI_VCS_EMU_OPCODES_H
 #define ATARI_VCS_EMU_OPCODES_H
 
-static const char* kOPCodeNames[256] = {
+static const char* kOPCodeNames[0x100] = {
     /* 0x00 */
     "BRK impl",
     "ORA X,ind",
@@ -17,7 +17,7 @@ static const char* kOPCodeNames[256] = {
     "unused opcode",
     "unused opcode",
     "ORA abs",
-    "ASL abs,
+    "ASL abs",
     "unused opcode",
 
     /* 0x10 */
@@ -99,7 +99,6 @@ static const char* kOPCodeNames[256] = {
     "unused opcode",
     "unused opcode",
     "EOR zpg, x",
-    "unused opcode",
     "LSR zpg, X",
     "unused opcode",
     "CLI impl",
@@ -292,7 +291,7 @@ static const char* kOPCodeNames[256] = {
     "unused opcode",
 };
 
-uint8_t cycletime = {
+uint8_t cycletime[0x100] = {
     7, 6, 0, 0, 0, 3, 5, 0, 3, 2, 2, 0, 0, 4, 6, 0,  // 00
     2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0,  // 10
     6, 6, 0, 0, 3, 3, 5, 0, 4, 2, 2, 0, 4, 4, 6, 0,  // 20
@@ -310,7 +309,8 @@ uint8_t cycletime = {
     2, 6, 0, 0, 3, 3, 5, 0, 2, 2, 2, 0, 4, 4, 6, 0,  // E0
     2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0   // F0
 };
-uint8_t extracycles= {
+
+uint8_t extracycles[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 00
     2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0,  // 10
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 20
