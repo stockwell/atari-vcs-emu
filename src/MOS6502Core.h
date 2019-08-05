@@ -2,13 +2,13 @@
 #define ATARI_VCS_EMU_MOS6502CORE_H
 
 #include "Common.h"
+#include "Memory.h"
 
-class MOS6502Core
-{
+class MOS6502Core {
 public:
   MOS6502Core();
   ~MOS6502Core();
-  void Init();
+  void Init(Memory* pMemory);
   void Reset();
   uint8_t Tick();
 
@@ -19,6 +19,7 @@ private:
   uint8_t YR;
   uint8_t SR;
   uint8_t SP;
+  Memory* m_pMemory;
 
 private:
   uint8_t FetchOPCode();
