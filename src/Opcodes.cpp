@@ -18,8 +18,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x0D] = &MOS6502Core::OPCode0x0D;
   m_OPCodes[0x0E] = &MOS6502Core::OPCode0x0E;
 
-
-
+  m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
 }
 
 void MOS6502Core::OPCodeInvalid() {
@@ -198,8 +197,9 @@ void MOS6502Core::OPCode0x4A() {
 
 }
 
+/* JMP abs */
 void MOS6502Core::OPCode0x4C() {
-
+  PC = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
 }
 
 void MOS6502Core::OPCode0x4D() {

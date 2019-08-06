@@ -26,7 +26,6 @@ private:
 private:
   uint8_t FetchOPCode();
   void ExecuteOPCode(uint8_t opcode);
-
   void OPCodeInvalid();
 
   void OPCode0x00();
