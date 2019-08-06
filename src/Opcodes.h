@@ -87,7 +87,7 @@ static const char* kOPCodeNames[0x100] = {
     "ADC #",
     "ROR A",
     "unused opcode",
-    "JMP ind",
+    "JMP abs",
     "ADC abs",
     "ROR abs",
     "unused opcode",
