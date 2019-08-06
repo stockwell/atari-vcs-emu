@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 project(atari-vcs-emu)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -14,7 +14,8 @@ add_executable(atari-vcs-emu
         src/TIACore.cpp
         src/HexDump.cpp
         src/Memory.cpp
-        src/RIOTCore.cpp)
+        src/RIOTCore.cpp
+        src/Opcodes.cpp)
 
 # subproject for unit tests
 add_subdirectory(vendor/googletest)

@@ -5,6 +5,8 @@
 
 MOS6502Core::MOS6502Core() {
   m_pMemory = nullptr;
+
+  InitOpcodeTable();
 }
 
 MOS6502Core::~MOS6502Core() {
