@@ -195,6 +195,4 @@ private:
   void OPCode0xFE();
 };
 
-
-
 #endif //ATARI_VCS_EMU_MOS6502CORE_H
