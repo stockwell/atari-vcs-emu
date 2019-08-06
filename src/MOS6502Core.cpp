@@ -40,5 +40,4 @@ void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
 
 uint8_t MOS6502Core::Tick() {
   ExecuteOPCode(FetchOPCode());
-  ExecuteOPCode(FetchOPCode());
 }

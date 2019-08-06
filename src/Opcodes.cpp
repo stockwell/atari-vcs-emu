@@ -19,6 +19,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x0E] = &MOS6502Core::OPCode0x0E;
 
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
+
+  m_OPCodes[0x78] = &MOS6502Core::OPCode0x78;
 }
 
 void MOS6502Core::OPCodeInvalid() {
@@ -298,8 +300,10 @@ void MOS6502Core::OPCode0x76() {
 
 }
 
+/* SEI impl */
 void MOS6502Core::OPCode0x78() {
-
+  SR |= 0x04u;
+  ++PC;
 }
 
 void MOS6502Core::OPCode0x79() {
