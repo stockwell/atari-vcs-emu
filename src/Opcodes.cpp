@@ -21,6 +21,11 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
 
   m_OPCodes[0x78] = &MOS6502Core::OPCode0x78;
+
+  m_OPCodes[0xA2] = &MOS6502Core::OPCode0xA2;
+  m_OPCodes[0xA9] = &MOS6502Core::OPCode0xA9;
+
+  m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
 }
 
 void MOS6502Core::OPCodeInvalid() {
@@ -398,8 +403,11 @@ void MOS6502Core::OPCode0xA1() {
 
 }
 
+/* LDX # */
 void MOS6502Core::OPCode0xA2() {
-
+  XR = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
+  printf("XR: 0x%02X\n", XR);
+  PC += 2;
 }
 
 void MOS6502Core::OPCode0xA4() {
@@ -418,8 +426,11 @@ void MOS6502Core::OPCode0xA8() {
 
 }
 
+/* LDA # */
 void MOS6502Core::OPCode0xA9() {
-
+  AC = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
+  printf("ACC: 0x%02X\n", AC);
+  PC += 2;
 }
 
 void MOS6502Core::OPCode0xAA() {
@@ -542,8 +553,11 @@ void MOS6502Core::OPCode0xD6() {
 
 }
 
+/* CLD impl */
 void MOS6502Core::OPCode0xD8() {
-
+  SR &= ~0x02;
+  ++PC;
+  printf("SR: %02X\n", SR);
 }
 
 void MOS6502Core::OPCode0xD9() {
