@@ -79,7 +79,7 @@ void MOS6502Core::OPCode0x0E() {
 
 /* BPL relative */
 void MOS6502Core::OPCode0x10() {
-  if (SR & 0x20) {
+  if ((SR & 0x20) == 0) {
     PC += (int8_t)m_pMemory->Read(++PC);
     ++PC;
   } else {
@@ -161,7 +161,7 @@ void MOS6502Core::OPCode0x2E() {
 
 /* BMI relative */
 void MOS6502Core::OPCode0x30() {
-  if ((SR & 0x20) == 0) {
+  if (SR & 0x20) {
     PC += (int8_t)m_pMemory->Read(++PC);
     ++PC;
   } else {
@@ -555,7 +555,7 @@ void MOS6502Core::OPCode0xCA() {
   --XR;
   ++PC;
 
-  XR & 0x80 ? SR &= ~0x20 : SR |= 0x20;
+  XR & 0x80 ? SR |= 0x20 : SR &= ~0x20 ;
   XR == 0x00 ? SR |= 0x10 : SR &= ~0x10;
 }
 
