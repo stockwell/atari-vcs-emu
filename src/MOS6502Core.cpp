@@ -35,7 +35,6 @@ uint8_t MOS6502Core::FetchOPCode() {
 void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
   printf("Opcode: %s(0x%02X), PC 0x%04X\n", kOPCodeNames[opcode], opcode, PC);
   (this->*m_OPCodes[opcode])();
-
 }
 
 uint8_t MOS6502Core::Tick() {
