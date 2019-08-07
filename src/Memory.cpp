@@ -55,3 +55,20 @@ uint8_t Memory::Read(uint16_t address) {
 
   return 0xFF;
 }
+
+void Memory::Write(uint16_t address, uint8_t value) {
+  /* MOS 6507 doesn't have address lines 13-15 connected. Only the first 13 bits of the address actually matter */
+  uint16_t actualAddress = address & 0x1FFF;
+
+  if (actualAddress >= TIA_START_ADDR && actualAddress <= TIA_END_ADDR) {
+    m_pMap[actualAddress] = value;
+    /* Dispatch to TIA core */
+  } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_END_ADDR) {
+    m_pMap[actualAddress] = value;
+  } else if (actualAddress >= RIOT_START_ADDR && actualAddress <= RIOT_END_ADDR) {
+    m_pMap[actualAddress] = value;
+    /* Dispatch to RIOT core */
+  } else {
+    std::cout << "Invalid write address! Addr = " << std::hex << address << std::endl;
+  }
+}
