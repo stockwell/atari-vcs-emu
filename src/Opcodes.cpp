@@ -22,6 +22,8 @@ void MOS6502Core::InitOpcodeTable() {
 
   m_OPCodes[0x78] = &MOS6502Core::OPCode0x78;
 
+  m_OPCodes[0x95] = &MOS6502Core::OPCode0x95;
+
   m_OPCodes[0xA2] = &MOS6502Core::OPCode0xA2;
   m_OPCodes[0xA9] = &MOS6502Core::OPCode0xA9;
 
@@ -371,8 +373,10 @@ void MOS6502Core::OPCode0x94() {
 
 }
 
+/* STA zpg, X */
 void MOS6502Core::OPCode0x95() {
-
+  m_pMemory->Write(m_pMemory->Read(++PC), AC);
+  ++PC;
 }
 
 void MOS6502Core::OPCode0x96() {
