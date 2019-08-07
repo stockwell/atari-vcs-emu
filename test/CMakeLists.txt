@@ -13,11 +13,21 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 enable_testing()
 
+set(vcs-emu-source
+        ${PROJECT_ROOT}/src/MOS6502Core.cpp
+        ${PROJECT_ROOT}/src/Memory.cpp
+        ${PROJECT_ROOT}/src/Opcodes.cpp
+        ${PROJECT_ROOT}/src/RIOTCore.cpp
+        ${PROJECT_ROOT}/src/TIACore.cpp
+        ${PROJECT_ROOT}/src/Cart.cpp)
+
 set(test-source
-        DummyTest.cpp)
+        OPCodeTest.cpp)
+
+include_directories(${PROJECT_ROOT}/src)
 
 # Build & link tests
-add_executable(${PROJECT_TEST_TARGET} AllTests.cpp ${test-source})
+add_executable(${PROJECT_TEST_TARGET} AllTests.cpp ${test-source} ${vcs-emu-source})
 target_link_libraries(${PROJECT_TEST_TARGET} gtest_main)
 
 # C Test
