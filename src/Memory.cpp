@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 #include "Memory.h"
 
@@ -42,6 +43,11 @@ void Memory::LoadROM(uint8_t *pROM) {
     m_pMap[i] = pROM[j];
   }
 }
+void Memory::LoadBuffer(uint16_t address, uint8_t *bytes, size_t numBytes) {
+  /* YOLO */
+  memcpy(&m_pMap[address], bytes, numBytes);
+}
+
 
 uint8_t Memory::Read(uint16_t address) {
 
