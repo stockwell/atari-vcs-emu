@@ -20,6 +20,8 @@ void MOS6502Core::InitOpcodeTable() {
 
   m_OPCodes[0x10] = &MOS6502Core::OPCode0x10;
 
+  m_OPCodes[0x20] = &MOS6502Core::OPCode0x20;
+
   m_OPCodes[0x30] = &MOS6502Core::OPCode0x30;
 
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
@@ -115,8 +117,10 @@ void MOS6502Core::OPCode0x1E() {
 
 }
 
+/* JSR */
 void MOS6502Core::OPCode0x20() {
-
+  SR = m_pMemory->Read(PC + 3);
+  PC = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
 }
 
 void MOS6502Core::OPCode0x21() {
