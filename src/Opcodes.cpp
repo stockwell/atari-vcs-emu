@@ -26,6 +26,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x30] = &MOS6502Core::OPCode0x30;
   m_OPCodes[0x38] = &MOS6502Core::OPCode0x38;
 
+  m_OPCodes[0x49] = &MOS6502Core::OPCode0x49;
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
 
   m_OPCodes[0x78] = &MOS6502Core::OPCode0x78;
@@ -231,8 +232,33 @@ void MOS6502Core::OPCode0x48() {
 
 }
 
+/* ADC */
 void MOS6502Core::OPCode0x49() {
+  uint8_t val = m_pMemory->Read(++PC);
+  ++PC;
 
+  uint8_t carry = AC & CARRY ? 1 : 0;
+  uint16_t result = AC + val + carry;
+
+  if (SR & DECIMAL) {
+    if (AC & 0x0F + val & 0x0F + carry > 0x09)
+      result += 0x06;
+
+    result & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
+    !((AC ^ val) & 0x80) && ((AC ^ result) & 0x80) ? SR |= OVERFLOW : SR &= ~OVERFLOW;
+
+    if (carry = result > 0x99)
+      result += 0x60;
+
+    carry ? SR |= CARRY : SR &= ~CARRY;
+  } else {
+    !((AC ^ val) & 0x80) && ((AC ^ result) & 0x80) ? SR |= OVERFLOW : SR &= ~OVERFLOW;
+    result > 0xFF ? SR |= CARRY : SR &= ~CARRY;
+    result & 0x80 ? SR |= NEGATIVE : SR &= ~NEGATIVE;
+  }
+
+  result & 0xFF == 0x00 ? SR |= ZERO : SR &= ~ZERO;
+  AC = result & 0xFF;
 }
 
 void MOS6502Core::OPCode0x4A() {
