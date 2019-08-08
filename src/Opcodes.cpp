@@ -429,7 +429,7 @@ void MOS6502Core::OPCode0x9D() {
 void MOS6502Core::OPCode0xA0() {
   YR = m_pMemory->Read(++PC);
   ++PC;
-  
+
   YR & 0x80 ? SR &= ~0x20 : SR |= 0x20;
   YR == 0x00 ? SR |= 0x10 : SR &= ~0x10;
 }
@@ -440,8 +440,8 @@ void MOS6502Core::OPCode0xA1() {
 
 /* LDX # */
 void MOS6502Core::OPCode0xA2() {
-  XR = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
-  PC += 2;
+  XR = m_pMemory->Read(++PC);
+  ++PC;
 
   XR & 0x80 ? SR &= ~0x20 : SR |= 0x20;
   XR == 0x00 ? SR |= 0x10 : SR &= ~0x10;
