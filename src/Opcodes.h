@@ -1,14 +1,14 @@
 #ifndef ATARI_VCS_EMU_OPCODES_H
 #define ATARI_VCS_EMU_OPCODES_H
 
-#define NEGATIVE  0x80
-#define OVERFLOW  0x40
-#define CONSTANT  0x20
-#define BREAK     0x10
-#define DECIMAL   0x08
-#define INTERRUPT 0x04
-#define ZERO      0x02
-#define CARRY     0x01
+#define NEGATIVE  0x80u
+#define OVERFLOW  0x40u
+#define CONSTANT  0x20u
+#define BREAK     0x10u
+#define DECIMAL   0x08u
+#define INTERRUPT 0x04u
+#define ZERO      0x02u
+#define CARRY     0x01u
 
 static const char* kOPCodeNames[0x100] = {
     /* 0x00 */

@@ -37,6 +37,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xA2] = &MOS6502Core::OPCode0xA2;
   m_OPCodes[0xA9] = &MOS6502Core::OPCode0xA9;
 
+  m_OPCodes[0xB0] = &MOS6502Core::OPCode0xB0;
+
   m_OPCodes[0xCA] = &MOS6502Core::OPCode0xCA;
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
 
@@ -193,7 +195,7 @@ void MOS6502Core::OPCode0x36() {
 
 /* SEC */
 void MOS6502Core::OPCode0x38() {
-  SR |= 0x08u;
+  SR |= CARRY;
   ++PC;
 }
 
@@ -340,7 +342,7 @@ void MOS6502Core::OPCode0x76() {
 
 /* SEI impl */
 void MOS6502Core::OPCode0x78() {
-  SR |= 0x04u;
+  SR |= INTERRUPT;
   ++PC;
 }
 
@@ -495,8 +497,14 @@ void MOS6502Core::OPCode0xAE() {
 
 }
 
+/* BCS relative */
 void MOS6502Core::OPCode0xB0() {
-
+  if (SR & CARRY) {
+    PC += (int8_t)m_pMemory->Read(++PC);
+    ++PC;
+  } else {
+    PC += 2;
+  }
 }
 
 void MOS6502Core::OPCode0xB1() {
@@ -611,7 +619,7 @@ void MOS6502Core::OPCode0xD6() {
 
 /* CLD impl */
 void MOS6502Core::OPCode0xD8() {
-  SR &= ~0x02;
+  SR &= ~DECIMAL;
   ++PC;
 }
 
