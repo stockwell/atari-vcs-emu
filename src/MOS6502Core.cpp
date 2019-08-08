@@ -20,20 +20,20 @@ void MOS6502Core::Init(Memory* pMemory) {
 
 void MOS6502Core::Reset() {
   /* Load reset vector */
-  PC = (unsigned)m_pMemory->Read(0xfffd) << 8u | m_pMemory->Read(0xfffc);
-  AC = 0x00;
-  XR = 0x00;
-  YR = 0x00;
-  SR = 0x20;
-  SP = 0xFF;
+  m_PC = (unsigned)m_pMemory->Read(0xfffd) << 8u | m_pMemory->Read(0xfffc);
+  m_AC = 0x00;
+  m_XR = 0x00;
+  m_YR = 0x00;
+  m_SR = 0x20;
+  m_SP = 0xFF;
 }
 
 uint8_t MOS6502Core::FetchOPCode() {
-  return m_pMemory->Read(PC);
+  return m_pMemory->Read(m_PC);
 }
 
 void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
-  printf("Opcode: %s(0x%02X), PC 0x%04X\n", kOPCodeNames[opcode], opcode, PC);
+  printf("Opcode: %s(0x%02X), PC 0x%04X\n", kOPCodeNames[opcode], opcode, m_PC);
   (this->*m_OPCodes[opcode])();
 }
 

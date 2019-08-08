@@ -90,11 +90,11 @@ void MOS6502Core::OPCode0x0E() {
 
 /* BPL relative */
 void MOS6502Core::OPCode0x10() {
-  if ((SR & NEGATIVE) == 0) {
-    PC += (int8_t)m_pMemory->Read(++PC);
-    ++PC;
+  if ((m_SR & NEGATIVE) == 0) {
+    m_PC += (int8_t)m_pMemory->Read(++m_PC);
+    ++m_PC;
   } else {
-    PC += 2;
+    m_PC += 2;
   }
 }
 
@@ -128,8 +128,8 @@ void MOS6502Core::OPCode0x1E() {
 
 /* JSR */
 void MOS6502Core::OPCode0x20() {
-  SP = m_pMemory->Read(PC + 3);
-  PC = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
+  m_SP = m_pMemory->Read(m_PC + 3);
+  m_PC = m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u;
 }
 
 void MOS6502Core::OPCode0x21() {
@@ -174,11 +174,11 @@ void MOS6502Core::OPCode0x2E() {
 
 /* BMI relative */
 void MOS6502Core::OPCode0x30() {
-  if (SR & NEGATIVE) {
-    PC += (int8_t)m_pMemory->Read(++PC);
-    ++PC;
+  if (m_SR & NEGATIVE) {
+    m_PC += (int8_t)m_pMemory->Read(++m_PC);
+    ++m_PC;
   } else {
-    PC += 2;
+    m_PC += 2;
   }
 }
 
@@ -196,8 +196,8 @@ void MOS6502Core::OPCode0x36() {
 
 /* SEC */
 void MOS6502Core::OPCode0x38() {
-  SR |= CARRY;
-  ++PC;
+  m_SR |= CARRY;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x39() {
@@ -234,31 +234,31 @@ void MOS6502Core::OPCode0x48() {
 
 /* ADC */
 void MOS6502Core::OPCode0x49() {
-  uint8_t val = m_pMemory->Read(++PC);
-  ++PC;
+  uint8_t val = m_pMemory->Read(++m_PC);
+  ++m_PC;
 
-  uint8_t carry = AC & CARRY ? 1 : 0;
-  uint16_t result = AC + val + carry;
+  uint8_t carry = m_AC & CARRY ? 1 : 0;
+  uint16_t result = m_AC + val + carry;
 
-  if (SR & DECIMAL) {
-    if (AC & 0x0F + val & 0x0F + carry > 0x09)
+  if (m_SR & DECIMAL) {
+    if (m_AC & 0x0F + val & 0x0F + carry > 0x09)
       result += 0x06;
 
-    result & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
-    !((AC ^ val) & 0x80) && ((AC ^ result) & 0x80) ? SR |= OVERFLOW : SR &= ~OVERFLOW;
+    result & 0x80 ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
+    !((m_AC ^ val) & 0x80) && ((m_AC ^ result) & 0x80) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
 
     if (carry = result > 0x99)
       result += 0x60;
 
-    carry ? SR |= CARRY : SR &= ~CARRY;
+    carry ? m_SR |= CARRY : m_SR &= ~CARRY;
   } else {
-    !((AC ^ val) & 0x80) && ((AC ^ result) & 0x80) ? SR |= OVERFLOW : SR &= ~OVERFLOW;
-    result > 0xFF ? SR |= CARRY : SR &= ~CARRY;
-    result & 0x80 ? SR |= NEGATIVE : SR &= ~NEGATIVE;
+    !((m_AC ^ val) & 0x80) && ((m_AC ^ result) & 0x80) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
+    result > 0xFF ? m_SR |= CARRY : m_SR &= ~CARRY;
+    result & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   }
 
-  result & 0xFF == 0x00 ? SR |= ZERO : SR &= ~ZERO;
-  AC = result & 0xFF;
+  result & 0xFF == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
+  m_AC = result & 0xFF;
 }
 
 void MOS6502Core::OPCode0x4A() {
@@ -267,7 +267,7 @@ void MOS6502Core::OPCode0x4A() {
 
 /* JMP abs */
 void MOS6502Core::OPCode0x4C() {
-  PC = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
+  m_PC = m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u;
 }
 
 void MOS6502Core::OPCode0x4D() {
@@ -368,8 +368,8 @@ void MOS6502Core::OPCode0x76() {
 
 /* SEI impl */
 void MOS6502Core::OPCode0x78() {
-  SR |= INTERRUPT;
-  ++PC;
+  m_SR |= INTERRUPT;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x79() {
@@ -434,8 +434,8 @@ void MOS6502Core::OPCode0x94() {
 
 /* STA zpg, X */
 void MOS6502Core::OPCode0x95() {
-  m_pMemory->Write(m_pMemory->Read(++PC), AC);
-  ++PC;
+  m_pMemory->Write(m_pMemory->Read(++m_PC), m_AC);
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x96() {
@@ -452,8 +452,8 @@ void MOS6502Core::OPCode0x99() {
 
 /* TXS */
 void MOS6502Core::OPCode0x9A() {
-  SP = XR;
-  ++PC;
+  m_SP = m_XR;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x9D() {
@@ -462,11 +462,11 @@ void MOS6502Core::OPCode0x9D() {
 
 /* LDY # */
 void MOS6502Core::OPCode0xA0() {
-  YR = m_pMemory->Read(++PC);
-  ++PC;
+  m_YR = m_pMemory->Read(++m_PC);
+  ++m_PC;
 
-  YR & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
-  YR == 0x00 ? SR |= ZERO : SR &= ~ZERO;
+  m_YR & 0x80 ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
+  m_YR == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xA1() {
@@ -475,11 +475,11 @@ void MOS6502Core::OPCode0xA1() {
 
 /* LDX # */
 void MOS6502Core::OPCode0xA2() {
-  XR = m_pMemory->Read(++PC);
-  ++PC;
+  m_XR = m_pMemory->Read(++m_PC);
+  ++m_PC;
 
-  XR & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
-  XR == 0x00 ? SR |= ZERO : SR &= ~ZERO;
+  m_XR & 0x80 ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
+  m_XR == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xA4() {
@@ -500,11 +500,11 @@ void MOS6502Core::OPCode0xA8() {
 
 /* LDA # */
 void MOS6502Core::OPCode0xA9() {
-  AC = m_pMemory->Read(++PC);
-  ++PC;
+  m_AC = m_pMemory->Read(++m_PC);
+  ++m_PC;
 
-  AC & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
-  AC == 0x00 ? SR |= ZERO : SR &= ~ZERO;
+  m_AC & 0x80 ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
+  m_AC == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xAA() {
@@ -525,11 +525,11 @@ void MOS6502Core::OPCode0xAE() {
 
 /* BCS relative */
 void MOS6502Core::OPCode0xB0() {
-  if (SR & CARRY) {
-    PC += (int8_t)m_pMemory->Read(++PC);
-    ++PC;
+  if (m_SR & CARRY) {
+    m_PC += (int8_t)m_pMemory->Read(++m_PC);
+    ++m_PC;
   } else {
-    PC += 2;
+    m_PC += 2;
   }
 }
 
@@ -595,11 +595,11 @@ void MOS6502Core::OPCode0xC6() {
 
 /* INY */
 void MOS6502Core::OPCode0xC8() {
-  ++YR;
-  ++PC;
+  ++m_YR;
+  ++m_PC;
 
-  YR & 0x80 ? SR |= NEGATIVE : SR &= ~NEGATIVE ;
-  YR == 0x00 ? SR |= ZERO : SR &= ~ZERO;
+  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE ;
+  m_YR == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xC9() {
@@ -608,11 +608,11 @@ void MOS6502Core::OPCode0xC9() {
 
 /* DEX impl */
 void MOS6502Core::OPCode0xCA() {
-  --XR;
-  ++PC;
+  --m_XR;
+  ++m_PC;
 
-  XR & 0x80 ? SR |= NEGATIVE : SR &= ~NEGATIVE ;
-  XR == 0x00 ? SR |= ZERO : SR &= ~ZERO;
+  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE ;
+  m_XR == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xCC() {
@@ -645,8 +645,8 @@ void MOS6502Core::OPCode0xD6() {
 
 /* CLD impl */
 void MOS6502Core::OPCode0xD8() {
-  SR &= ~DECIMAL;
-  ++PC;
+  m_SR &= ~DECIMAL;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0xD9() {
@@ -687,26 +687,26 @@ void MOS6502Core::OPCode0xE8() {
 
 /* SBC */
 void MOS6502Core::OPCode0xE9() {
-  uint8_t val = m_pMemory->Read(++PC);
-  ++PC;
-  uint8_t carry = AC & CARRY ? 1 : 0;
+  uint8_t val = m_pMemory->Read(++m_PC);
+  ++m_PC;
+  uint8_t carry = m_AC & CARRY ? 1 : 0;
 
-  uint16_t result = AC - val - carry;
-  result & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
-  result == 0x00 ? SR |= ZERO : SR &= ~ZERO;
+  uint16_t result = m_AC - val - carry;
+  result & 0x80 ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
+  result == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 
-  ((AC ^ result) & 0x80) && ((AC ^ result) & 0x80) ? SR |= OVERFLOW : SR &= ~OVERFLOW;
+  ((m_AC ^ result) & 0x80) && ((m_AC ^ result) & 0x80) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
 
-  if (SR & DECIMAL) {
-    if (AC & 0x0F - carry < val & 0x0F)
+  if (m_SR & DECIMAL) {
+    if (m_AC & 0x0F - carry < val & 0x0F)
       result -= 0x06;
 
     if (result > 0x99)
       result -= 0x60;
   }
 
-  result < 0x100 ? SR |= CARRY : SR &= ~CARRY;
-  AC = result & 0xFF;
+  result < 0x100 ? m_SR |= CARRY : m_SR &= ~CARRY;
+  m_AC = result & 0xFF;
 }
 
 void MOS6502Core::OPCode0xEA() {

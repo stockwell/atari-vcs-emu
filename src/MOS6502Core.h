@@ -14,12 +14,12 @@ public:
   uint8_t Tick();
 
 private:
-  uint16_t PC;
-  uint8_t AC;
-  uint8_t XR;
-  uint8_t YR;
-  uint8_t SR;
-  uint8_t SP;
+  uint16_t m_PC;
+  uint8_t m_AC;
+  uint8_t m_XR;
+  uint8_t m_YR;
+  uint8_t m_SR;
+  uint8_t m_SP;
   Memory* m_pMemory;
   void(MOS6502Core::*m_OPCodes[0x100])();
 
