@@ -465,8 +465,8 @@ void MOS6502Core::OPCode0xA8() {
 
 /* LDA # */
 void MOS6502Core::OPCode0xA9() {
-  AC = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
-  PC += 2;
+  AC = m_pMemory->Read(++PC);
+  ++PC;
 
   AC & 0x80 ? SR &= ~0x20 : SR |= 0x20;
   AC == 0x00 ? SR |= 0x10 : SR &= ~0x10;
