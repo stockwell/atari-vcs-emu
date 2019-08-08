@@ -31,6 +31,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x95] = &MOS6502Core::OPCode0x95;
   m_OPCodes[0x9A] = &MOS6502Core::OPCode0x9A;
 
+  m_OPCodes[0xA0] = &MOS6502Core::OPCode0xA0;
   m_OPCodes[0xA2] = &MOS6502Core::OPCode0xA2;
   m_OPCodes[0xA9] = &MOS6502Core::OPCode0xA9;
 
@@ -424,8 +425,13 @@ void MOS6502Core::OPCode0x9D() {
 
 }
 
+/* LDY # */
 void MOS6502Core::OPCode0xA0() {
-
+  YR = m_pMemory->Read(++PC);
+  ++PC;
+  
+  YR & 0x80 ? SR &= ~0x20 : SR |= 0x20;
+  YR == 0x00 ? SR |= 0x10 : SR &= ~0x10;
 }
 
 void MOS6502Core::OPCode0xA1() {
