@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "MOS6502Core.h"
+#include "Opcodes.h"
 
 void MOS6502Core::InitOpcodeTable() {
   for (auto & m_OPCode : m_OPCodes) {
@@ -40,6 +41,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
 
   m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
+
+  m_OPCodes[0xE9] = &MOS6502Core::OPCode0xE9;
 }
 
 void MOS6502Core::OPCodeInvalid() {
@@ -84,7 +87,7 @@ void MOS6502Core::OPCode0x0E() {
 
 /* BPL relative */
 void MOS6502Core::OPCode0x10() {
-  if ((SR & 0x20) == 0) {
+  if ((SR & NEGATIVE) == 0) {
     PC += (int8_t)m_pMemory->Read(++PC);
     ++PC;
   } else {
@@ -122,7 +125,7 @@ void MOS6502Core::OPCode0x1E() {
 
 /* JSR */
 void MOS6502Core::OPCode0x20() {
-  SR = m_pMemory->Read(PC + 3);
+  SP = m_pMemory->Read(PC + 3);
   PC = m_pMemory->Read(PC + 1) | (unsigned)m_pMemory->Read(PC + 2) << 8u;
 }
 
@@ -168,7 +171,7 @@ void MOS6502Core::OPCode0x2E() {
 
 /* BMI relative */
 void MOS6502Core::OPCode0x30() {
-  if (SR & 0x20) {
+  if (SR & NEGATIVE) {
     PC += (int8_t)m_pMemory->Read(++PC);
     ++PC;
   } else {
@@ -434,8 +437,8 @@ void MOS6502Core::OPCode0xA0() {
   YR = m_pMemory->Read(++PC);
   ++PC;
 
-  YR & 0x80 ? SR &= ~0x20 : SR |= 0x20;
-  YR == 0x00 ? SR |= 0x10 : SR &= ~0x10;
+  YR & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
+  YR == 0x00 ? SR |= ZERO : SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xA1() {
@@ -447,8 +450,8 @@ void MOS6502Core::OPCode0xA2() {
   XR = m_pMemory->Read(++PC);
   ++PC;
 
-  XR & 0x80 ? SR &= ~0x20 : SR |= 0x20;
-  XR == 0x00 ? SR |= 0x10 : SR &= ~0x10;
+  XR & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
+  XR == 0x00 ? SR |= ZERO : SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xA4() {
@@ -472,8 +475,8 @@ void MOS6502Core::OPCode0xA9() {
   AC = m_pMemory->Read(++PC);
   ++PC;
 
-  AC & 0x80 ? SR &= ~0x20 : SR |= 0x20;
-  AC == 0x00 ? SR |= 0x10 : SR &= ~0x10;
+  AC & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
+  AC == 0x00 ? SR |= ZERO : SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xAA() {
@@ -561,8 +564,8 @@ void MOS6502Core::OPCode0xC8() {
   ++YR;
   ++PC;
 
-  YR & 0x80 ? SR |= 0x20 : SR &= ~0x20 ;
-  YR == 0x00 ? SR |= 0x10 : SR &= ~0x10;
+  YR & 0x80 ? SR |= NEGATIVE : SR &= ~NEGATIVE ;
+  YR == 0x00 ? SR |= ZERO : SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xC9() {
@@ -574,8 +577,8 @@ void MOS6502Core::OPCode0xCA() {
   --XR;
   ++PC;
 
-  XR & 0x80 ? SR |= 0x20 : SR &= ~0x20 ;
-  XR == 0x00 ? SR |= 0x10 : SR &= ~0x10;
+  XR & 0x80 ? SR |= NEGATIVE : SR &= ~NEGATIVE ;
+  XR == 0x00 ? SR |= ZERO : SR &= ~ZERO;
 }
 
 void MOS6502Core::OPCode0xCC() {
@@ -648,8 +651,28 @@ void MOS6502Core::OPCode0xE8() {
 
 }
 
+/* SBC */
 void MOS6502Core::OPCode0xE9() {
+  uint8_t val = m_pMemory->Read(++PC);
+  ++PC;
+  uint8_t carry = AC & CARRY ? 1 : 0;
 
+  uint16_t result = AC - val - carry;
+  result & 0x80 ? SR &= ~NEGATIVE : SR |= NEGATIVE;
+  result == 0x00 ? SR |= ZERO : SR &= ~ZERO;
+
+  ((AC ^ result) & 0x80) && ((AC ^ result) & 0x80) ? SR |= OVERFLOW : SR &= ~OVERFLOW;
+
+  if (SR & DECIMAL) {
+    if (AC & 0x0F - carry < val & 0x0F)
+      result -= 0x06;
+
+    if (result > 0x99)
+      result -= 0x60;
+  }
+
+  result < 0x100 ? SR |= CARRY : SR &= ~CARRY;
+  AC = result & 0xFF;
 }
 
 void MOS6502Core::OPCode0xEA() {

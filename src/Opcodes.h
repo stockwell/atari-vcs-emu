@@ -1,6 +1,15 @@
 #ifndef ATARI_VCS_EMU_OPCODES_H
 #define ATARI_VCS_EMU_OPCODES_H
 
+#define NEGATIVE  0x80
+#define OVERFLOW  0x40
+#define CONSTANT  0x20
+#define BREAK     0x10
+#define DECIMAL   0x08
+#define INTERRUPT 0x04
+#define ZERO      0x02
+#define CARRY     0x01
+
 static const char* kOPCodeNames[0x100] = {
     /* 0x00 */
     "BRK impl",
@@ -291,7 +300,7 @@ static const char* kOPCodeNames[0x100] = {
     "unused opcode",
 };
 
-uint8_t cycletime[0x100] = {
+static const uint8_t cycletime[0x100] = {
     7, 6, 0, 0, 0, 3, 5, 0, 3, 2, 2, 0, 0, 4, 6, 0,  // 00
     2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0,  // 10
     6, 6, 0, 0, 3, 3, 5, 0, 4, 2, 2, 0, 4, 4, 6, 0,  // 20
@@ -310,7 +319,7 @@ uint8_t cycletime[0x100] = {
     2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0   // F0
 };
 
-uint8_t extracycles[0x100] = {
+static const uint8_t extracycles[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 00
     2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0,  // 10
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  // 20
