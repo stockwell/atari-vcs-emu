@@ -140,7 +140,7 @@ void MOS6502Core::OPCode0x1E() {
 
 /* JSR */
 void MOS6502Core::OPCode0x20() {
-  m_SP = m_pMemory->Read(m_PC + 3);
+  std::cout << "TODO: Push current PC to stack" << std::endl;
   m_PC = m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u;
 }
 
