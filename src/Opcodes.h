@@ -1,6 +1,7 @@
 #ifndef ATARI_VCS_EMU_OPCODES_H
 #define ATARI_VCS_EMU_OPCODES_H
 
+/* Bits in the status register */
 #define NEGATIVE  0x80u
 #define OVERFLOW  0x40u
 #define CONSTANT  0x20u
@@ -9,6 +10,9 @@
 #define INTERRUPT 0x04u
 #define ZERO      0x02u
 #define CARRY     0x01u
+
+/* Base memory address of the stack */
+#define STACK_BASE 0x100u
 
 static const char* kOPCodeNames[0x100] = {
     /* 0x00 */

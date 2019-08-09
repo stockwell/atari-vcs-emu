@@ -197,6 +197,12 @@ private:
   void OPCodeSBC(uint8_t val);
   void OPCodeADC(uint8_t val);
   void OPCodesASL(uint16_t address);
+
+  uint8_t StackPull8();
+  uint16_t StackPull16();
+  void StackPush(uint8_t pushval);
+  void StackPush(uint16_t pushval);
+
 };
 
 #endif //ATARI_VCS_EMU_MOS6502CORE_H

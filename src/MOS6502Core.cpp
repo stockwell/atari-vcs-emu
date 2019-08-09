@@ -36,7 +36,7 @@ void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
   uint16_t PC = m_PC;
   (this->*m_OPCodes[opcode])();
   printf("Opcode: %s(0x%02X), PC 0x%04X\n", kOPCodeNames[opcode], opcode, PC);
-  printf("SR: 0x%02X  |  AC: 0x%02X  |  XR: 0x%02X | YR: 0x%02X | SR: 0x%02X | SP: 0x%02X\n", m_SR, m_AC, m_XR, m_YR, m_SR, m_SP);
+  printf("SR: 0x%02X  |  AC: 0x%02X  |  XR: 0x%02X | YR: 0x%02X | SP: 0x%02X\n", m_SR, m_AC, m_XR, m_YR, m_SP);
 }
 
 uint8_t MOS6502Core::Tick() {

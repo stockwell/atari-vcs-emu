@@ -9,6 +9,9 @@
 #define RAM_START_ADDR  0x80
 #define RAM_END_ADDR    0xFF
 
+#define STACK_START_ADDR 0x100
+#define STACK_END_ADDR   0x1FF
+
 #define RIOT_START_ADDR 0x200
 #define RIOT_END_ADDR   0x2FF
 
@@ -54,9 +57,10 @@ uint8_t Memory::Read(uint16_t address) {
   /* MOS 6507 doesn't have address lines 13-15 connected. Only the first 13 bits of the address actually matter */
   uint16_t actualAddress = address & 0x1FFF;
 
-  if (actualAddress >= ROM_START_ADDR && actualAddress <= ROM_END_ADDR) {
-    uint8_t val = m_pMap[actualAddress];
-    return val;
+  if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
+    return m_pMap[actualAddress];
+  } else if (actualAddress >= ROM_START_ADDR && actualAddress <= ROM_END_ADDR) {
+    return m_pMap[actualAddress];
   }
 
   return 0xFF;
@@ -70,6 +74,8 @@ void Memory::Write(uint16_t address, uint8_t value) {
     m_pMap[actualAddress] = value;
     /* Dispatch to TIA core */
   } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_END_ADDR) {
+    m_pMap[actualAddress] = value;
+  } else if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
     m_pMap[actualAddress] = value;
   } else if (actualAddress >= RIOT_START_ADDR && actualAddress <= RIOT_END_ADDR) {
     m_pMap[actualAddress] = value;

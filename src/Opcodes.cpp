@@ -29,6 +29,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x49] = &MOS6502Core::OPCode0x49;
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
 
+  m_OPCodes[0x60] = &MOS6502Core::OPCode0x60;
+
   m_OPCodes[0x78] = &MOS6502Core::OPCode0x78;
 
   m_OPCodes[0x84] = &MOS6502Core::OPCode0x84;
@@ -142,7 +144,8 @@ void MOS6502Core::OPCode0x1E() {
 
 /* JSR */
 void MOS6502Core::OPCode0x20() {
-  std::cout << "TODO: Push current PC to stack" << std::endl;
+  uint16_t addr = m_PC + 3;
+  StackPush(addr);
   m_PC = m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u;
 }
 
@@ -303,8 +306,9 @@ void MOS6502Core::OPCode0x5E() {
 
 }
 
+/* RTS */
 void MOS6502Core::OPCode0x60() {
-
+  m_PC = StackPull16();
 }
 
 void MOS6502Core::OPCode0x61() {
@@ -401,7 +405,7 @@ void MOS6502Core::OPCode0x86() {
 void MOS6502Core::OPCode0x88() {
   --m_YR;
   ++m_PC;
-  
+
   m_YR & 0x80 ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
   m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
@@ -789,4 +793,24 @@ void MOS6502Core::OPCodeSBC(uint8_t val) {
 void MOS6502Core::OPCodesASL(uint16_t address) {
   uint8_t result = m_pMemory->Read(address) << 1;
 
+}
+
+void MOS6502Core::StackPush(uint16_t pushval) {
+  m_pMemory->Write(STACK_BASE + m_SP, (pushval >> 8) & 0xFF);
+  m_pMemory->Write(STACK_BASE + ((m_SP - 1) & 0xFF), pushval & 0xFF);
+  m_SP -= 2;
+}
+
+void MOS6502Core::StackPush(uint8_t pushval) {
+  m_pMemory->Write(STACK_BASE + m_SP--, pushval);
+}
+
+uint16_t MOS6502Core::StackPull16() {
+  uint16_t temp = m_pMemory->Read(STACK_BASE + ((m_SP + 1) & 0xFF)) | ((uint16_t)m_pMemory->Read(STACK_BASE + ((m_SP + 2) & 0xFF)) << 8);
+  m_SP += 2;
+  return(temp);
+}
+
+uint8_t MOS6502Core::StackPull8() {
+  return (m_pMemory->Read(STACK_BASE + ++m_SP));
 }
