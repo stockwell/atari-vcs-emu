@@ -27,6 +27,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x30] = &MOS6502Core::OPCode0x30;
   m_OPCodes[0x38] = &MOS6502Core::OPCode0x38;
 
+  m_OPCodes[0x40] = &MOS6502Core::OPCode0x40;
   m_OPCodes[0x49] = &MOS6502Core::OPCode0x49;
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
 
@@ -238,8 +239,10 @@ void MOS6502Core::OPCode0x3E() {
 
 }
 
+/* PHA */
 void MOS6502Core::OPCode0x40() {
-
+  StackPush(m_AC);
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x41() {
