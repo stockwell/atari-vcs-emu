@@ -1,9 +1,6 @@
 #ifndef ATARI_VCS_EMU_OPCODES_H
 #define ATARI_VCS_EMU_OPCODES_H
 
-/* Base memory address of the stack */
-#define STACK_BASE 0x100u
-
 static const char* kOPCodeNames[0x100] = {
     /* 0x00 */
     "BRK impl",

@@ -14,6 +14,9 @@
 #define ZERO      0x02u
 #define CARRY     0x01u
 
+/* Base memory address of the stack */
+#define STACK_BASE 0x100u
+
 class MOS6502Core {
 public:
   MOS6502Core();
