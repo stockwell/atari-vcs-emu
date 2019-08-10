@@ -75,8 +75,10 @@ void MOS6502Core::OPCode0x06() {
 
 }
 
+/* PHP */
 void MOS6502Core::OPCode0x08() {
-
+  StackPush(m_SR);
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x09() {

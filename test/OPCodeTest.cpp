@@ -66,7 +66,14 @@ TEST_F(MOS6502Test, OpcodeASL_ZPG) {
 
 /* 0x08 */
 TEST_F(MOS6502Test, OpcodePHP) {
+  m_pMemory->Load(0xF000, 0x08); /* PHA */
+  m_pProcessor->m_SR = 0xFF;
 
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xFC, m_pProcessor->m_SP);
+  ASSERT_EQ(0xFF, m_pMemory->Read(STACK_BASE + 0xFD));
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
 /* 0x09 */
