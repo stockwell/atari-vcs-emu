@@ -275,12 +275,9 @@ void MOS6502Core::OPCode0x48() {
   ++m_PC;
 }
 
-/* ADC */
+/* EOR */
 void MOS6502Core::OPCode0x49() {
-  uint8_t val = m_pMemory->Read(++m_PC);
-  ++m_PC;
 
-  OPCodeADC(val);
 }
 
 void MOS6502Core::OPCode0x4A() {
@@ -353,8 +350,10 @@ void MOS6502Core::OPCode0x68() {
 
 }
 
+/* ADC */
 void MOS6502Core::OPCode0x69() {
-
+  OPCodeADC(++m_PC);
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x6A() {
@@ -731,10 +730,9 @@ void MOS6502Core::OPCode0xE8() {
 
 /* SBC */
 void MOS6502Core::OPCode0xE9() {
-  uint8_t val = m_pMemory->Read(++m_PC);
   ++m_PC;
 
-  OPCodeSBC(val);
+  OPCodeSBC(++m_PC);
 }
 
 /* NOP */
@@ -784,7 +782,8 @@ void MOS6502Core::OPCode0xFE() {
 
 }
 
-void MOS6502Core::OPCodeADC(uint8_t val) {
+void MOS6502Core::OPCodeADC(uint16_t address) {
+  uint8_t val = m_pMemory->Read(address);
   uint8_t carry = m_AC & CARRY ? 1 : 0;
   uint16_t result = m_AC + val + carry;
 
@@ -810,7 +809,8 @@ void MOS6502Core::OPCodeADC(uint8_t val) {
   m_AC = result & 0xFF;
 }
 
-void MOS6502Core::OPCodeSBC(uint8_t val) {
+void MOS6502Core::OPCodeSBC(uint16_t address) {
+  uint8_t val = m_pMemory->Read(address);
   uint8_t carry = m_AC & CARRY ? 1 : 0;
 
   uint16_t result = m_AC - val - carry;

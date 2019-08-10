@@ -84,12 +84,12 @@ static const char* kOPCodeNames[0x100] = {
     "LSR zpg",
     "unused opcode",
     "PHA, impl",
-    "ADC #",
-    "ROR A",
+    "EOR #",
+    "LSR A",
     "unused opcode",
     "JMP abs",
-    "ADC abs",
-    "ROR abs",
+    "EOR abs",
+    "LSR abs",
     "unused opcode",
 
     /* 0x50 */

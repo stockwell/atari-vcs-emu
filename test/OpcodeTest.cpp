@@ -389,6 +389,11 @@ TEST_F(MOS6502Test, OPCodePHA) {
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
+/* 0x49 */
+TEST_F(MOS6502Test, OPCodeEOR) {
+
+}
+
 /* 0x78 */
 TEST_F(MOS6502Test, OpcodeSEI) {
   m_pMemory->Load(0xf000, 0x78); /* SEI */
