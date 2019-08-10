@@ -31,7 +31,7 @@ add_executable(${PROJECT_TEST_TARGET} AllTests.cpp ${test-source} ${vcs-emu-sour
 target_link_libraries(${PROJECT_TEST_TARGET} gtest_main)
 
 # C Test
-add_test(NAME cpputest-runner COMMAND ${PROJECT_TEST_TARGET})
+add_test(NAME gtest-runner COMMAND ${PROJECT_TEST_TARGET})
 
 # Coverage Report
 if (CMAKE_BUILD_TYPE STREQUAL "Coverage")
