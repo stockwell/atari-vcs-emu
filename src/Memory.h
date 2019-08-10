@@ -15,7 +15,7 @@ public:
   uint8_t Read(uint16_t address);
   void Write(uint16_t address, uint8_t value);
   void Load(uint16_t address, uint8_t value);
-  void LoadBuffer(uint16_t address, uint8_t *bytes, size_t numBytes);
+  void Load(uint16_t address, uint8_t *bytes, size_t numBytes);
   void LoadROM(uint8_t* pROM);
 
 private:

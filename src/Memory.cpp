@@ -46,11 +46,15 @@ void Memory::LoadROM(uint8_t *pROM) {
     m_pMap[i] = pROM[j];
   }
 }
-void Memory::LoadBuffer(uint16_t address, uint8_t *bytes, size_t numBytes) {
+void Memory::Load(uint16_t address, uint8_t *bytes, size_t numBytes) {
   /* YOLO */
   memcpy(&m_pMap[address], bytes, numBytes);
 }
 
+void Memory::Load(uint16_t address, uint8_t byte) {
+  /* YOLO */
+  m_pMap[address & 0x1FFF] = byte;
+}
 
 uint8_t Memory::Read(uint16_t address) {
 
