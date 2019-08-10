@@ -53,6 +53,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
 
   m_OPCodes[0xE9] = &MOS6502Core::OPCode0xE9;
+
+  m_OPCodes[0xF8] = &MOS6502Core::OPCode0xF8;
 }
 
 void MOS6502Core::OPCodeInvalid() {
@@ -731,8 +733,10 @@ void MOS6502Core::OPCode0xF6() {
 
 }
 
+/* SED */
 void MOS6502Core::OPCode0xF8() {
-
+  m_SR |= DECIMAL;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0xF9() {

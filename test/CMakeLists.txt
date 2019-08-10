@@ -22,7 +22,7 @@ set(vcs-emu-source
         ${PROJECT_ROOT}/src/Cart.cpp)
 
 set(test-source
-        OPCodeTest.cpp)
+        OpcodeTest.cpp)
 
 include_directories(${PROJECT_ROOT}/src)
 

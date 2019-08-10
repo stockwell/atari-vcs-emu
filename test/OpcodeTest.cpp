@@ -305,3 +305,14 @@ TEST_F(MOS6502Test, DEY) {
 
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
+
+/* 0xF8 */
+TEST_F(MOS6502Test, OpcodeSED) {
+  m_pMemory->Load(0xf000, 0xF8); /* SED */
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(DECIMAL, m_pProcessor->m_SR & DECIMAL);
+
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
