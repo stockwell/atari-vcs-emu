@@ -205,7 +205,7 @@ TEST_F(MOS6502Test, OPcodeASL_ZPG_X) {
 
 /* 0x18 */
 TEST_F(MOS6502Test, OPcodeCLC) {
-  m_pMemory->Load(0xf000, 0x18);
+  m_pMemory->Load(0xf000, 0x18); /* CLC */
 
   m_pProcessor->m_SR |= CARRY;
   m_pProcessor->Tick();
@@ -227,6 +227,23 @@ TEST_F(MOS6502Test, OPcodeORA_ABS_X) {
 /* 0x1E */
 TEST_F(MOS6502Test, OPcodeASL_ABS_X) {
 
+}
+
+/* 0x20 */
+TEST_F(MOS6502Test, OPcodeJSR) {
+
+}
+
+/* 0x40 */
+TEST_F(MOS6502Test, OPCodePHA) {
+  m_pMemory->Load(0xF000, 0x40); /* PHA */
+  m_pProcessor->m_AC = 0x80;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xFC, m_pProcessor->m_SP);
+  ASSERT_EQ(0x80, m_pMemory->Read(STACK_BASE + 0xFD));
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
 /* 0x78 */
