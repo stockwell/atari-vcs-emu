@@ -81,19 +81,14 @@ void MOS6502Core::OPCode0x09() {
 
 }
 
-/* AL A */
+/* ASL A */
 void MOS6502Core::OPCode0x0A() {
+  m_AC & 0x80 ? m_SR |= CARRY : m_SR &= ~CARRY;
   m_AC <<= 1;
-
-  if (m_AC & 0x80) {
-    m_SR |= CARRY | OVERFLOW;
-  } else {
-    m_SR &= ~CARRY | ~OVERFLOW;
-  }
-
-  m_AC ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
-
   ++m_PC;
+
+  m_AC & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCode0x0D() {
