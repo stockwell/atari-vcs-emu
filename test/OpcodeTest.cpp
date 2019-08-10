@@ -306,6 +306,37 @@ TEST_F(MOS6502Test, DEY) {
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
+/* 0xAA */
+TEST_F(MOS6502Test, OpcodeTAX) {
+  uint8_t instr[] = {0xAA,   /* TAX */
+                     0xAA,   /* TAX */
+                     0xAA};  /* TAX */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->m_AC = 0x55;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->m_AC = 0x00;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->m_AC = 0x80;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_XR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
+}
+
 /* 0xF8 */
 TEST_F(MOS6502Test, OpcodeSED) {
   m_pMemory->Load(0xf000, 0xF8); /* SED */

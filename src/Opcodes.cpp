@@ -44,6 +44,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xA0] = &MOS6502Core::OPCode0xA0;
   m_OPCodes[0xA2] = &MOS6502Core::OPCode0xA2;
   m_OPCodes[0xA9] = &MOS6502Core::OPCode0xA9;
+  m_OPCodes[0xAA] = &MOS6502Core::OPCode0xAA;
 
   m_OPCodes[0xB0] = &MOS6502Core::OPCode0xB0;
 
@@ -519,8 +520,13 @@ void MOS6502Core::OPCode0xA9() {
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
+/* TAX */
 void MOS6502Core::OPCode0xAA() {
-
+  m_XR = m_AC;
+  ++m_PC;
+  
+  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_XR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCode0xAC() {
