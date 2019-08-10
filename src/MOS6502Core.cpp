@@ -24,8 +24,8 @@ void MOS6502Core::Reset() {
   m_AC = 0x00;
   m_XR = 0x00;
   m_YR = 0x00;
-  m_SR = 0x20;
-  m_SP = 0xFF;
+  m_SR = CONSTANT;
+  m_SP = 0xFD;
 }
 
 uint8_t MOS6502Core::FetchOPCode() {
