@@ -4,6 +4,16 @@
 #include "Common.h"
 #include "Memory.h"
 
+/* Bits in the status register */
+#define NEGATIVE  0x80u
+#define OVERFLOW  0x40u
+#define CONSTANT  0x20u
+#define BREAK     0x10u
+#define DECIMAL   0x08u
+#define INTERRUPT 0x04u
+#define ZERO      0x02u
+#define CARRY     0x01u
+
 class MOS6502Core {
 public:
   MOS6502Core();
