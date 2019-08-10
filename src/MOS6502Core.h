@@ -13,7 +13,7 @@ public:
   void InitOpcodeTable();
   uint8_t Tick();
 
-private:
+public:
   uint16_t m_PC;
   uint8_t m_AC;
   uint8_t m_XR;
@@ -21,6 +21,8 @@ private:
   uint8_t m_SR;
   uint8_t m_SP;
   Memory* m_pMemory;
+
+private:
   void(MOS6502Core::*m_OPCodes[0x100])();
 
 private:
