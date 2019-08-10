@@ -306,6 +306,34 @@ TEST_F(MOS6502Test, DEY) {
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
+/* 0xA9 */
+TEST_F(MOS6502Test, OpcodeLDA) {
+  uint8_t instr[] = {0xA9, 0x02,  /* LDA #02 */
+                     0xA9, 0x00,  /* LDA #00 */
+                     0xA9, 0x85}; /* LDA #80 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x02, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x85, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF006, m_pProcessor->m_PC);
+}
+
 /* 0xAA */
 TEST_F(MOS6502Test, OpcodeTAX) {
   uint8_t instr[] = {0xAA,   /* TAX */
