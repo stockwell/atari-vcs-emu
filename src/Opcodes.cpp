@@ -59,6 +59,7 @@ void MOS6502Core::InitOpcodeTable() {
 
   m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
 
+  m_OPCodes[0xE8] = &MOS6502Core::OPCode0xE8;
   m_OPCodes[0xE9] = &MOS6502Core::OPCode0xE9;
   m_OPCodes[0xEA] = &MOS6502Core::OPCode0xEA;
 
@@ -724,8 +725,13 @@ void MOS6502Core::OPCode0xE6() {
 
 }
 
+/* INX */
 void MOS6502Core::OPCode0xE8() {
+  ++m_XR;
+  ++m_PC;
 
+  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE ;
+  m_XR == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
 /* SBC */
@@ -838,6 +844,27 @@ void MOS6502Core::OPCodesASL(uint16_t address) {
   val <<= 1;
   m_pMemory->Write(address, val);
 
+  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
+}
+
+void MOS6502Core::OPCodesCMP(uint16_t address) {
+  uint16_t val = m_AC - m_pMemory->Read(address);
+  val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
+  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
+}
+
+void MOS6502Core::OPCodesCPX(uint16_t address) {
+  uint16_t val = m_XR - m_pMemory->Read(address);
+  val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
+  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
+}
+
+void MOS6502Core::OPCodesCPY(uint16_t address) {
+  uint16_t val = m_YR - m_pMemory->Read(address);
+  val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
   val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
