@@ -21,6 +21,7 @@ void MOS6502Core::InitOpcodeTable() {
 
   m_OPCodes[0x10] = &MOS6502Core::OPCode0x10;
   m_OPCodes[0x18] = &MOS6502Core::OPCode0x18;
+  m_OPCodes[0x1E] = &MOS6502Core::OPCode0x1E;
 
   m_OPCodes[0x20] = &MOS6502Core::OPCode0x20;
 
@@ -78,16 +79,8 @@ void MOS6502Core::OPCode0x05() {
 
 /* ASL, ZPG */
 void MOS6502Core::OPCode0x06() {
-  uint16_t address = m_pMemory->Read(++m_PC);
-  uint8_t val = m_pMemory->Read(address);
+  OPCodesASL(m_pMemory->Read(++m_PC));
   ++m_PC;
-
-  val & 0x80 ? m_SR |= CARRY : m_SR &= ~CARRY;
-  val <<= 1;
-  m_pMemory->Write(address, val);
-
-  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
-  val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 /* PHP */
@@ -153,12 +146,16 @@ void MOS6502Core::OPCode0x19() {
 
 }
 
+
 void MOS6502Core::OPCode0x1D() {
 
 }
 
+/* ASL ABS + X */
 void MOS6502Core::OPCode0x1E() {
-
+  uint16_t address = m_pMemory->Read(m_PC + 1) | (m_pMemory->Read(m_PC + 2)) << 8u;
+  OPCodesASL(address + m_XR);
+  m_PC += 3;
 }
 
 /* JSR */
