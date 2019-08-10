@@ -524,7 +524,7 @@ void MOS6502Core::OPCode0xA9() {
 void MOS6502Core::OPCode0xAA() {
   m_XR = m_AC;
   ++m_PC;
-  
+
   m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_XR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }

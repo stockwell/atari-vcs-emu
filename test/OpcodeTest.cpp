@@ -337,6 +337,34 @@ TEST_F(MOS6502Test, OpcodeTAX) {
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
+/* 0xB0 */
+TEST_F(MOS6502Test, OpcodeBCS) {
+  uint8_t instr[] = {0xB0, 0xFB,  /* BCS -5*/
+                     0xB0, 0xFB,  /* BCS -5 */
+                     0xB0, 0x05,  /* BCS 5 */
+                     0xB0, 0x05}; /* BCS 5 */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->m_SR &= ~CARRY;
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF002, m_pProcessor->m_PC);
+
+  m_pProcessor->m_SR |= CARRY;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xEFFF, m_pProcessor->m_PC);
+
+  m_pProcessor->m_PC = 0xF004;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF00B, m_pProcessor->m_PC);
+
+  m_pProcessor->m_SR &= ~CARRY;
+  m_pProcessor->m_PC = 0xF006;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF008, m_pProcessor->m_PC);
+}
+
 /* 0xF8 */
 TEST_F(MOS6502Test, OpcodeSED) {
   m_pMemory->Load(0xf000, 0xF8); /* SED */
