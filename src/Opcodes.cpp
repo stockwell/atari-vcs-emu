@@ -52,6 +52,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xAA] = &MOS6502Core::OPCode0xAA;
 
   m_OPCodes[0xB0] = &MOS6502Core::OPCode0xB0;
+  m_OPCodes[0xB8] = &MOS6502Core::OPCode0xB8;
 
   m_OPCodes[0xCA] = &MOS6502Core::OPCode0xCA;
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
@@ -590,8 +591,10 @@ void MOS6502Core::OPCode0xB6() {
 
 }
 
+/* CLV */
 void MOS6502Core::OPCode0xB8() {
-
+  m_SR &= ~OVERFLOW;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0xB9() {

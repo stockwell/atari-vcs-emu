@@ -614,6 +614,17 @@ TEST_F(MOS6502Test, OpcodeBCS) {
   ASSERT_EQ(0xF008, m_pProcessor->m_PC);
 }
 
+/* 0xB8 */
+TEST_F(MOS6502Test, OpcodeCLV) {
+  m_pMemory->Load(0xf000, 0xB8); /* CLV */
+
+  m_pProcessor->m_SR |= OVERFLOW;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & OVERFLOW);
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
 /* 0xEA */
 TEST_F(MOS6502Test, OpcodeNOP) {
   m_pMemory->Load(0xf000, 0xEA); /* NOP */
