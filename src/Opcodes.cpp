@@ -24,6 +24,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x1E] = &MOS6502Core::OPCode0x1E;
 
   m_OPCodes[0x20] = &MOS6502Core::OPCode0x20;
+  m_OPCodes[0x28] = &MOS6502Core::OPCode0x28;
 
   m_OPCodes[0x30] = &MOS6502Core::OPCode0x30;
   m_OPCodes[0x38] = &MOS6502Core::OPCode0x38;
@@ -181,8 +182,11 @@ void MOS6502Core::OPCode0x26() {
 
 }
 
+/* PLP */
 void MOS6502Core::OPCode0x28() {
-
+  m_SR = StackPull8();
+  m_SR |= CONSTANT;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x29() {

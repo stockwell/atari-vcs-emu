@@ -313,6 +313,42 @@ TEST_F(MOS6502Test, OPcodeJSR) {
 
 }
 
+/* 0x21 */
+TEST_F(MOS6502Test, OPcodeAND_X_IND) {
+
+}
+
+/* 0x24 */
+TEST_F(MOS6502Test, OPcodeBIT_ZPG) {
+
+}
+
+/* 0x25 */
+TEST_F(MOS6502Test, OPcodeAND_ZPG) {
+
+}
+
+/* 0x26 */
+TEST_F(MOS6502Test, OPcodeROL_ZPG) {
+
+}
+
+/* 0x28 */
+TEST_F(MOS6502Test, OPcodePLP) {
+  uint8_t instr[] = {0x40,  /* PHA */
+                     0x28}; /* PLP */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_AC = 0x55;
+  m_pProcessor->m_SR = 0x00;
+
+  m_pProcessor->Tick();
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55 | CONSTANT, m_pProcessor->m_SR);
+  ASSERT_EQ(0xF002, m_pProcessor->m_PC);
+}
+
 /* 0x30 */
 TEST_F(MOS6502Test, OPcodeBMI) {
   uint8_t instr[] = {0x30, 0xFB,  /* BMI -5*/
