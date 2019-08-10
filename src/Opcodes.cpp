@@ -75,8 +75,18 @@ void MOS6502Core::OPCode0x05() {
 
 }
 
+/* ASL, ZPG */
 void MOS6502Core::OPCode0x06() {
+  uint16_t address = m_pMemory->Read(++m_PC);
+  uint8_t val = m_pMemory->Read(address);
+  ++m_PC;
 
+  val & 0x80 ? m_SR |= CARRY : m_SR &= ~CARRY;
+  val <<= 1;
+  m_pMemory->Write(address, val);
+
+  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 /* PHP */

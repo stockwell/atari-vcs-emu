@@ -61,7 +61,42 @@ TEST_F(MOS6502Test, OpcodeORA_ZPG) {
 
 /* 0x06 */
 TEST_F(MOS6502Test, OpcodeASL_ZPG) {
+  uint8_t instr[] = {0x06, 0x80,  /* ASL $80 */
+                     0x06, 0x80,  /* ASL $80 */
+                     0x06, 0x80,  /* ASL $80 */
+                     0x06, 0x80}; /* ASL $80 */
 
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Write(0x80, 0x20);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x40, m_pMemory->Read(0x80));
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pMemory->Read(0x80));
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pMemory->Read(0x80));
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pMemory->Read(0x80));
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF008, m_pProcessor->m_PC);
 }
 
 /* 0x08 */
