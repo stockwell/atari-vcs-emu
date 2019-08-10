@@ -31,6 +31,12 @@ protected:
 
 };
 
-TEST_F(MOS6502Test, DummyTest) {
+TEST_F(MOS6502Test, ResetTest) {
+  m_pProcessor->m_pMemory->Load(0xfffd, 0xAA);
+  m_pProcessor->m_pMemory->Load(0xfffc, 0x55);
 
+  m_pProcessor->Reset();
+
+  ASSERT_EQ(m_pProcessor->m_SP, 0xFD);
+  ASSERT_EQ(m_pProcessor->m_PC, 0xAA55);
 }
