@@ -30,6 +30,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x38] = &MOS6502Core::OPCode0x38;
 
   m_OPCodes[0x40] = &MOS6502Core::OPCode0x40;
+  m_OPCodes[0x48] = &MOS6502Core::OPCode0x48;
   m_OPCodes[0x49] = &MOS6502Core::OPCode0x49;
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
 
@@ -58,6 +59,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
 
   m_OPCodes[0xE9] = &MOS6502Core::OPCode0xE9;
+  m_OPCodes[0xEA] = &MOS6502Core::OPCode0xEA;
 
   m_OPCodes[0xF8] = &MOS6502Core::OPCode0xF8;
 }
@@ -184,8 +186,7 @@ void MOS6502Core::OPCode0x26() {
 
 /* PLP */
 void MOS6502Core::OPCode0x28() {
-  m_SR = StackPull8();
-  m_SR |= CONSTANT;
+  m_SR = StackPull8() | CONSTANT;
   ++m_PC;
 }
 
@@ -249,10 +250,10 @@ void MOS6502Core::OPCode0x3E() {
 
 }
 
-/* PHA */
+/* RTI */
 void MOS6502Core::OPCode0x40() {
-  StackPush(m_AC);
-  ++m_PC;
+  m_SR = StackPull8() | CONSTANT;
+  m_PC = StackPull16();
 }
 
 void MOS6502Core::OPCode0x41() {
@@ -267,8 +268,10 @@ void MOS6502Core::OPCode0x46() {
 
 }
 
+/* PHA */
 void MOS6502Core::OPCode0x48() {
-
+  StackPush(m_AC);
+  ++m_PC;
 }
 
 /* ADC */
@@ -731,8 +734,9 @@ void MOS6502Core::OPCode0xE9() {
   OPCodeSBC(val);
 }
 
+/* NOP */
 void MOS6502Core::OPCode0xEA() {
-
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0xEC() {
