@@ -61,9 +61,11 @@ uint8_t Memory::Read(uint16_t address) {
   /* MOS 6507 doesn't have address lines 13-15 connected. Only the first 13 bits of the address actually matter */
   uint16_t actualAddress = address & 0x1FFF;
 
-  if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
+  if (actualAddress >= TIA_START_ADDR && actualAddress <= TIA_END_ADDR) {
     return m_pMap[actualAddress];
-  } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_START_ADDR) {
+  } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_END_ADDR) {
+    return m_pMap[actualAddress];
+  } else if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
     return m_pMap[actualAddress];
   } else if (actualAddress >= ROM_START_ADDR && actualAddress <= ROM_END_ADDR) {
     return m_pMap[actualAddress];
