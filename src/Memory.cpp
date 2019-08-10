@@ -48,7 +48,7 @@ void Memory::LoadROM(uint8_t *pROM) {
 }
 void Memory::Load(uint16_t address, uint8_t *bytes, size_t numBytes) {
   /* YOLO */
-  memcpy(&m_pMap[address], bytes, numBytes);
+  memcpy(m_pMap + (address & 0x1FFF), bytes, numBytes);
 }
 
 void Memory::Load(uint16_t address, uint8_t byte) {
@@ -62,6 +62,8 @@ uint8_t Memory::Read(uint16_t address) {
   uint16_t actualAddress = address & 0x1FFF;
 
   if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
+    return m_pMap[actualAddress];
+  } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_START_ADDR) {
     return m_pMap[actualAddress];
   } else if (actualAddress >= ROM_START_ADDR && actualAddress <= ROM_END_ADDR) {
     return m_pMap[actualAddress];
