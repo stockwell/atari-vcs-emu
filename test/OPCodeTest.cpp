@@ -256,3 +256,16 @@ TEST_F(MOS6502Test, OpcodeSEI) {
 
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
+
+/* 0x84 */
+TEST_F(MOS6502Test, OpcodeSTY_ZPG) {
+  uint8_t instr[] = {0x84, 0x80};  /* STY $80*/
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_YR = 0x80;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pMemory->Read(0x80));
+
+  ASSERT_EQ(0xF002, m_pProcessor->m_PC);
+}

@@ -391,10 +391,8 @@ void MOS6502Core::OPCode0x81() {
 
 /* STY zpg */
 void MOS6502Core::OPCode0x84() {
-  m_YR = m_pMemory->Read(++m_PC);
+  m_pMemory->Write(m_pMemory->Read(++m_PC), m_YR);
   ++m_PC;
-
-  m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCode0x85() {
