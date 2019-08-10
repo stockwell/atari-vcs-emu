@@ -377,6 +377,17 @@ TEST_F(MOS6502Test, OPcodeBMI) {
   ASSERT_EQ(0xF008, m_pProcessor->m_PC);
 }
 
+/* 0x38 */
+TEST_F(MOS6502Test, OpcodeSEC) {
+  m_pMemory->Load(0xf000, 0x38); /* SEC */
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
+
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
 /* 0x48 */
 TEST_F(MOS6502Test, OPCodePHA) {
   m_pMemory->Load(0xF000, 0x48); /* PHA */
@@ -400,7 +411,7 @@ TEST_F(MOS6502Test, OpcodeSEI) {
 
   m_pProcessor->Tick();
 
-  ASSERT_EQ(m_pProcessor->m_SR & INTERRUPT, INTERRUPT);
+  ASSERT_EQ(INTERRUPT, m_pProcessor->m_SR & INTERRUPT);
 
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
@@ -628,6 +639,33 @@ TEST_F(MOS6502Test, OpcodeCLV) {
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & OVERFLOW);
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
+/* 0xE8 */
+TEST_F(MOS6502Test, OpcodeINX) {
+  uint8_t instr[] = {0xE8,  /* INX */
+                     0xE8,  /* INX */
+                     0xE8}; /* INX */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_XR = 0xFE;
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xFF, m_pProcessor->m_XR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0x00, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0x01, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
 /* 0xEA */
