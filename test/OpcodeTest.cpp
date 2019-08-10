@@ -641,6 +641,72 @@ TEST_F(MOS6502Test, OpcodeCLV) {
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
+/* 0xD9 */
+TEST_F(MOS6502Test, OpcodeCMP_ABS_Y) {
+  uint8_t instr[] = {0xD9, 0x80, 0x00,   /* CMP $80, Y */
+                     0xD9, 0x80, 0x00,   /* CMP $80, Y */
+                     0xD9, 0x80, 0x00};  /* CMP $80, Y */
+
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x81, 0x01);
+  m_pProcessor->m_AC = 0x02;
+  m_pProcessor->m_YR = 0x01;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->m_AC = 0x01;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->m_AC = 0x00;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+}
+
+/* 0xDD */
+TEST_F(MOS6502Test, OpcodeCMP_ABS_X) {
+  uint8_t instr[] = {0xDD, 0x80, 0x00,   /* CMP $80, X */
+                     0xDD, 0x80, 0x00,   /* CMP $80, X */
+                     0xDD, 0x80, 0x00};  /* CMP $80, X */
+
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x81, 0x01);
+  m_pProcessor->m_AC = 0x02;
+  m_pProcessor->m_XR = 0x01;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->m_AC = 0x01;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->m_AC = 0x00;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+}
+
 /* 0xE8 */
 TEST_F(MOS6502Test, OpcodeINX) {
   uint8_t instr[] = {0xE8,  /* INX */

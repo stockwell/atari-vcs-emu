@@ -58,6 +58,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
 
   m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
+  m_OPCodes[0xD9] = &MOS6502Core::OPCode0xD9;
+  m_OPCodes[0xDD] = &MOS6502Core::OPCode0xDD;
 
   m_OPCodes[0xE8] = &MOS6502Core::OPCode0xE8;
   m_OPCodes[0xE9] = &MOS6502Core::OPCode0xE9;
@@ -629,8 +631,10 @@ void MOS6502Core::OPCode0xC4() {
 
 }
 
+/* CMP zpg */
 void MOS6502Core::OPCode0xC5() {
-
+  OPCodesCMP(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0xC6() {
@@ -642,12 +646,14 @@ void MOS6502Core::OPCode0xC8() {
   ++m_YR;
   ++m_PC;
 
-  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE ;
+  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
+/* CMP # */
 void MOS6502Core::OPCode0xC9() {
-
+  OPCodesCMP(++m_PC);
+  ++m_PC;
 }
 
 /* DEX impl */
@@ -655,7 +661,7 @@ void MOS6502Core::OPCode0xCA() {
   --m_XR;
   ++m_PC;
 
-  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE ;
+  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_XR == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
@@ -663,8 +669,10 @@ void MOS6502Core::OPCode0xCC() {
 
 }
 
+/* CMP ABS */
 void MOS6502Core::OPCode0xCD() {
-
+  OPCodesCMP(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8);
+  m_PC += 3;
 }
 
 void MOS6502Core::OPCode0xCE() {
@@ -679,8 +687,10 @@ void MOS6502Core::OPCode0xD1() {
 
 }
 
+/* CMP zpg, X */
 void MOS6502Core::OPCode0xD5() {
-
+  OPCodesCMP(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0xD6() {
@@ -693,12 +703,16 @@ void MOS6502Core::OPCode0xD8() {
   ++m_PC;
 }
 
+/* CMP ABS, Y */
 void MOS6502Core::OPCode0xD9() {
-
+  OPCodesCMP((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8) + m_YR);
+  m_PC += 3;
 }
 
+/* CMP ABS, X */
 void MOS6502Core::OPCode0xDD() {
-
+  OPCodesCMP((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8) + m_XR);
+  m_PC += 3;
 }
 
 void MOS6502Core::OPCode0xDE() {
@@ -736,9 +750,8 @@ void MOS6502Core::OPCode0xE8() {
 
 /* SBC */
 void MOS6502Core::OPCode0xE9() {
-  ++m_PC;
-
   OPCodeSBC(++m_PC);
+  ++m_PC;
 }
 
 /* NOP */
