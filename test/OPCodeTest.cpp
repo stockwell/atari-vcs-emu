@@ -205,7 +205,13 @@ TEST_F(MOS6502Test, OPcodeASL_ZPG_X) {
 
 /* 0x18 */
 TEST_F(MOS6502Test, OPcodeCLC) {
+  m_pMemory->Load(0xf000, 0x18);
 
+  m_pProcessor->m_SR |= CARRY;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
 /* 0x19 */

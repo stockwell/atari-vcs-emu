@@ -20,6 +20,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x0E] = &MOS6502Core::OPCode0x0E;
 
   m_OPCodes[0x10] = &MOS6502Core::OPCode0x10;
+  m_OPCodes[0x18] = &MOS6502Core::OPCode0x18;
 
   m_OPCodes[0x20] = &MOS6502Core::OPCode0x20;
 
@@ -132,8 +133,10 @@ void MOS6502Core::OPCode0x16() {
 
 }
 
+/* CLC */
 void MOS6502Core::OPCode0x18() {
-
+  m_SR &= ~CARRY;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x19() {
