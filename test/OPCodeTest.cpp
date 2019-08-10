@@ -39,4 +39,17 @@ TEST_F(MOS6502Test, ResetTest) {
 
   ASSERT_EQ(m_pProcessor->m_SP, 0xFD);
   ASSERT_EQ(m_pProcessor->m_PC, 0xAA55);
+
+}
+
+TEST_F(MOS6502Test, OpcodeSEI) {
+  m_pProcessor->m_pMemory->Load(0xfffd, 0xF0);
+  m_pProcessor->m_pMemory->Load(0xfffc, 0x00);
+  m_pProcessor->m_pMemory->Load(0xf000, 0x78);
+
+  m_pProcessor->Reset();
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(m_pProcessor->m_SR & INTERRUPT, INTERRUPT);
 }
