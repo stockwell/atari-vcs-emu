@@ -91,12 +91,23 @@ void MOS6502Core::OPCode0x0A() {
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
+
 void MOS6502Core::OPCode0x0D() {
 
 }
 
+/* ASL ABS */
 void MOS6502Core::OPCode0x0E() {
+  uint16_t address = m_pMemory->Read(m_PC + 1) | (m_pMemory->Read(m_PC + 2)) << 8u;
+  uint8_t val = m_pMemory->Read(address);
+  val & 0x80 ? m_SR |= CARRY : m_SR &= ~CARRY;
 
+  val <<= 1;
+  m_pMemory->Write(address, val);
+  m_PC += 3;
+
+  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 /* BPL relative */
