@@ -408,7 +408,7 @@ void MOS6502Core::OPCode0x88() {
   --m_YR;
   ++m_PC;
 
-  m_YR & 0x80 ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
+  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
@@ -473,7 +473,7 @@ void MOS6502Core::OPCode0xA0() {
   m_YR = m_pMemory->Read(++m_PC);
   ++m_PC;
 
-  m_YR & 0x80 ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
+  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
