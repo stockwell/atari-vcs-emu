@@ -269,3 +269,32 @@ TEST_F(MOS6502Test, OpcodeSTY_ZPG) {
 
   ASSERT_EQ(0xF002, m_pProcessor->m_PC);
 }
+
+/* 0x88 */
+TEST_F(MOS6502Test, DEY) {
+  uint8_t instr[] = {0x88,   /* DEY */
+                     0x88,   /* DEY */
+                     0x88};  /* DEY */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_YR = 0x02;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x01, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xFF, m_pProcessor->m_YR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
+}
