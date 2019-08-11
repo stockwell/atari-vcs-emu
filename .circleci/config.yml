@@ -2,9 +2,9 @@ version: 2
 jobs:
   build:
     docker:
-      - image: debian:stretch
+      - image: stockwell/atari-vcs-emu:0.0.1
 
     steps:
       - checkout
 
-      - run: echo Hello, world.
+      - run: ./build.sh
