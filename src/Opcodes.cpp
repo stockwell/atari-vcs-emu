@@ -103,7 +103,8 @@ void MOS6502Core::OPCode0x01() {
 
 /* ORA, zpg */
 void MOS6502Core::OPCode0x05() {
-
+  OPCodesORA(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* ASL, ZPG */
@@ -118,6 +119,7 @@ void MOS6502Core::OPCode0x08() {
   ++m_PC;
 }
 
+/* ORA # */
 void MOS6502Core::OPCode0x09() {
 
 }
