@@ -51,7 +51,7 @@ TEST_F(MOS6502Test, OpcodeBRK) {
 
 /* 0x01 */
 TEST_F(MOS6502Test, OpcodeORA_IND_X) {
-  uint8_t instr[] = {0x01, 0x80};  /* ORA $80, X */
+  uint8_t instr[] = {0x01, 0x7F};  /* ORA $80, X */
 
   m_pMemory->Load(0xf000, instr, sizeof instr);
 
@@ -60,6 +60,7 @@ TEST_F(MOS6502Test, OpcodeORA_IND_X) {
   m_pMemory->Write(0x81, 0x00);
   m_pMemory->Write(0x20, 0x40);
 
+  m_pProcessor->m_XR = 0x01;
   m_pProcessor->m_AC = 0x20;
 
   m_pProcessor->Tick();
@@ -272,7 +273,24 @@ TEST_F(MOS6502Test, OpcodeBPL) {
 
 /* 0x11 */
 TEST_F(MOS6502Test, OPcodeORA_IND_Y) {
+  uint8_t instr[] = {0x11, 0x7F};  /* ORA $80, X */
 
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  /* Effective address is in addresses 0x80 & 0x81 -> 0x20 */
+  m_pMemory->Write(0x80, 0x20);
+  m_pMemory->Write(0x81, 0x00);
+  m_pMemory->Write(0x20, 0x40);
+
+  m_pProcessor->m_YR = 0x01;
+  m_pProcessor->m_AC = 0x20;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x60, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+  ASSERT_EQ(0xf002, m_pProcessor->m_PC);
 }
 
 /* 0x15 */
