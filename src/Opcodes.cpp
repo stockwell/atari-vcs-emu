@@ -121,7 +121,8 @@ void MOS6502Core::OPCode0x08() {
 
 /* ORA # */
 void MOS6502Core::OPCode0x09() {
-
+  OPCodesORA(++m_PC);
+  ++m_PC;
 }
 
 /* ASL A */

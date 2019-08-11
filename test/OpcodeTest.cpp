@@ -72,7 +72,7 @@ TEST_F(MOS6502Test, OpcodeORA_IND_X) {
 
 /* 0x05 */
 TEST_F(MOS6502Test, OpcodeORA_ZPG) {
-  uint8_t instr[] = {0x05, 0x80};  /* ORA $80, X */
+  uint8_t instr[] = {0x05, 0x80};  /* ORA $80 */
 
   m_pMemory->Load(0xf000, instr, sizeof instr);
 
@@ -142,7 +142,18 @@ TEST_F(MOS6502Test, OpcodePHP) {
 
 /* 0x09 */
 TEST_F(MOS6502Test, OpcodeORA_IM) {
+  uint8_t instr[] = {0x09, 0x40};  /* ORA #$40 */
 
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->m_AC = 0x20;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x60, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+  ASSERT_EQ(0xf002, m_pProcessor->m_PC);
 }
 
 /* 0x0A */
