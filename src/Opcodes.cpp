@@ -22,6 +22,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x10] = &MOS6502Core::OPCode0x10;
   m_OPCodes[0x11] = &MOS6502Core::OPCode0x11;
   m_OPCodes[0x15] = &MOS6502Core::OPCode0x15;
+  m_OPCodes[0x16] = &MOS6502Core::OPCode0x16;
   m_OPCodes[0x18] = &MOS6502Core::OPCode0x18;
   m_OPCodes[0x1E] = &MOS6502Core::OPCode0x1E;
 
@@ -170,8 +171,10 @@ void MOS6502Core::OPCode0x15() {
   ++m_PC;
 }
 
+/* ASL ZPG, X */
 void MOS6502Core::OPCode0x16() {
-
+  OPCodesASL(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* CLC */
