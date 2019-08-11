@@ -45,6 +45,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x85] = &MOS6502Core::OPCode0x85;
   m_OPCodes[0x88] = &MOS6502Core::OPCode0x88;
 
+  m_OPCodes[0x90] = &MOS6502Core::OPCode0x90;
   m_OPCodes[0x95] = &MOS6502Core::OPCode0x95;
   m_OPCodes[0x9A] = &MOS6502Core::OPCode0x9A;
 
@@ -128,12 +129,8 @@ void MOS6502Core::OPCode0x0E() {
 
 /* BPL relative */
 void MOS6502Core::OPCode0x10() {
-  if ((m_SR & NEGATIVE) == 0) {
-    m_PC += (int8_t)m_pMemory->Read(++m_PC);
-    ++m_PC;
-  } else {
-    m_PC += 2;
-  }
+  (m_SR & NEGATIVE) == 0x00 ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x11() {
@@ -221,12 +218,8 @@ void MOS6502Core::OPCode0x2E() {
 
 /* BMI relative */
 void MOS6502Core::OPCode0x30() {
-  if (m_SR & NEGATIVE) {
-    m_PC += (int8_t)m_pMemory->Read(++m_PC);
-    ++m_PC;
-  } else {
-    m_PC += 2;
-  }
+  m_SR & NEGATIVE ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x31() {
@@ -307,12 +300,8 @@ void MOS6502Core::OPCode0x4E() {
 
 /* BVC */
 void MOS6502Core::OPCode0x50() {
-  if ((m_SR & OVERFLOW) == 0x00) {
-    m_PC += (int8_t)m_pMemory->Read(++m_PC);
-    ++m_PC;
-  } else {
-    m_PC += 2;
-  }
+  (m_SR & OVERFLOW) == 0x00 ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x51() {
@@ -388,12 +377,8 @@ void MOS6502Core::OPCode0x6E() {
 
 /* BVS */
 void MOS6502Core::OPCode0x70() {
-  if ((m_SR & OVERFLOW)) {
-    m_PC += (int8_t)m_pMemory->Read(++m_PC);
-    ++m_PC;
-  } else {
-    m_PC += 2;
-  }
+  m_SR & OVERFLOW ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x71() {
@@ -471,8 +456,10 @@ void MOS6502Core::OPCode0x8E() {
 
 }
 
+/* BCC */
 void MOS6502Core::OPCode0x90() {
-
+  (m_SR & CARRY) == 0x00 ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x91() {
@@ -586,12 +573,8 @@ void MOS6502Core::OPCode0xAE() {
 
 /* BCS relative */
 void MOS6502Core::OPCode0xB0() {
-  if (m_SR & CARRY) {
-    m_PC += (int8_t)m_pMemory->Read(++m_PC);
-    ++m_PC;
-  } else {
-    m_PC += 2;
-  }
+  m_SR & CARRY ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0xB1() {

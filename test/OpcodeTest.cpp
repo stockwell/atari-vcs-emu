@@ -526,6 +526,34 @@ TEST_F(MOS6502Test, DEY) {
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
+/* 0x90 */
+TEST_F(MOS6502Test, OPcodeBCC) {
+  uint8_t instr[] = {0x90, 0xFB,  /* BCC -5*/
+                     0x90, 0xFB,  /* BCC -5 */
+                     0x90, 0x05,  /* BCC 5 */
+                     0x90, 0x05}; /* BCC 5 */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->m_SR |= CARRY;
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF002, m_pProcessor->m_PC);
+
+  m_pProcessor->m_SR &= ~CARRY;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xEFFF, m_pProcessor->m_PC);
+
+  m_pProcessor->m_PC = 0xF004;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF00B, m_pProcessor->m_PC);
+
+  m_pProcessor->m_SR |= CARRY;
+  m_pProcessor->m_PC = 0xF006;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF008, m_pProcessor->m_PC);
+}
+
 /* 0x95 */
 TEST_F(MOS6502Test, OpcodeSTA_ZPG_X) {
   uint8_t instr[] = {0x95, 0x80};   /* STA $80, X */
