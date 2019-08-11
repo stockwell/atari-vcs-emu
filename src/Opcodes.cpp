@@ -21,6 +21,7 @@ void MOS6502Core::InitOpcodeTable() {
 
   m_OPCodes[0x10] = &MOS6502Core::OPCode0x10;
   m_OPCodes[0x11] = &MOS6502Core::OPCode0x11;
+  m_OPCodes[0x15] = &MOS6502Core::OPCode0x15;
   m_OPCodes[0x18] = &MOS6502Core::OPCode0x18;
   m_OPCodes[0x1E] = &MOS6502Core::OPCode0x1E;
 
@@ -165,7 +166,8 @@ void MOS6502Core::OPCode0x11() {
 
 /* ORA ZPG, X */
 void MOS6502Core::OPCode0x15() {
-
+  OPCodesORA(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x16() {
