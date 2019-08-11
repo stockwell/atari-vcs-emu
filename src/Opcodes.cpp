@@ -57,6 +57,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xCA] = &MOS6502Core::OPCode0xCA;
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
 
+  m_OPCodes[0xD5] = &MOS6502Core::OPCode0xD5;
   m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
   m_OPCodes[0xD9] = &MOS6502Core::OPCode0xD9;
   m_OPCodes[0xDD] = &MOS6502Core::OPCode0xDD;
