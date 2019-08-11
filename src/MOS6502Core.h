@@ -199,6 +199,7 @@ private:
   void OPCode0xEA();
   void OPCode0xEC();
   void OPCode0xED();
+  void OPCode0xEE();
 
   void OPCode0xF0();
   void OPCode0xF1();
@@ -209,12 +210,15 @@ private:
   void OPCode0xFD();
   void OPCode0xFE();
 
-  void OPCodeSBC(uint16_t address);
-  void OPCodeADC(uint16_t address);
+  void OPCodesSBC(uint16_t address);
+  void OPCodesADC(uint16_t address);
   void OPCodesASL(uint16_t address);
   void OPCodesCMP(uint16_t address);
   void OPCodesCPX(uint16_t address);
   void OPCodesCPY(uint16_t address);
+  void OPCodesINC(uint16_t address);
+  void OPCodesDEC(uint16_t address);
+  void OPCodesORA(uint16_t address);
 
   uint8_t StackPull8();
   uint16_t StackPull16();
