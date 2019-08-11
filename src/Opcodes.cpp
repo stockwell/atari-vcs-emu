@@ -24,6 +24,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x15] = &MOS6502Core::OPCode0x15;
   m_OPCodes[0x16] = &MOS6502Core::OPCode0x16;
   m_OPCodes[0x18] = &MOS6502Core::OPCode0x18;
+  m_OPCodes[0x19] = &MOS6502Core::OPCode0x19;
+  m_OPCodes[0x1D] = &MOS6502Core::OPCode0x1D;
   m_OPCodes[0x1E] = &MOS6502Core::OPCode0x1E;
 
   m_OPCodes[0x20] = &MOS6502Core::OPCode0x20;
@@ -167,7 +169,7 @@ void MOS6502Core::OPCode0x11() {
 
 /* ORA ZPG, X */
 void MOS6502Core::OPCode0x15() {
-  OPCodesORA(m_pMemory->Read(++m_PC));
+  OPCodesORA(m_pMemory->Read(++m_PC) + m_XR);
   ++m_PC;
 }
 
@@ -183,13 +185,16 @@ void MOS6502Core::OPCode0x18() {
   ++m_PC;
 }
 
+/* ORA ABS Y */
 void MOS6502Core::OPCode0x19() {
-
+  OPCodesORA((m_pMemory->Read(m_PC + 1) | (m_pMemory->Read(m_PC + 2)) << 8u) + m_YR);
+  m_PC += 3;
 }
 
-
+/* ORA ABS X */
 void MOS6502Core::OPCode0x1D() {
-
+  OPCodesORA((m_pMemory->Read(m_PC + 1) | (m_pMemory->Read(m_PC + 2)) << 8u) + m_XR);
+  m_PC += 3;
 }
 
 /* ASL ABS + X */

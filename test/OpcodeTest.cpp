@@ -295,12 +295,13 @@ TEST_F(MOS6502Test, OPcodeORA_IND_Y) {
 
 /* 0x15 */
 TEST_F(MOS6502Test, OPcodeORA_ZPG_X) {
-  uint8_t instr[] = {0x15, 0x80};  /* ORA $80, X */
+  uint8_t instr[] = {0x15, 0x7F};  /* ORA $80, X */
 
   m_pMemory->Load(0xf000, instr, sizeof instr);
 
   m_pMemory->Write(0x80, 0x40);
 
+  m_pProcessor->m_XR = 0x01;
   m_pProcessor->m_AC = 0x20;
 
   m_pProcessor->Tick();
