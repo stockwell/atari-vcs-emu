@@ -17,6 +17,8 @@ add_executable(atari-vcs-emu
         src/RIOTCore.cpp
         src/Opcodes.cpp)
 
+target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1)
+
 # subproject for unit tests
 add_subdirectory(vendor/googletest)
 add_subdirectory(test atari-2600-tests)

@@ -34,8 +34,11 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x49] = &MOS6502Core::OPCode0x49;
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
 
+  m_OPCodes[0x50] = &MOS6502Core::OPCode0x50;
+
   m_OPCodes[0x60] = &MOS6502Core::OPCode0x60;
 
+  m_OPCodes[0x70] = &MOS6502Core::OPCode0x70;
   m_OPCodes[0x78] = &MOS6502Core::OPCode0x78;
 
   m_OPCodes[0x84] = &MOS6502Core::OPCode0x84;
@@ -54,8 +57,9 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xB0] = &MOS6502Core::OPCode0xB0;
   m_OPCodes[0xB8] = &MOS6502Core::OPCode0xB8;
 
-  m_OPCodes[0xCA] = &MOS6502Core::OPCode0xCA;
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
+  m_OPCodes[0xCA] = &MOS6502Core::OPCode0xCA;
+  m_OPCodes[0xCD] = &MOS6502Core::OPCode0xCD;
 
   m_OPCodes[0xD5] = &MOS6502Core::OPCode0xD5;
   m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
@@ -301,8 +305,14 @@ void MOS6502Core::OPCode0x4E() {
 
 }
 
+/* BVC */
 void MOS6502Core::OPCode0x50() {
-
+  if ((m_SR & OVERFLOW) == 0x00) {
+    m_PC += (int8_t)m_pMemory->Read(++m_PC);
+    ++m_PC;
+  } else {
+    m_PC += 2;
+  }
 }
 
 void MOS6502Core::OPCode0x51() {
@@ -376,8 +386,14 @@ void MOS6502Core::OPCode0x6E() {
 
 }
 
+/* BVS */
 void MOS6502Core::OPCode0x70() {
-
+  if ((m_SR & OVERFLOW)) {
+    m_PC += (int8_t)m_pMemory->Read(++m_PC);
+    ++m_PC;
+  } else {
+    m_PC += 2;
+  }
 }
 
 void MOS6502Core::OPCode0x71() {

@@ -33,10 +33,10 @@ uint8_t MOS6502Core::FetchOPCode() {
 }
 
 void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
-  printf("Opcode: %s(0x%02X), PC 0x%04X\n", kOPCodeNames[opcode], opcode, m_PC);
+  Log("Opcode: %s(0x%02X), PC 0x%04X", kOPCodeNames[opcode], opcode, m_PC);
   (this->*m_OPCodes[opcode])();
-  printf("SR: 0x%02X  |  AC: 0x%02X  |  XR: 0x%02X | YR: 0x%02X | SP: 0x%02X\n", m_SR, m_AC, m_XR, m_YR, m_SP);
-  printf("%s%s%s%s%s%s%s\n",
+  Log("SR: 0x%02X  |  AC: 0x%02X  |  XR: 0x%02X | YR: 0x%02X | SP: 0x%02X", m_SR, m_AC, m_XR, m_YR, m_SP);
+  Log("%s%s%s%s%s%s%s",
       m_SR & CARRY ? "C " : "",
       m_SR & ZERO ? "Z " : "",
       m_SR & INTERRUPT ? "I ": "",

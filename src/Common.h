@@ -7,8 +7,6 @@
 #define SafeDelete(pointer) if(pointer != NULL) {delete pointer; pointer = NULL;}
 #define SafeDeleteArray(pointer) if(pointer != NULL) {delete [] pointer; pointer = NULL;}
 
-#define DEBUG
-
 #ifdef DEBUG
 #define Log(M, ...) printf(M "\n", ##__VA_ARGS__)
 #define LogHexDump(...) hexDump(__VA_ARGS__)
