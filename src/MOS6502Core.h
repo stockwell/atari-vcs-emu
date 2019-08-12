@@ -219,6 +219,9 @@ private:
   void OPCodesINC(uint16_t address);
   void OPCodesDEC(uint16_t address);
   void OPCodesORA(uint16_t address);
+  void OPCodesLDA(uint16_t address);
+  void OPCodesLDX(uint16_t address);
+  void OPCodesLDY(uint16_t address);
 
   uint8_t StackPull8();
   uint16_t StackPull16();

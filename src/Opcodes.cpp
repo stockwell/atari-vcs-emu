@@ -82,10 +82,13 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xEC] = &MOS6502Core::OPCode0xEC;
   m_OPCodes[0xED] = &MOS6502Core::OPCode0xED;
 
+  m_OPCodes[0xF1] = &MOS6502Core::OPCode0xF1;
   m_OPCodes[0xF5] = &MOS6502Core::OPCode0xF5;
+  m_OPCodes[0xF6] = &MOS6502Core::OPCode0xF6;
   m_OPCodes[0xF8] = &MOS6502Core::OPCode0xF8;
   m_OPCodes[0xF9] = &MOS6502Core::OPCode0xF9;
   m_OPCodes[0xFD] = &MOS6502Core::OPCode0xFD;
+  m_OPCodes[0xFE] = &MOS6502Core::OPCode0xFE;
 }
 
 void MOS6502Core::OPCodeInvalid() {
@@ -537,11 +540,8 @@ void MOS6502Core::OPCode0x9D() {
 
 /* LDY # */
 void MOS6502Core::OPCode0xA0() {
-  m_YR = m_pMemory->Read(++m_PC);
+  OPCodesLDY(++m_PC);
   ++m_PC;
-
-  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
-  m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCode0xA1() {
@@ -550,11 +550,8 @@ void MOS6502Core::OPCode0xA1() {
 
 /* LDX # */
 void MOS6502Core::OPCode0xA2() {
-  m_XR = m_pMemory->Read(++m_PC);
+  OPCodesLDX(++m_PC);
   ++m_PC;
-
-  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
-  m_XR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCode0xA4() {
@@ -580,11 +577,8 @@ void MOS6502Core::OPCode0xA8() {
 
 /* LDA # */
 void MOS6502Core::OPCode0xA9() {
-  m_AC = m_pMemory->Read(++m_PC);
+  OPCodesLDA(++m_PC);
   ++m_PC;
-
-  m_AC & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
-  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 /* TAX */
@@ -812,7 +806,8 @@ void MOS6502Core::OPCode0xED() {
 
 /* INC, ABS */
 void MOS6502Core::OPCode0xEE() {
-
+  OPCodesINC(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8);
+  m_PC += 3;
 }
 
 /* BEQ, Relative */
@@ -822,18 +817,23 @@ void MOS6502Core::OPCode0xF0() {
 
 /* SBC Indirect, Y */
 void MOS6502Core::OPCode0xF1() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_YR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesSBC(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* SBC zpg, X */
 void MOS6502Core::OPCode0xF5() {
-  OPCodesSBC(m_pMemory->Read(++m_PC));
+  OPCodesSBC(m_pMemory->Read(++m_PC) + m_XR);
   ++m_PC;
 }
 
 /* INC zpg, X */
 void MOS6502Core::OPCode0xF6() {
-
+  OPCodesINC(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* SED */
@@ -948,6 +948,28 @@ void MOS6502Core::OPCodesINC(uint16_t address) {
 void MOS6502Core::OPCodesDEC(uint16_t address) {
 
 }
+
+void MOS6502Core::OPCodesLDA(uint16_t address) {
+  m_AC = m_pMemory->Read(address);
+
+  m_AC & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
+}
+
+void MOS6502Core::OPCodesLDX(uint16_t address) {
+  m_XR = m_pMemory->Read(address);
+
+  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_XR ? m_SR &= ~ZERO : m_SR |= ZERO;
+}
+
+void MOS6502Core::OPCodesLDY(uint16_t address) {
+  m_YR = m_pMemory->Read(address);
+
+  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
+}
+
 
 void MOS6502Core::OPCodesORA(uint16_t address) {
   m_AC |= m_pMemory->Read(address);
