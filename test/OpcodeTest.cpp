@@ -682,6 +682,25 @@ TEST_F(MOS6502Test, OpcodeSTA_ZPG_X) {
   ASSERT_EQ(0xF002, m_pProcessor->m_PC);
 }
 
+/* 0x99 */
+TEST_F(MOS6502Test, OpcodeSTA_ABS_Y) {
+  uint8_t instr[] = {0x99, 0x80, 0x00,  /* STA $0080,Y */
+                     0x99, 0x80, 0x00,  /* STA $0080,Y */
+                     0x99, 0x80, 0x00}; /* STA $0080,Y */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x81, 0xAA);
+
+
+  m_pProcessor->m_YR = 0x01;
+  m_pProcessor->m_AC = 0x55;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pMemory->Read(0x81));
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
+}
+
+
 /* 0x9A */
 TEST_F(MOS6502Test, OpcodeTXS) {
   uint8_t instr[] = {0x9A};   /* TXS */
@@ -693,6 +712,24 @@ TEST_F(MOS6502Test, OpcodeTXS) {
   ASSERT_EQ(0x55, m_pProcessor->m_SP);
 
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
+/* 0x9D */
+TEST_F(MOS6502Test, OpcodeSTA_ABS_X) {
+  uint8_t instr[] = {0x9D, 0x80, 0x00,  /* STA $0080,X */
+                     0x9D, 0x80, 0x00,  /* STA $0080,X */
+                     0x9D, 0x80, 0x00}; /* STA $0080,X */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x81, 0xAA);
+
+
+  m_pProcessor->m_XR = 0x01;
+  m_pProcessor->m_AC = 0x55;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pMemory->Read(0x81));
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
 /* 0xA0 */
@@ -748,6 +785,96 @@ TEST_F(MOS6502Test, OpcodeLDX_Immediate) {
   ASSERT_EQ(0x85, m_pProcessor->m_XR);
   ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF006, m_pProcessor->m_PC);
+}
+
+/* 0xA4 */
+TEST_F(MOS6502Test, OpcodeLDY_ZPG) {
+  uint8_t instr[] = {0xA4, 0x02,  /* LDY $02 */
+                     0xA4, 0x02,  /* LDY $02 */
+                     0xA4, 0x02}; /* LDY $02 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x02, 0x55);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_YR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF006, m_pProcessor->m_PC);
+}
+
+/* 0xA5 */
+TEST_F(MOS6502Test, OpcodeLDA_ZPG) {
+  uint8_t instr[] = {0xA5, 0x02,  /* LDA $02 */
+                     0xA5, 0x02,  /* LDA $02 */
+                     0xA5, 0x02}; /* LDA $02 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x02, 0x55);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF006, m_pProcessor->m_PC);
+}
+
+/* 0xA6 */
+TEST_F(MOS6502Test, OpcodeLDX_ZPG) {
+  uint8_t instr[] = {0xA6, 0x02,  /* LDX $02 */
+                     0xA6, 0x02,  /* LDX $02 */
+                     0xA6, 0x02}; /* LDX $02 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x02, 0x55);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_XR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
 
   ASSERT_EQ(0xF006, m_pProcessor->m_PC);
 }
