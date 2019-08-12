@@ -222,6 +222,14 @@ private:
   void OPCodesLDA(uint16_t address);
   void OPCodesLDX(uint16_t address);
   void OPCodesLDY(uint16_t address);
+  void OPCodesSTA(uint16_t address);
+  void OPCodesSTX(uint16_t address);
+  void OPCodesSTY(uint16_t address);
+  void OPCodesEOR(uint16_t address);
+  void OPCodesAND(uint16_t address);
+  void OPCodesLSR(uint16_t address);
+  void OPCodesROR(uint16_t address);
+  void OPCodesROL(uint16_t address);
 
   uint8_t StackPull8();
   uint16_t StackPull16();
