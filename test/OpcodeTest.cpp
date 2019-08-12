@@ -969,6 +969,96 @@ TEST_F(MOS6502Test, OpcodeTAX) {
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
+/* 0xAC */
+TEST_F(MOS6502Test, OpcodeLDY_ABS) {
+  uint8_t instr[] = {0xAC, 0x02, 0x00,  /* LDY $02 */
+                     0xAC, 0x02, 0x00,  /* LDY $02 */
+                     0xAC, 0x02, 0x00}; /* LDY $02 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x02, 0x55);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_YR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF009, m_pProcessor->m_PC);
+}
+
+/* 0xAD */
+TEST_F(MOS6502Test, OpcodeLDA_ABS) {
+  uint8_t instr[] = {0xAD, 0x02, 0x00,  /* LDA $02 */
+                     0xAD, 0x02, 0x00,  /* LDA $02 */
+                     0xAD, 0x02, 0x00}; /* LDA $02 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x02, 0x55);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF009, m_pProcessor->m_PC);
+}
+
+/* 0xAE */
+TEST_F(MOS6502Test, OpcodeLDX_ABS) {
+  uint8_t instr[] = {0xAE, 0x02, 0x00,  /* LDX $02 */
+                     0xAE, 0x02, 0x00,  /* LDX $02 */
+                     0xAE, 0x02, 0x00}; /* LDX $02 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x02, 0x55);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_XR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x02, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF009, m_pProcessor->m_PC);
+}
+
 /* 0xB0 */
 TEST_F(MOS6502Test, OpcodeBCS) {
   uint8_t instr[] = {0xB0, 0xFB,  /* BCS -5*/

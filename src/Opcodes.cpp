@@ -67,6 +67,10 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xA8] = &MOS6502Core::OPCode0xA8;
   m_OPCodes[0xA9] = &MOS6502Core::OPCode0xA9;
   m_OPCodes[0xAA] = &MOS6502Core::OPCode0xAA;
+  m_OPCodes[0xAC] = &MOS6502Core::OPCode0xAC;
+  m_OPCodes[0xAD] = &MOS6502Core::OPCode0xAD;
+  m_OPCodes[0xAE] = &MOS6502Core::OPCode0xAE;
+
 
   m_OPCodes[0xB0] = &MOS6502Core::OPCode0xB0;
   m_OPCodes[0xB8] = &MOS6502Core::OPCode0xB8;
@@ -636,17 +640,20 @@ void MOS6502Core::OPCode0xAA() {
 
 /* LDY ABS */
 void MOS6502Core::OPCode0xAC() {
-
+  OPCodesLDY(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  m_PC += 3;
 }
 
 /* LDA ABS */
 void MOS6502Core::OPCode0xAD() {
-
+  OPCodesLDA(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  m_PC += 3;
 }
 
 /* LDX ABS */
 void MOS6502Core::OPCode0xAE() {
-
+  OPCodesLDX(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  m_PC += 3;
 }
 
 /* BCS relative */
@@ -939,13 +946,13 @@ void MOS6502Core::OPCodesSBC(uint16_t address) {
   uint8_t carry = m_AC & CARRY ? 1 : 0;
 
   uint16_t result = m_AC - val - carry;
-  result & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  result & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   result ? m_SR &= ~ZERO : m_SR |= ZERO;
 
-  ((m_AC ^ result) & 0x80) && ((m_AC ^ result) & 0x80) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
+  ((m_AC ^ result) & 0x80) != 0 ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
 
   if (m_SR & DECIMAL) {
-    if (m_AC & 0x0F - carry < val & 0x0F)
+    if (((m_AC & 0x0Fu) - carry) < (val & 0x0Fu))
       result -= 0x06;
 
     if (result > 0x99)
@@ -953,38 +960,38 @@ void MOS6502Core::OPCodesSBC(uint16_t address) {
   }
 
   result < 0x100 ? m_SR |= CARRY : m_SR &= ~CARRY;
-  m_AC = result & 0xFF;
+  m_AC = result & 0xFFu;
 }
 
 void MOS6502Core::OPCodesASL(uint16_t address) {
   uint8_t val = m_pMemory->Read(address);
-  val & 0x80 ? m_SR |= CARRY : m_SR &= ~CARRY;
+  val & 0x80u ? m_SR |= CARRY : m_SR &= ~CARRY;
 
-  val <<= 1;
+  val <<= 1u;
   m_pMemory->Write(address, val);
 
-  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesCMP(uint16_t address) {
   uint16_t val = m_AC - m_pMemory->Read(address);
   val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
-  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesCPX(uint16_t address) {
   uint16_t val = m_XR - m_pMemory->Read(address);
   val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
-  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesCPY(uint16_t address) {
   uint16_t val = m_YR - m_pMemory->Read(address);
   val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
-  val & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
@@ -999,27 +1006,27 @@ void MOS6502Core::OPCodesDEC(uint16_t address) {
 void MOS6502Core::OPCodesLDA(uint16_t address) {
   m_AC = m_pMemory->Read(address);
 
-  m_AC & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesLDX(uint16_t address) {
   m_XR = m_pMemory->Read(address);
 
-  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_XR & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_XR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesLDY(uint16_t address) {
   m_YR = m_pMemory->Read(address);
 
-  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_YR & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesORA(uint16_t address) {
   m_AC |= m_pMemory->Read(address);
-  m_AC & 0x80 ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
