@@ -54,6 +54,7 @@ fi
 
 cmake -DCMAKE_BUILD_TYPE=Coverage ../
 make coverage || halt_build "build or test(s) failed"
+make xml_coverage
 
 cmake ../
 make all

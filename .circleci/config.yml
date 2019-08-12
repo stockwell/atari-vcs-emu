@@ -1,4 +1,6 @@
-version: 2
+version: 2.1
+orbs:
+  codecov: codecov/codecov@1.0.2
 jobs:
   build:
     docker:
@@ -9,3 +11,5 @@ jobs:
       - run: git submodule sync
       - run: git submodule update --init
       - run: ./build.sh
+      - codecov/upload:
+          file: cmake-build-docker/atari-2600-tests/xml_coverage.xml
