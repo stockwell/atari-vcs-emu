@@ -695,11 +695,40 @@ TEST_F(MOS6502Test, OpcodeTXS) {
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
+/* 0xA0 */
+TEST_F(MOS6502Test, OpcodeLDY_Immediate) {
+  uint8_t instr[] = {0xA0, 0x02,  /* LDY #02 */
+                     0xA0, 0x00,  /* LDY #00 */
+                     0xA0, 0x85}; /* LDY #85 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x02, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x85, m_pProcessor->m_YR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF006, m_pProcessor->m_PC);
+}
+
+
 /* 0xA2 */
-TEST_F(MOS6502Test, OpcodeLDX) {
+TEST_F(MOS6502Test, OpcodeLDX_Immediate) {
   uint8_t instr[] = {0xA2, 0x02,  /* LDX #02 */
                      0xA2, 0x00,  /* LDX #00 */
-                     0xA2, 0x85}; /* LDX #80 */
+                     0xA2, 0x85}; /* LDX #85 */
   m_pMemory->Load(0xf000, instr, sizeof instr);
 
   m_pProcessor->Tick();
@@ -919,6 +948,17 @@ TEST_F(MOS6502Test, OpcodeCMP_ZPG_X) {
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 
   ASSERT_EQ(0xf006, m_pProcessor->m_PC);
+}
+
+/* 0xD8 */
+TEST_F(MOS6502Test, OpcodeCLD) {
+  m_pMemory->Load(0xf000, 0xD8); /* CLD */
+
+  m_pProcessor->m_SR |= DECIMAL;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & DECIMAL);
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
 
