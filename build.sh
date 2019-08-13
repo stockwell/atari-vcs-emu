@@ -47,14 +47,13 @@ printf "\n--- Build & Test\n"
 
 # Check if running in a container
 if grep docker /proc/1/cgroup -qa; then
-  mkdir -p cmake-build-docker && pushd cmake-build-docker  
+  mkdir -p cmake-build-docker && pushd cmake-build-docker
 else
   mkdir -p cmake-build && pushd cmake-build
 fi
 
 cmake -DCMAKE_BUILD_TYPE=Coverage ../
 make coverage || halt_build "build or test(s) failed"
-make xml_coverage
 
 cmake ../
 make all
