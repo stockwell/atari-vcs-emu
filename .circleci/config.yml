@@ -4,9 +4,14 @@ orbs:
 jobs:
   build:
     docker:
-      - image: stockwell/atari-vcs-emu:0.0.1
+      - image: gcc:latest
 
     steps:
+      - run:
+          name: Install Dependencies
+          command: |
+              apt-get -y -q update
+              apt-get -y -q install cmake gcovr
       - checkout
       - run: git submodule sync
       - run: git submodule update --init
@@ -14,4 +19,4 @@ jobs:
       - codecov/upload:
           file: cmake-build-docker/atari-2600-tests/xml_coverage.xml
       - store_test_results:
-          path: cmake-build-docker/atari-2600-tests/test_detail.xml 
+          path: cmake-build-docker/atari-2600-tests
