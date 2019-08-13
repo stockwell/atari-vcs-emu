@@ -230,6 +230,7 @@ private:
   void OPCodesLSR(uint16_t address);
   void OPCodesROR(uint16_t address);
   void OPCodesROL(uint16_t address);
+  void OPCodesBIT(uint16_t address);
 
   uint8_t StackPull8();
   uint16_t StackPull16();

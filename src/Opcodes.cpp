@@ -173,7 +173,7 @@ void MOS6502Core::OPCode0x10() {
   ++m_PC;
 }
 
-/* ORA Indirect, Y */
+/* ORA Y-Indirect */
 void MOS6502Core::OPCode0x11() {
   uint16_t address = m_pMemory->Read(++m_PC) + m_YR;
   address |= (m_pMemory->Read(address + 1u)) << 8u;
@@ -226,24 +226,31 @@ void MOS6502Core::OPCode0x20() {
   m_PC = m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u;
 }
 
-/* AND X, ind */
+/* AND X-Indirect */
 void MOS6502Core::OPCode0x21() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_XR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesAND(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* BIT ZPG */
 void MOS6502Core::OPCode0x24() {
-
+  OPCodesBIT(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* AND ZPG */
 void MOS6502Core::OPCode0x25() {
-
+  OPCodesAND(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* ROL ZPG */
 void MOS6502Core::OPCode0x26() {
-
+  OPCodesROL(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* PLP */
@@ -252,9 +259,10 @@ void MOS6502Core::OPCode0x28() {
   ++m_PC;
 }
 
-/* AND ABS */
+/* AND # */
 void MOS6502Core::OPCode0x29() {
-
+  OPCodesAND(++m_PC);
+  ++m_PC;
 }
 
 /* ROL A */
@@ -264,17 +272,21 @@ void MOS6502Core::OPCode0x2A() {
 
 /* BIT ABS */
 void MOS6502Core::OPCode0x2C() {
-
+  uint16_t address = m_pMemory->Read(m_PC + 1) | (m_pMemory->Read(m_PC + 2)) << 8u;
+  OPCodesBIT(address);
+  m_PC += 3;
 }
 
 /* AND ABS */
 void MOS6502Core::OPCode0x2D() {
-
+  OPCodesAND( m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  m_PC += 3;
 }
 
 /* ROL # */
 void MOS6502Core::OPCode0x2E() {
-
+  OPCodesROL(++m_PC);
+  ++m_PC;
 }
 
 /* BMI relative */
@@ -283,19 +295,25 @@ void MOS6502Core::OPCode0x30() {
   ++m_PC;
 }
 
-/* AND ind, Y */
+/* AND Y-Indirect */
 void MOS6502Core::OPCode0x31() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_YR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesAND(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* AND zpg, X */
 void MOS6502Core::OPCode0x35() {
-
+  OPCodesAND(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* ROL zpg, X */
 void MOS6502Core::OPCode0x36() {
-
+  OPCodesROL(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* SEC */
@@ -306,17 +324,20 @@ void MOS6502Core::OPCode0x38() {
 
 /* AND abs, Y */
 void MOS6502Core::OPCode0x39() {
-
+  OPCodesAND((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_YR);
+  m_PC += 3;
 }
 
 /* AND abs, X */
 void MOS6502Core::OPCode0x3D() {
-
+  OPCodesAND((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_XR);
+  m_PC += 3;
 }
 
 /* ROL abs, X */
 void MOS6502Core::OPCode0x3E() {
-
+  OPCodesROL((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_XR);
+  m_PC += 3;
 }
 
 /* RTI */
@@ -327,17 +348,23 @@ void MOS6502Core::OPCode0x40() {
 
 /* EOR X ind */
 void MOS6502Core::OPCode0x41() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_XR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesEOR(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* EOR zpg */
 void MOS6502Core::OPCode0x45() {
-
+  OPCodesEOR(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* LSR zpg */
 void MOS6502Core::OPCode0x46() {
-
+  OPCodesLSR(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* PHA */
@@ -346,9 +373,10 @@ void MOS6502Core::OPCode0x48() {
   ++m_PC;
 }
 
-/* EOR */
+/* EOR # */
 void MOS6502Core::OPCode0x49() {
-
+  OPCodesEOR(++m_PC);
+  ++m_PC;
 }
 
 /* LSR A */
@@ -363,12 +391,14 @@ void MOS6502Core::OPCode0x4C() {
 
 /* EOR abs */
 void MOS6502Core::OPCode0x4D() {
-
+  OPCodesEOR((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u));
+  m_PC += 3;
 }
 
 /* LSR abs */
 void MOS6502Core::OPCode0x4E() {
-
+  OPCodesLSR((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u));
+  m_PC += 3;
 }
 
 /* BVC */
@@ -379,7 +409,11 @@ void MOS6502Core::OPCode0x50() {
 
 /* EOR ind, Y */
 void MOS6502Core::OPCode0x51() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_YR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesEOR(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 void MOS6502Core::OPCode0x55() {
@@ -1030,35 +1064,39 @@ void MOS6502Core::OPCodesORA(uint16_t address) {
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
-void MOS6502Core:: OPCodesSTA(uint16_t address) {
+void MOS6502Core::OPCodesSTA(uint16_t address) {
   m_pMemory->Write(address, m_AC);
 }
 
-void MOS6502Core:: OPCodesSTX(uint16_t address) {
+void MOS6502Core::OPCodesSTX(uint16_t address) {
   m_pMemory->Write(address, m_XR);
 }
 
-void MOS6502Core:: OPCodesSTY(uint16_t address) {
+void MOS6502Core::OPCodesSTY(uint16_t address) {
   m_pMemory->Write(address, m_YR);
 }
 
-void MOS6502Core:: OPCodesEOR(uint16_t address) {
+void MOS6502Core::OPCodesEOR(uint16_t address) {
 
 }
 
-void MOS6502Core:: OPCodesAND(uint16_t address) {
+void MOS6502Core::OPCodesAND(uint16_t address) {
 
 }
 
-void MOS6502Core:: OPCodesLSR(uint16_t address) {
+void MOS6502Core::OPCodesLSR(uint16_t address) {
 
 }
 
-void MOS6502Core:: OPCodesROR(uint16_t address) {
+void MOS6502Core::OPCodesROR(uint16_t address) {
 
 }
 
-void MOS6502Core:: OPCodesROL(uint16_t address) {
+void MOS6502Core::OPCodesROL(uint16_t address) {
+
+}
+
+void MOS6502Core::OPCodesBIT(uint16_t address) {
 
 }
 
