@@ -678,6 +678,19 @@ TEST_F(MOS6502Test, DEY) {
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
+/* 0x8A */
+TEST_F(MOS6502Test, OpcodeTXA) {
+  uint8_t instr[] = {0x8A};   /* TXA */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->m_XR = 0x55;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pProcessor->m_AC);
+
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
 /* 0x90 */
 TEST_F(MOS6502Test, OPcodeBCC) {
   uint8_t instr[] = {0x90, 0xFB,  /* BCC -5*/
