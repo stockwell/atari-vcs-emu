@@ -65,6 +65,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x5E] = &MOS6502Core::OPCode0x5E;
 
   m_OPCodes[0x60] = &MOS6502Core::OPCode0x60;
+  m_OPCodes[0x68] = &MOS6502Core::OPCode0x68;
   m_OPCodes[0x69] = &MOS6502Core::OPCode0x69;
   m_OPCodes[0x6C] = &MOS6502Core::OPCode0x6C;
 
@@ -500,7 +501,11 @@ void MOS6502Core::OPCode0x66() {
 
 /* PLA */
 void MOS6502Core::OPCode0x68() {
+  m_AC = StackPull8();
+  ++m_PC;
 
+  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 /* ADC # */
