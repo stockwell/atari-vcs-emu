@@ -637,6 +637,18 @@ TEST_F(MOS6502Test, OpcodeSTA_ZPG) {
   ASSERT_EQ(0xF002, m_pProcessor->m_PC);
 }
 
+/* 0x86 */
+TEST_F(MOS6502Test, OpcodeSTX_ZPG) {
+  uint8_t instr[] = {0x86, 0x80};   /* STX $80 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->m_XR = 0x55;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x55, m_pMemory->Read(0x80));
+  ASSERT_EQ(0xF002, m_pProcessor->m_PC);
+}
+
 /* 0x88 */
 TEST_F(MOS6502Test, DEY) {
   uint8_t instr[] = {0x88,   /* DEY */
