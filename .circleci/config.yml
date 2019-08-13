@@ -13,5 +13,5 @@ jobs:
       - run: ./build.sh
       - codecov/upload:
           file: cmake-build-docker/atari-2600-tests/xml_coverage.xml
-      - store_test_results
+      - store_test_results:
           path: cmake-build-docker/atari-2600-tests/test_detail.xml 
