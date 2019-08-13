@@ -29,17 +29,37 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x1E] = &MOS6502Core::OPCode0x1E;
 
   m_OPCodes[0x20] = &MOS6502Core::OPCode0x20;
+  m_OPCodes[0x21] = &MOS6502Core::OPCode0x21;
+  m_OPCodes[0x24] = &MOS6502Core::OPCode0x24;
+  m_OPCodes[0x25] = &MOS6502Core::OPCode0x25;
+  m_OPCodes[0x26] = &MOS6502Core::OPCode0x26;
   m_OPCodes[0x28] = &MOS6502Core::OPCode0x28;
+  m_OPCodes[0x29] = &MOS6502Core::OPCode0x29;
+  m_OPCodes[0x2C] = &MOS6502Core::OPCode0x2C;
+  m_OPCodes[0x2D] = &MOS6502Core::OPCode0x2D;
+  m_OPCodes[0x2E] = &MOS6502Core::OPCode0x2E;
 
   m_OPCodes[0x30] = &MOS6502Core::OPCode0x30;
+  m_OPCodes[0x31] = &MOS6502Core::OPCode0x31;
+  m_OPCodes[0x35] = &MOS6502Core::OPCode0x35;
+  m_OPCodes[0x36] = &MOS6502Core::OPCode0x36;
   m_OPCodes[0x38] = &MOS6502Core::OPCode0x38;
+  m_OPCodes[0x39] = &MOS6502Core::OPCode0x39;
+  m_OPCodes[0x3D] = &MOS6502Core::OPCode0x3D;
+  m_OPCodes[0x3E] = &MOS6502Core::OPCode0x3E;
 
   m_OPCodes[0x40] = &MOS6502Core::OPCode0x40;
+  m_OPCodes[0x41] = &MOS6502Core::OPCode0x41;
+  m_OPCodes[0x45] = &MOS6502Core::OPCode0x45;
+  m_OPCodes[0x46] = &MOS6502Core::OPCode0x46;
   m_OPCodes[0x48] = &MOS6502Core::OPCode0x48;
   m_OPCodes[0x49] = &MOS6502Core::OPCode0x49;
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
+  m_OPCodes[0x4D] = &MOS6502Core::OPCode0x4D;
+  m_OPCodes[0x4E] = &MOS6502Core::OPCode0x4E;
 
   m_OPCodes[0x50] = &MOS6502Core::OPCode0x50;
+  m_OPCodes[0x51] = &MOS6502Core::OPCode0x51;
 
   m_OPCodes[0x60] = &MOS6502Core::OPCode0x60;
   m_OPCodes[0x69] = &MOS6502Core::OPCode0x69;
@@ -346,7 +366,7 @@ void MOS6502Core::OPCode0x40() {
   m_PC = StackPull16();
 }
 
-/* EOR X ind */
+/* EOR X-Indirect */
 void MOS6502Core::OPCode0x41() {
   uint16_t address = m_pMemory->Read(++m_PC) + m_XR;
   address |= (m_pMemory->Read(address + 1u)) << 8u;
@@ -407,7 +427,7 @@ void MOS6502Core::OPCode0x50() {
   ++m_PC;
 }
 
-/* EOR ind, Y */
+/* EOR Y-Indirect */
 void MOS6502Core::OPCode0x51() {
   uint16_t address = m_pMemory->Read(++m_PC) + m_YR;
   address |= (m_pMemory->Read(address + 1u)) << 8u;
