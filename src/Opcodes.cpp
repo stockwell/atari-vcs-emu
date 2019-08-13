@@ -597,18 +597,22 @@ void MOS6502Core::OPCode0x88() {
   m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
+/* TXA */
 void MOS6502Core::OPCode0x8A() {
 
 }
 
+/* STY abs */
 void MOS6502Core::OPCode0x8C() {
 
 }
 
+/* STA abs */
 void MOS6502Core::OPCode0x8D() {
 
 }
 
+/* STX abs */
 void MOS6502Core::OPCode0x8E() {
 
 }
@@ -619,6 +623,7 @@ void MOS6502Core::OPCode0x90() {
   ++m_PC;
 }
 
+/* STA Y-Indirect */
 void MOS6502Core::OPCode0x91() {
 
 }
@@ -745,18 +750,22 @@ void MOS6502Core::OPCode0xB0() {
   ++m_PC;
 }
 
+/* LDA Y-Indirect */
 void MOS6502Core::OPCode0xB1() {
 
 }
 
+/* LDY zpg, X */
 void MOS6502Core::OPCode0xB4() {
 
 }
 
+/* LDA zpg, X */
 void MOS6502Core::OPCode0xB5() {
 
 }
 
+/* LDX zpg, Y */
 void MOS6502Core::OPCode0xB6() {
 
 }
@@ -767,34 +776,42 @@ void MOS6502Core::OPCode0xB8() {
   ++m_PC;
 }
 
+/* LDA abs, Y */
 void MOS6502Core::OPCode0xB9() {
 
 }
 
+/* TSX */
 void MOS6502Core::OPCode0xBA() {
 
 }
 
+/* LDY abs, X */
 void MOS6502Core::OPCode0xBC() {
 
 }
 
+/* LDA abs, X */
 void MOS6502Core::OPCode0xBD() {
 
 }
 
+/* LDX abs, Y */
 void MOS6502Core::OPCode0xBE() {
 
 }
 
+/* CPY # */
 void MOS6502Core::OPCode0xC0() {
 
 }
 
+/* CMP X-Indirect */
 void MOS6502Core::OPCode0xC1() {
 
 }
 
+/* CPY zpg */
 void MOS6502Core::OPCode0xC4() {
 
 }
@@ -805,6 +822,7 @@ void MOS6502Core::OPCode0xC5() {
   ++m_PC;
 }
 
+/* DEC zpg */
 void MOS6502Core::OPCode0xC6() {
 
 }
@@ -824,7 +842,7 @@ void MOS6502Core::OPCode0xC9() {
   ++m_PC;
 }
 
-/* DEX impl */
+/* DEX */
 void MOS6502Core::OPCode0xCA() {
   --m_XR;
   ++m_PC;
@@ -833,26 +851,29 @@ void MOS6502Core::OPCode0xCA() {
   m_XR == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
-/* CPY ABS */
+/* CPY abs */
 void MOS6502Core::OPCode0xCC() {
   OPCodesCPY(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   m_PC += 3;
 }
 
-/* CMP ABS */
+/* CMP abs */
 void MOS6502Core::OPCode0xCD() {
   OPCodesCMP(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   m_PC += 3;
 }
 
+/* DEC abs */
 void MOS6502Core::OPCode0xCE() {
 
 }
 
+/* BNE # */
 void MOS6502Core::OPCode0xD0() {
 
 }
 
+/* CMP Y-Indirect */
 void MOS6502Core::OPCode0xD1() {
 
 }
@@ -863,6 +884,7 @@ void MOS6502Core::OPCode0xD5() {
   ++m_PC;
 }
 
+/* DEC zpg, X */
 void MOS6502Core::OPCode0xD6() {
 
 }
@@ -885,26 +907,32 @@ void MOS6502Core::OPCode0xDD() {
   m_PC += 3;
 }
 
+/* DEC abs, X */
 void MOS6502Core::OPCode0xDE() {
 
 }
 
+/* CPX # */
 void MOS6502Core::OPCode0xE0() {
 
 }
 
+/* SBC X-Indirect */
 void MOS6502Core::OPCode0xE1() {
 
 }
 
+/* CPX zpg */
 void MOS6502Core::OPCode0xE4() {
 
 }
 
+/* SBC zpg */
 void MOS6502Core::OPCode0xE5() {
 
 }
 
+/* INC zpg */
 void MOS6502Core::OPCode0xE6() {
 
 }
@@ -929,19 +957,19 @@ void MOS6502Core::OPCode0xEA() {
   ++m_PC;
 }
 
-/* CPX, ABS */
+/* CPX, abs */
 void MOS6502Core::OPCode0xEC() {
   OPCodesCPX(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   m_PC += 3;
 }
 
-/* SBC, ABS */
+/* SBC, abs */
 void MOS6502Core::OPCode0xED() {
   OPCodesSBC(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   m_PC += 3;
 }
 
-/* INC, ABS */
+/* INC, abs */
 void MOS6502Core::OPCode0xEE() {
   OPCodesINC(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   m_PC += 3;
