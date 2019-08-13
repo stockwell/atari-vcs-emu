@@ -691,6 +691,45 @@ TEST_F(MOS6502Test, OpcodeTXA) {
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
+/* 0x8C */
+TEST_F(MOS6502Test, OpcodeSTY_ABS) {
+  uint8_t instr[] = {0x8C, 0x80, 0x00};  /* STY $80*/
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_YR = 0x80;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pMemory->Read(0x80));
+
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
+}
+
+/* 0x8D */
+TEST_F(MOS6502Test, OpcodeSTA_ABS) {
+  uint8_t instr[] = {0x8D, 0x80, 0x00};  /* STA $80*/
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_AC = 0x80;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pMemory->Read(0x80));
+
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
+}
+
+/* 0x8E */
+TEST_F(MOS6502Test, OpcodeSTX_ABS) {
+  uint8_t instr[] = {0x8E, 0x80, 0x00};  /* STX $80*/
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_XR = 0x80;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pMemory->Read(0x80));
+
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
+}
+
 /* 0x90 */
 TEST_F(MOS6502Test, OPcodeBCC) {
   uint8_t instr[] = {0x90, 0xFB,  /* BCC -5*/
