@@ -60,9 +60,13 @@ void MOS6502Core::InitOpcodeTable() {
 
   m_OPCodes[0x50] = &MOS6502Core::OPCode0x50;
   m_OPCodes[0x51] = &MOS6502Core::OPCode0x51;
+  m_OPCodes[0x59] = &MOS6502Core::OPCode0x59;
+  m_OPCodes[0x5D] = &MOS6502Core::OPCode0x5D;
+  m_OPCodes[0x5E] = &MOS6502Core::OPCode0x5E;
 
   m_OPCodes[0x60] = &MOS6502Core::OPCode0x60;
   m_OPCodes[0x69] = &MOS6502Core::OPCode0x69;
+  m_OPCodes[0x6C] = &MOS6502Core::OPCode0x6C;
 
   m_OPCodes[0x70] = &MOS6502Core::OPCode0x70;
   m_OPCodes[0x78] = &MOS6502Core::OPCode0x78;
@@ -411,13 +415,13 @@ void MOS6502Core::OPCode0x4C() {
 
 /* EOR abs */
 void MOS6502Core::OPCode0x4D() {
-  OPCodesEOR((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u));
+  OPCodesEOR(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   m_PC += 3;
 }
 
 /* LSR abs */
 void MOS6502Core::OPCode0x4E() {
-  OPCodesLSR((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u));
+  OPCodesLSR(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   m_PC += 3;
 }
 
@@ -436,28 +440,37 @@ void MOS6502Core::OPCode0x51() {
   ++m_PC;
 }
 
+/* EOR zpg, X*/
 void MOS6502Core::OPCode0x55() {
 
 }
 
+/* LSR zpg, X */
 void MOS6502Core::OPCode0x56() {
 
 }
 
+/* CLI */
 void MOS6502Core::OPCode0x58() {
 
 }
 
+/* EOR abs, Y */
 void MOS6502Core::OPCode0x59() {
-
+  OPCodesEOR((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_YR);
+  m_PC += 3;
 }
 
+/* EOR abs, X */
 void MOS6502Core::OPCode0x5D() {
-
+  OPCodesEOR((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_XR);
+  m_PC += 3;
 }
 
+/* LSR abs, X */
 void MOS6502Core::OPCode0x5E() {
-
+  OPCodesLSR((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_XR);
+  m_PC += 3;
 }
 
 /* RTS */
@@ -465,40 +478,48 @@ void MOS6502Core::OPCode0x60() {
   m_PC = StackPull16();
 }
 
+/* ADX X-Indirect */
 void MOS6502Core::OPCode0x61() {
 
 }
 
+/* ADC zpg */
 void MOS6502Core::OPCode0x65() {
 
 }
 
+/* ROR zpg */
 void MOS6502Core::OPCode0x66() {
 
 }
 
+/* PLA */
 void MOS6502Core::OPCode0x68() {
 
 }
 
-/* ADC */
+/* ADC # */
 void MOS6502Core::OPCode0x69() {
   OPCodesADC(++m_PC);
   ++m_PC;
 }
 
+/* ROR A */
 void MOS6502Core::OPCode0x6A() {
 
 }
 
+/* JMP Indirect */
 void MOS6502Core::OPCode0x6C() {
-
+  m_PC = m_pMemory->Read(m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u);
 }
 
+/* ADC abs */
 void MOS6502Core::OPCode0x6D() {
 
 }
 
+/* ROR abs */
 void MOS6502Core::OPCode0x6E() {
 
 }
@@ -509,14 +530,17 @@ void MOS6502Core::OPCode0x70() {
   ++m_PC;
 }
 
+/* ADC Y-Indirect */
 void MOS6502Core::OPCode0x71() {
 
 }
 
+/* ADC zpg, X */
 void MOS6502Core::OPCode0x75() {
 
 }
 
+/* ROR zpg, X */
 void MOS6502Core::OPCode0x76() {
 
 }
@@ -527,18 +551,22 @@ void MOS6502Core::OPCode0x78() {
   ++m_PC;
 }
 
+/* ADC abs, Y */
 void MOS6502Core::OPCode0x79() {
 
 }
 
+/* ADC abs, X */
 void MOS6502Core::OPCode0x7D() {
 
 }
 
+/* ROR abs, X */
 void MOS6502Core::OPCode0x7E() {
 
 }
 
+/* STA X-Indirect */
 void MOS6502Core::OPCode0x81() {
 
 }
@@ -555,6 +583,7 @@ void MOS6502Core::OPCode0x85() {
   ++m_PC;
 }
 
+/* STX zpg */
 void MOS6502Core::OPCode0x86() {
 
 }
