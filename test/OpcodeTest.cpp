@@ -419,6 +419,13 @@ TEST_F(MOS6502Test, OPcodeASL_ABS_X) {
 
 /* 0x20 */
 TEST_F(MOS6502Test, OPcodeJSR) {
+  uint8_t instr[] = {0x20, 0x80, 0x00};   /* JMP $80 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->Tick();
+  
+  ASSERT_EQ(0xFB, m_pProcessor->m_SP);
+  ASSERT_EQ(0x80, m_pProcessor->m_PC);
 
 }
 
