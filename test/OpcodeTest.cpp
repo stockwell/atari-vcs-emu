@@ -506,6 +506,23 @@ TEST_F(MOS6502Test, OpcodeSEC) {
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
+/* 0x40 */
+TEST_F(MOS6502Test, OpcodeRTI) {
+  m_pMemory->Load(0xf000, 0x40); /* RTI */
+
+  m_pMemory->Load(STACK_BASE + 0xF0, 0xAA);
+  m_pMemory->Load(STACK_BASE + 0xF1, 0x00);
+  m_pMemory->Load(STACK_BASE + 0xF2, 0xF0);
+
+  m_pProcessor->m_SR = 0x55;
+  m_pProcessor->m_SP = 0xEF;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xAA | CONSTANT, m_pProcessor->m_SR);
+  ASSERT_EQ(0xF000, m_pProcessor->m_PC);
+}
+
 /* 0x48 */
 TEST_F(MOS6502Test, OPCodePHA) {
   m_pMemory->Load(0xF000, 0x48); /* PHA */
