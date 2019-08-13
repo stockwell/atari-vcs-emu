@@ -568,6 +568,35 @@ TEST_F(MOS6502Test, OPcodeBVC) {
   ASSERT_EQ(0xF008, m_pProcessor->m_PC);
 }
 
+/* 0x68 */
+TEST_F(MOS6502Test, OPcodePLA) {
+  uint8_t instr[] = {0x08,  /* PHP */
+                     0x08,  /* PHP */
+                     0x68,  /* PLA */
+                     0x68}; /* PLA */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_AC = 0xAA;
+
+  m_pProcessor->m_SR = 0xF0;
+  m_pProcessor->Tick();
+
+  m_pProcessor->m_SR = 0x00;
+  m_pProcessor->Tick();
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF0, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF004, m_pProcessor->m_PC);
+}
+
 /* 0x69 */
 TEST_F(MOS6502Test, OPcodeADC) {
 
@@ -1186,6 +1215,35 @@ TEST_F(MOS6502Test, OpcodeCLV) {
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & OVERFLOW);
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
+/* 0xCA */
+TEST_F(MOS6502Test, OpcodeDEX) {
+  uint8_t instr[] = {0xCA,  /* DEX */
+                     0xCA,  /* DEX */
+                     0xCA}; /* DEX */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_XR = 0x02;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x01, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xFF, m_pProcessor->m_XR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
 /* 0xCD */
