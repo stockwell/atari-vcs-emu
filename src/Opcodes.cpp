@@ -151,6 +151,9 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xDD] = &MOS6502Core::OPCode0xDD;
   m_OPCodes[0xDE] = &MOS6502Core::OPCode0xDE;
 
+  m_OPCodes[0xE4] = &MOS6502Core::OPCode0xE4;
+  m_OPCodes[0xE5] = &MOS6502Core::OPCode0xE5;
+  m_OPCodes[0xE6] = &MOS6502Core::OPCode0xE6;
   m_OPCodes[0xE8] = &MOS6502Core::OPCode0xE8;
   m_OPCodes[0xE9] = &MOS6502Core::OPCode0xE9;
   m_OPCodes[0xEA] = &MOS6502Core::OPCode0xEA;
@@ -1036,22 +1039,29 @@ void MOS6502Core::OPCode0xE0() {
 
 /* SBC X-Indirect */
 void MOS6502Core::OPCode0xE1() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_XR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesSBC(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* CPX zpg */
 void MOS6502Core::OPCode0xE4() {
-
+  OPCodesCPX(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* SBC zpg */
 void MOS6502Core::OPCode0xE5() {
-
+  OPCodesSBC(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* INC zpg */
 void MOS6502Core::OPCode0xE6() {
-
+  OPCodesINC(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* INX */
