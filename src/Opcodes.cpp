@@ -453,6 +453,7 @@ void MOS6502Core::OPCode0x49() {
 
 /* LSR A */
 void MOS6502Core::OPCode0x4A() {
+  ++m_PC;
   m_AC & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
 
   m_AC >>= 1;
