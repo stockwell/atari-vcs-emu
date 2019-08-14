@@ -54,6 +54,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x46] = &MOS6502Core::OPCode0x46;
   m_OPCodes[0x48] = &MOS6502Core::OPCode0x48;
   m_OPCodes[0x49] = &MOS6502Core::OPCode0x49;
+  m_OPCodes[0x4A] = &MOS6502Core::OPCode0x4A;
   m_OPCodes[0x4C] = &MOS6502Core::OPCode0x4C;
   m_OPCodes[0x4D] = &MOS6502Core::OPCode0x4D;
   m_OPCodes[0x4E] = &MOS6502Core::OPCode0x4E;
@@ -452,7 +453,12 @@ void MOS6502Core::OPCode0x49() {
 
 /* LSR A */
 void MOS6502Core::OPCode0x4A() {
+  m_AC & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
 
+  m_AC >>= 1;
+
+  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 /* JMP abs */
