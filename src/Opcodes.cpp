@@ -137,10 +137,11 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xC5] = &MOS6502Core::OPCode0xC5;
   m_OPCodes[0xC6] = &MOS6502Core::OPCode0xC6;
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
+  m_OPCodes[0xC9] = &MOS6502Core::OPCode0xC9;
   m_OPCodes[0xCA] = &MOS6502Core::OPCode0xCA;
   m_OPCodes[0xCC] = &MOS6502Core::OPCode0xCC;
   m_OPCodes[0xCD] = &MOS6502Core::OPCode0xCD;
-  m_OPCodes[0xC9] = &MOS6502Core::OPCode0xC9;
+  m_OPCodes[0xCE] = &MOS6502Core::OPCode0xCE;
 
   m_OPCodes[0xD1] = &MOS6502Core::OPCode0xD1;
   m_OPCodes[0xD5] = &MOS6502Core::OPCode0xD5;
@@ -709,6 +710,7 @@ void MOS6502Core::OPCode0x91() {
 /* STY zpg, X */
 void MOS6502Core::OPCode0x94() {
   OPCodesSTY(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* STA zpg, X */
@@ -720,6 +722,7 @@ void MOS6502Core::OPCode0x95() {
 /* STX zpg, Y */
 void MOS6502Core::OPCode0x96() {
   OPCodesSTX(m_pMemory->Read(++m_PC) + m_YR);
+  ++m_PC
 }
 
 /* TYA */
@@ -971,7 +974,8 @@ void MOS6502Core::OPCode0xCD() {
 
 /* DEC abs */
 void MOS6502Core::OPCode0xCE() {
-
+  OPCodesDEC(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  m_PC += 3;
 }
 
 /* BNE # */
