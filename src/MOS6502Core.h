@@ -17,6 +17,12 @@
 /* Base memory address of the stack */
 #define STACK_BASE 0x100u
 
+/* Vectors */
+#define NMI_VECTOR    0xFFFA
+#define RESET_VECTOR  0xFFFC
+#define IRQ_VECTOR    0xFFFE
+#define BRK_VECTOR    0xFFFE
+
 class MOS6502Core {
 public:
   MOS6502Core();

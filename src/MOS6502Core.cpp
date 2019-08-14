@@ -20,7 +20,7 @@ void MOS6502Core::Init(Memory* pMemory) {
 
 void MOS6502Core::Reset() {
   /* Load reset vector */
-  m_PC = (unsigned)m_pMemory->Read(0xfffd) << 8u | m_pMemory->Read(0xfffc);
+  m_PC = (unsigned)m_pMemory->Read(RESET_VECTOR + 1) << 8u | m_pMemory->Read(RESET_VECTOR);
   m_AC = 0x00;
   m_XR = 0x00;
   m_YR = 0x00;
