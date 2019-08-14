@@ -1309,7 +1309,15 @@ void MOS6502Core::OPCodesAND(uint16_t address) {
 }
 
 void MOS6502Core::OPCodesLSR(uint16_t address) {
+  uint8_t val = m_pMemory->Read(address);
+  val & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
 
+  val >>= 1;
+
+  m_pMemory->Write(address, val);
+
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesROR(uint16_t address) {
