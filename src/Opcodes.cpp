@@ -119,13 +119,14 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xAD] = &MOS6502Core::OPCode0xAD;
   m_OPCodes[0xAE] = &MOS6502Core::OPCode0xAE;
 
-
   m_OPCodes[0xB0] = &MOS6502Core::OPCode0xB0;
   m_OPCodes[0xB1] = &MOS6502Core::OPCode0xB1;
   m_OPCodes[0xB4] = &MOS6502Core::OPCode0xB4;
   m_OPCodes[0xB5] = &MOS6502Core::OPCode0xB5;
   m_OPCodes[0xB6] = &MOS6502Core::OPCode0xB6;
   m_OPCodes[0xB8] = &MOS6502Core::OPCode0xB8;
+  m_OPCodes[0xB9] = &MOS6502Core::OPCode0xB9;
+  m_OPCodes[0xBA] = &MOS6502Core::OPCode0xBA;
 
   m_OPCodes[0xC1] = &MOS6502Core::OPCode0xC1;
   m_OPCodes[0xC5] = &MOS6502Core::OPCode0xC5;
@@ -861,12 +862,16 @@ void MOS6502Core::OPCode0xB8() {
 
 /* LDA abs, Y */
 void MOS6502Core::OPCode0xB9() {
-
+  OPCodesLDA((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_YR);
+  ++m_PC;
 }
 
 /* TSX */
 void MOS6502Core::OPCode0xBA() {
+  m_SP = m_XR;
 
+  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_XR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 /* LDY abs, X */
