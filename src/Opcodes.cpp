@@ -142,6 +142,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xCD] = &MOS6502Core::OPCode0xCD;
   m_OPCodes[0xC9] = &MOS6502Core::OPCode0xC9;
 
+  m_OPCodes[0xD1] = &MOS6502Core::OPCode0xD1;
   m_OPCodes[0xD5] = &MOS6502Core::OPCode0xD5;
   m_OPCodes[0xD8] = &MOS6502Core::OPCode0xD8;
   m_OPCodes[0xD9] = &MOS6502Core::OPCode0xD9;
@@ -979,7 +980,11 @@ void MOS6502Core::OPCode0xD0() {
 
 /* CMP Y-Indirect */
 void MOS6502Core::OPCode0xD1() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_YR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesCMP(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* CMP zpg, X */
