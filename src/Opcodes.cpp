@@ -1239,11 +1239,19 @@ void MOS6502Core::OPCodesCPY(uint16_t address) {
 }
 
 void MOS6502Core::OPCodesINC(uint16_t address) {
+  uint8_t val = m_pMemory->Read(address);
+  m_pMemory->Write(address, ++val);
 
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesDEC(uint16_t address) {
+  uint8_t val = m_pMemory->Read(address);
+  m_pMemory->Write(address, --val);
 
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesLDA(uint16_t address) {
@@ -1267,12 +1275,6 @@ void MOS6502Core::OPCodesLDY(uint16_t address) {
   m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
-void MOS6502Core::OPCodesORA(uint16_t address) {
-  m_AC |= m_pMemory->Read(address);
-  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
-  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
-}
-
 void MOS6502Core::OPCodesSTA(uint16_t address) {
   m_pMemory->Write(address, m_AC);
 }
@@ -1285,12 +1287,25 @@ void MOS6502Core::OPCodesSTY(uint16_t address) {
   m_pMemory->Write(address, m_YR);
 }
 
-void MOS6502Core::OPCodesEOR(uint16_t address) {
+void MOS6502Core::OPCodesORA(uint16_t address) {
+  m_AC |= m_pMemory->Read(address);
 
+  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
+}
+
+void MOS6502Core::OPCodesEOR(uint16_t address) {
+  m_AC ^= m_pMemory->Read(address);
+
+  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesAND(uint16_t address) {
+  m_AC &= m_pMemory->Read(address);
 
+  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesLSR(uint16_t address) {
