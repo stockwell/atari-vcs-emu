@@ -107,6 +107,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x9D] = &MOS6502Core::OPCode0x9D;
 
   m_OPCodes[0xA0] = &MOS6502Core::OPCode0xA0;
+  m_OPCodes[0xA1] = &MOS6502Core::OPCode0xA1;
   m_OPCodes[0xA2] = &MOS6502Core::OPCode0xA2;
   m_OPCodes[0xA4] = &MOS6502Core::OPCode0xA4;
   m_OPCodes[0xA5] = &MOS6502Core::OPCode0xA5;
@@ -740,9 +741,13 @@ void MOS6502Core::OPCode0xA0() {
   ++m_PC;
 }
 
-/* LDA X, ind */
+/* LDA X-Indirect */
 void MOS6502Core::OPCode0xA1() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_XR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesLDA(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* LDX # */
