@@ -178,7 +178,9 @@ void MOS6502Core::OPCodeInvalid() {
 
 /* BRK */
 void MOS6502Core::OPCode0x00() {
-
+  StackPush(m_PC);
+  StackPush((uint8_t)(m_SR | BREAK));
+  m_PC = m_pMemory->Read(BRK_VECTOR) | (m_pMemory->Read(BRK_VECTOR + 1));
 }
 
 /* ORA x, Indirect */
@@ -728,7 +730,7 @@ void MOS6502Core::OPCode0x95() {
 /* STX zpg, Y */
 void MOS6502Core::OPCode0x96() {
   OPCodesSTX(m_pMemory->Read(++m_PC) + m_YR);
-  ++m_PC
+  ++m_PC;
 }
 
 /* TYA */
