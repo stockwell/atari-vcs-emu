@@ -882,12 +882,13 @@ void MOS6502Core::OPCode0xB8() {
 /* LDA abs, Y */
 void MOS6502Core::OPCode0xB9() {
   OPCodesLDA((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_YR);
-  ++m_PC;
+  m_PC += 3;
 }
 
 /* TSX */
 void MOS6502Core::OPCode0xBA() {
   m_SP = m_XR;
+  ++m_PC;
 
   m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_XR ? m_SR &= ~ZERO : m_SR |= ZERO;
