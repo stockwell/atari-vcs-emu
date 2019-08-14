@@ -540,6 +540,16 @@ TEST_F(MOS6502Test, OPCodeEOR) {
 
 }
 
+/* 0x4C */
+TEST_F(MOS6502Test, OPcodeJMP_ABS) {
+  uint8_t instr[] = {0x4C, 0x80, 0xF0};   /* JMP $80 */
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xF080, m_pProcessor->m_PC);
+}
+
 /* 0x50 */
 TEST_F(MOS6502Test, OPcodeBVC) {
   uint8_t instr[] = {0x50, 0xFB,  /* BVC -5*/
