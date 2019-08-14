@@ -70,11 +70,17 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x60] = &MOS6502Core::OPCode0x60;
   m_OPCodes[0x61] = &MOS6502Core::OPCode0x61;
   m_OPCodes[0x65] = &MOS6502Core::OPCode0x65;
+  m_OPCodes[0x66] = &MOS6502Core::OPCode0x66;
   m_OPCodes[0x68] = &MOS6502Core::OPCode0x68;
   m_OPCodes[0x69] = &MOS6502Core::OPCode0x69;
   m_OPCodes[0x6C] = &MOS6502Core::OPCode0x6C;
+  m_OPCodes[0x6D] = &MOS6502Core::OPCode0x6D;
+  m_OPCodes[0x6E] = &MOS6502Core::OPCode0x6E;
 
   m_OPCodes[0x70] = &MOS6502Core::OPCode0x70;
+  m_OPCodes[0x71] = &MOS6502Core::OPCode0x71;
+  m_OPCodes[0x75] = &MOS6502Core::OPCode0x75;
+  m_OPCodes[0x76] = &MOS6502Core::OPCode0x76;
   m_OPCodes[0x78] = &MOS6502Core::OPCode0x78;
 
   m_OPCodes[0x84] = &MOS6502Core::OPCode0x84;
@@ -509,7 +515,8 @@ void MOS6502Core::OPCode0x65() {
 
 /* ROR zpg */
 void MOS6502Core::OPCode0x66() {
-
+  OPCodesROR(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* PLA */
@@ -539,12 +546,14 @@ void MOS6502Core::OPCode0x6C() {
 
 /* ADC abs */
 void MOS6502Core::OPCode0x6D() {
-
+  OPCodesADC(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  m_PC += 3;
 }
 
 /* ROR abs */
 void MOS6502Core::OPCode0x6E() {
-
+  OPCodesROR(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  m_PC += 3;
 }
 
 /* BVS */
@@ -555,17 +564,23 @@ void MOS6502Core::OPCode0x70() {
 
 /* ADC Y-Indirect */
 void MOS6502Core::OPCode0x71() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_YR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesADC(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* ADC zpg, X */
 void MOS6502Core::OPCode0x75() {
-
+  OPCodesADC(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* ROR zpg, X */
 void MOS6502Core::OPCode0x76() {
-
+  OPCodesROR(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* SEI impl */
