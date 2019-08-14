@@ -151,6 +151,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xDD] = &MOS6502Core::OPCode0xDD;
   m_OPCodes[0xDE] = &MOS6502Core::OPCode0xDE;
 
+  m_OPCodes[0xE0] = &MOS6502Core::OPCode0xE0;
+  m_OPCodes[0xE1] = &MOS6502Core::OPCode0xE1;
   m_OPCodes[0xE4] = &MOS6502Core::OPCode0xE4;
   m_OPCodes[0xE5] = &MOS6502Core::OPCode0xE5;
   m_OPCodes[0xE6] = &MOS6502Core::OPCode0xE6;
@@ -1034,7 +1036,8 @@ void MOS6502Core::OPCode0xDE() {
 
 /* CPX # */
 void MOS6502Core::OPCode0xE0() {
-
+  OPCodesCPX(++m_PC);
+  ++m_PC;
 }
 
 /* SBC X-Indirect */
