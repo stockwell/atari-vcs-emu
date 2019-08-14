@@ -542,7 +542,7 @@ TEST_F(MOS6502Test, OPCodeEOR) {
 
 /* 0x4C */
 TEST_F(MOS6502Test, OPcodeJMP_ABS) {
-  uint8_t instr[] = {0x4C, 0x80, 0xF0};   /* JMP $80 */
+  uint8_t instr[] = {0x4C, 0x80, 0xF0};   /* JMP $f080 */
   m_pMemory->Load(0xf000, instr, sizeof instr);
 
   m_pProcessor->Tick();
@@ -621,6 +621,18 @@ TEST_F(MOS6502Test, OPcodePLA) {
 /* 0x69 */
 TEST_F(MOS6502Test, OPcodeADC) {
 
+}
+
+/* 0x6C */
+TEST_F(MOS6502Test, OPcodeJMP_Indirect) {
+  uint8_t instr[] = {0x6C, 0x80, 0x00};  /* JMP ($0080)*/
+
+  m_pMemory->Load(0xF000, instr, sizeof instr);
+  m_pMemory->Load(0x80, 0xFF);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xFF, m_pProcessor->m_PC);
 }
 
 /* 0x70 */
