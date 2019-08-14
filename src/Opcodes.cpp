@@ -135,6 +135,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xC1] = &MOS6502Core::OPCode0xC1;
   m_OPCodes[0xC4] = &MOS6502Core::OPCode0xC4;
   m_OPCodes[0xC5] = &MOS6502Core::OPCode0xC5;
+  m_OPCodes[0xC6] = &MOS6502Core::OPCode0xC6;
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
   m_OPCodes[0xCA] = &MOS6502Core::OPCode0xCA;
   m_OPCodes[0xCC] = &MOS6502Core::OPCode0xCC;
@@ -926,7 +927,8 @@ void MOS6502Core::OPCode0xC5() {
 
 /* DEC zpg */
 void MOS6502Core::OPCode0xC6() {
-
+  OPCodesDEC(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* INY */
