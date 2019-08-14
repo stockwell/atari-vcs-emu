@@ -68,6 +68,8 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x5E] = &MOS6502Core::OPCode0x5E;
 
   m_OPCodes[0x60] = &MOS6502Core::OPCode0x60;
+  m_OPCodes[0x61] = &MOS6502Core::OPCode0x61;
+  m_OPCodes[0x65] = &MOS6502Core::OPCode0x65;
   m_OPCodes[0x68] = &MOS6502Core::OPCode0x68;
   m_OPCodes[0x69] = &MOS6502Core::OPCode0x69;
   m_OPCodes[0x6C] = &MOS6502Core::OPCode0x6C;
@@ -490,14 +492,19 @@ void MOS6502Core::OPCode0x60() {
   m_PC = StackPull16();
 }
 
-/* ADX X-Indirect */
+/* ADC X-Indirect */
 void MOS6502Core::OPCode0x61() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_XR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesADC(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* ADC zpg */
 void MOS6502Core::OPCode0x65() {
-
+  OPCodesADC(m_pMemory->Read(++m_PC));
+  ++m_PC;
 }
 
 /* ROR zpg */
