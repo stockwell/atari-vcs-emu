@@ -97,9 +97,11 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x8E] = &MOS6502Core::OPCode0x8E;
 
   m_OPCodes[0x90] = &MOS6502Core::OPCode0x90;
+  m_OPCodes[0x91] = &MOS6502Core::OPCode0x91;
   m_OPCodes[0x94] = &MOS6502Core::OPCode0x94;
   m_OPCodes[0x95] = &MOS6502Core::OPCode0x95;
   m_OPCodes[0x96] = &MOS6502Core::OPCode0x96;
+  m_OPCodes[0x98] = &MOS6502Core::OPCode0x98;
   m_OPCodes[0x99] = &MOS6502Core::OPCode0x99;
   m_OPCodes[0x9A] = &MOS6502Core::OPCode0x9A;
   m_OPCodes[0x9D] = &MOS6502Core::OPCode0x9D;
@@ -683,7 +685,11 @@ void MOS6502Core::OPCode0x90() {
 
 /* STA Y-Indirect */
 void MOS6502Core::OPCode0x91() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_YR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesSTA(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* STY zpg, X */
@@ -704,7 +710,10 @@ void MOS6502Core::OPCode0x96() {
 
 /* TYA */
 void MOS6502Core::OPCode0x98() {
+  m_AC = m_YR;
 
+  m_AC & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 /* STA abs, Y */
