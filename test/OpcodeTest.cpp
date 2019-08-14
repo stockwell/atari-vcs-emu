@@ -578,6 +578,17 @@ TEST_F(MOS6502Test, OPcodeBVC) {
   ASSERT_EQ(0xF008, m_pProcessor->m_PC);
 }
 
+/* 0x58 */
+TEST_F(MOS6502Test, OpcodeCLI) {
+  m_pMemory->Load(0xf000, 0x58); /* CLI */
+
+  m_pProcessor->m_SR |= INTERRUPT;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & INTERRUPT);
+  ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
 /* 0x68 */
 TEST_F(MOS6502Test, OPcodePLA) {
   uint8_t instr[] = {0x08,  /* PHP */
@@ -1335,7 +1346,6 @@ TEST_F(MOS6502Test, OpcodeCLD) {
   ASSERT_EQ(0x00, m_pProcessor->m_SR & DECIMAL);
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
-
 
 /* 0xD9 */
 TEST_F(MOS6502Test, OpcodeCMP_ABS_Y) {

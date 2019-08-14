@@ -60,6 +60,7 @@ void MOS6502Core::InitOpcodeTable() {
 
   m_OPCodes[0x50] = &MOS6502Core::OPCode0x50;
   m_OPCodes[0x51] = &MOS6502Core::OPCode0x51;
+  m_OPCodes[0x58] = &MOS6502Core::OPCode0x58;
   m_OPCodes[0x59] = &MOS6502Core::OPCode0x59;
   m_OPCodes[0x5D] = &MOS6502Core::OPCode0x5D;
   m_OPCodes[0x5E] = &MOS6502Core::OPCode0x5E;
@@ -458,7 +459,8 @@ void MOS6502Core::OPCode0x56() {
 
 /* CLI */
 void MOS6502Core::OPCode0x58() {
-
+  m_SR &= ~INTERRUPT;
+  ++m_PC;
 }
 
 /* EOR abs, Y */
