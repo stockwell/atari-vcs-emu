@@ -60,6 +60,8 @@ void MOS6502Core::InitOpcodeTable() {
 
   m_OPCodes[0x50] = &MOS6502Core::OPCode0x50;
   m_OPCodes[0x51] = &MOS6502Core::OPCode0x51;
+  m_OPCodes[0x55] = &MOS6502Core::OPCode0x55;
+  m_OPCodes[0x56] = &MOS6502Core::OPCode0x56;
   m_OPCodes[0x58] = &MOS6502Core::OPCode0x58;
   m_OPCodes[0x59] = &MOS6502Core::OPCode0x59;
   m_OPCodes[0x5D] = &MOS6502Core::OPCode0x5D;
@@ -449,12 +451,14 @@ void MOS6502Core::OPCode0x51() {
 
 /* EOR zpg, X*/
 void MOS6502Core::OPCode0x55() {
-
+  OPCodesEOR(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* LSR zpg, X */
 void MOS6502Core::OPCode0x56() {
-
+  OPCodesLSR(m_pMemory->Read(++m_PC) + m_XR);
+  ++m_PC;
 }
 
 /* CLI */
