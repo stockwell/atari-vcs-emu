@@ -86,6 +86,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x7D] = &MOS6502Core::OPCode0x7D;
   m_OPCodes[0x7E] = &MOS6502Core::OPCode0x7E;
 
+  m_OPCodes[0x81] = &MOS6502Core::OPCode0x81;
   m_OPCodes[0x84] = &MOS6502Core::OPCode0x84;
   m_OPCodes[0x85] = &MOS6502Core::OPCode0x85;
   m_OPCodes[0x86] = &MOS6502Core::OPCode0x86;
@@ -119,6 +120,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xB0] = &MOS6502Core::OPCode0xB0;
   m_OPCodes[0xB8] = &MOS6502Core::OPCode0xB8;
 
+  m_OPCodes[0xC1] = &MOS6502Core::OPCode0xC1;
   m_OPCodes[0xC5] = &MOS6502Core::OPCode0xC5;
   m_OPCodes[0xC8] = &MOS6502Core::OPCode0xC8;
   m_OPCodes[0xCA] = &MOS6502Core::OPCode0xCA;
@@ -612,7 +614,11 @@ void MOS6502Core::OPCode0x7E() {
 
 /* STA X-Indirect */
 void MOS6502Core::OPCode0x81() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_XR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesSTA(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* STY zpg */
@@ -860,7 +866,11 @@ void MOS6502Core::OPCode0xC0() {
 
 /* CMP X-Indirect */
 void MOS6502Core::OPCode0xC1() {
+  uint16_t address = m_pMemory->Read(++m_PC) + m_XR;
+  address |= (m_pMemory->Read(address + 1u)) << 8u;
 
+  OPCodesCMP(m_pMemory->Read(address));
+  ++m_PC;
 }
 
 /* CPY zpg */
