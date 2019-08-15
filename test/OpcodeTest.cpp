@@ -41,7 +41,6 @@ TEST_F(MOS6502Test, ResetTest) {
 
   ASSERT_EQ(m_pProcessor->m_SP, 0xFD);
   ASSERT_EQ(m_pProcessor->m_PC, 0xAA55);
-
 }
 
 /* 0x00 */
