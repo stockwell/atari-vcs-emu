@@ -144,6 +144,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xCD] = &MOS6502Core::OPCode0xCD;
   m_OPCodes[0xCE] = &MOS6502Core::OPCode0xCE;
 
+  m_OPCodes[0xD0] = &MOS6502Core::OPCode0xD0;
   m_OPCodes[0xD1] = &MOS6502Core::OPCode0xD1;
   m_OPCodes[0xD5] = &MOS6502Core::OPCode0xD5;
   m_OPCodes[0xD6] = &MOS6502Core::OPCode0xD6;
@@ -164,6 +165,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0xED] = &MOS6502Core::OPCode0xED;
   m_OPCodes[0xEE] = &MOS6502Core::OPCode0xEE;
 
+  m_OPCodes[0xF0] = &MOS6502Core::OPCode0xF0;
   m_OPCodes[0xF1] = &MOS6502Core::OPCode0xF1;
   m_OPCodes[0xF5] = &MOS6502Core::OPCode0xF5;
   m_OPCodes[0xF6] = &MOS6502Core::OPCode0xF6;
@@ -994,9 +996,10 @@ void MOS6502Core::OPCode0xCE() {
   m_PC += 3;
 }
 
-/* BNE # */
+/* BNE Relative */
 void MOS6502Core::OPCode0xD0() {
-
+  m_SR & NEGATIVE ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
+  ++m_PC;
 }
 
 /* CMP Y-Indirect */
@@ -1117,7 +1120,8 @@ void MOS6502Core::OPCode0xEE() {
 
 /* BEQ, Relative */
 void MOS6502Core::OPCode0xF0() {
-
+  m_SR & ZERO ? m_PC += m_pMemory->Read(++m_PC) : ++m_PC;
+  ++m_PC;
 }
 
 /* SBC Indirect, Y */
@@ -1337,7 +1341,11 @@ void MOS6502Core::OPCodesROL(uint16_t address) {
 }
 
 void MOS6502Core::OPCodesBIT(uint16_t address) {
+  uint8_t val = m_pMemory->Read(address) & m_AC;
+  m_SR = (m_SR & 0x3F) | (val & 0xC0);
 
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::StackPush(uint16_t pushval) {
