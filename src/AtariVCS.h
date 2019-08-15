@@ -6,6 +6,7 @@
 class Cartridge;
 class MOS6502Core;
 class Memory;
+class TIACore;
 
 class AtariVCS
 {
@@ -22,6 +23,7 @@ private:
   Cartridge* m_pCartridge;
   MOS6502Core* m_pProcessor;
   Memory* m_pMemory;
+  TIACore* m_pTIA;
 };
 
 #endif //ATARI_VCS_EMU_ATARIVCS_H

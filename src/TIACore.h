@@ -7,11 +7,12 @@ class TIACore {
 public:
     TIACore();
     ~TIACore();
+    void Init();
     void Write(uint8_t address, uint8_t value);
     uint8_t Read(uint8_t address);
 };
 
-static const char* kTIAReadRegisterNames[0x0F] = {
+static const char* kTIAReadRegisterNames[0x0E] = {
     "Cxm0p",    /* Read Collision M0-P1   M0-P0 */
     "Cxm0p",    /*                M1-P0   M1-P1 */
     "Cxp0fb",   /*                P0-PF   P0-BL */
@@ -28,52 +29,54 @@ static const char* kTIAReadRegisterNames[0x0F] = {
     "Intp5"     /* Read Input (Trigger) 1 */
 };
 
+static const char* kTIAWriteRegisterNames[0x2D] = {
+    "Vsync",  /* Vertical Sync Set-Clear              */
+    "Vblank", /* Vertical Blank Set-Clear             */
+    "Wsync",  /* Wait for Horizontal Blank            */
+    "Rsync",  /* Reset Horizontal Sync Counter        */
+    "Nusiz0", /* Number-Size player/missle 0          */
+    "Nusiz1", /* Number-Size player/missle 1          */
+    "Colup0", /* Color-Luminance Player 0             */
+    "Colup1", /* Color-Luminance Player 1             */
+    "Colupf", /* Color-Luminance Playfield            */
+    "Colubk", /* Color-Luminance Background           */
+    "Ctrlpf", /* Control Playfield, Ball, Collisions  */
+    "Refp0",  /* Reflection Player 0                  */
+    "Refp1",  /* Reflection Player 1                  */
+    "Pf0",    /* Playfield Register Byte 0            */
+    "Pf1",    /* Playfield Register Byte 1            */
+    "Pf2",    /* Playfield Register Byte 2            */
+    "Resp0",  /* Reset Player 0                       */
+    "Resp1",  /* Reset Player 1                       */
+    "Resm0",  /* Reset Missle 0                       */
+    "Resm1",  /* Reset Missle 1                       */
+    "Resbl",  /* Reset Ball                           */
+    "Audc0",  /* Audio Control 0                      */
+    "Audc1",  /* Audio Control 1                      */
+    "Audf0",  /* Audio Frequency 0                    */
+    "Audf1",  /* Audio Frequency 1                    */
+    "Audv0",  /* Audio Volume 0                       */
+    "Audv1",  /* Audio Volume 1                       */
+    "Grp0",   /* Graphics Register Player 0           */
+    "Grp1",   /* Graphics Register Player 1           */
+    "Enam0",  /* Graphics Enable Missle 0             */
+    "Enam1",  /* Graphics Enable Missle 1             */
+    "Enabl",  /* Graphics Enable Ball                 */
+    "Hmp0",   /* Horizontal Motion Player 0           */
+    "Hmp1",   /* Horizontal Motion Player 1           */
+    "Hmm0",   /* Horizontal Motion Missle 0           */
+    "Hmm1",   /* Horizontal Motion Missle 1           */
+    "Hmbl",   /* Horizontal Motion Ball               */
+    "Vdelp0", /* Vertical Delay Player 0              */
+    "Vdelp1", /* Vertical Delay Player 1              */
+    "Vdelbl", /* Vertical Delay Ball                  */
+    "Resmp0", /* Reset Missle 0 to Player 0           */
+    "Resmp1", /* Reset Missle 1 to Player 1           */
+    "Hmove",  /* Apply Horizontal Motion              */
+    "Hmclr",  /* Clear Horizontal Move Registers      */
+    "Cxclr"  /* Clear Collision Latches               */
+};
 
-/*
-00      Vsync           0000 00x0       Vertical Sync Set-Clear
-01      Vblank          xx00 00x0       Vertical Blank Set-Clear
-02      Wsync           ---- ----       Wait for Horizontal Blank
-03      Rsync           ---- ----       Reset Horizontal Sync Counter
-04      Nusiz0          00xx 0xxx       Number-Size player/missle 0
-05      Nusiz1          00xx 0xxx       Number-Size player/missle 1
-06      Colup0          xxxx xxx0       Color-Luminance Player 0
-07      Colup1          xxxx xxx0       Color-Luminance Player 1
-08      Colupf          xxxx xxx0       Color-Luminance Playfield
-09      Colubk          xxxx xxx0       Color-Luminance Background
-0A      Ctrlpf          00xx 0xxx       Control Playfield, Ball, Collisions
-0B      Refp0           0000 x000       Reflection Player 0
-0C      Refp1           0000 x000       Reflection Player 1
-0D      Pf0             xxxx 0000       Playfield Register Byte 0
-0E      Pf1             xxxx xxxx       Playfield Register Byte 1
-0F      Pf2             xxxx xxxx       Playfield Register Byte 2
-10      Resp0           ---- ----       Reset Player 0
-11      Resp1           ---- ----       Reset Player 1
-12      Resm0           ---- ----       Reset Missle 0
-13      Resm1           ---- ----       Reset Missle 1
-14      Resbl           ---- ----       Reset Ball
-15      Audc0           0000 xxxx       Audio Control 0
-16      Audc1           0000 xxxx       Audio Control 1
-17      Audf0           000x xxxx       Audio Frequency 0
-18      Audf1           000x xxxx       Audio Frequency 1
-19      Audv0           0000 xxxx       Audio Volume 0
-1A      Audv1           0000 xxxx       Audio Volume 1
-1B      Grp0            xxxx xxxx       Graphics Register Player 0
-1C      Grp1            xxxx xxxx       Graphics Register Player 1
-1D      Enam0           0000 00x0       Graphics Enable Missle 0
-1E      Enam1           0000 00x0       Graphics Enable Missle 1
-1F      Enabl           0000 00x0       Graphics Enable Ball
-20      Hmp0            xxxx 0000       Horizontal Motion Player 0
-21      Hmp1            xxxx 0000       Horizontal Motion Player 1
-22      Hmm0            xxxx 0000       Horizontal Motion Missle 0
-23      Hmm1            xxxx 0000       Horizontal Motion Missle 1
-24      Hmbl            xxxx 0000       Horizontal Motion Ball
-25      Vdelp0          0000 000x       Vertical Delay Player 0
-26      Vdelp1          0000 000x       Vertical Delay Player 1
-27      Vdelbl          0000 000x       Vertical Delay Ball
-28      Resmp0          0000 00x0       Reset Missle 0 to Player 0
-29      Resmp1          0000 00x0       Reset Missle 1 to Player 1
-2A      Hmove           ---- ----       Apply Horizontal Motion
-2B      Hmclr           ---- ----       Clear Horizontal Move Registers
-2C      Cxclr           ---- ----       Clear Collision Latches */
+
 
 #endif //ATARI_VCS_EMU_TIACORE_H

@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include "Memory.h"
+#include "TIACore.h"
 
 #define TIA_START_ADDR  0x00
 #define TIA_END_ADDR    0x7F
@@ -30,6 +31,10 @@ void Memory::SetProcessor(MOS6502Core *pProcessor) {
   m_pProcessor = pProcessor;
 }
 
+void Memory::SetTIA(TIACore *pTIA) {
+  m_pTIA = pTIA;
+}
+
 void Memory::Init() {
   m_pMap = new uint8_t[65536];
 }
@@ -40,7 +45,7 @@ void Memory::Reset() {
   }
 }
 
-void Memory::LoadROM(uint8_t *pROM) {
+void Memory::LoadROM(const uint8_t *pROM) {
   /* Careful - this assumes a 4K ROM */
   for (int i = ROM_START_ADDR, j = 0; i < ROM_END_ADDR; i++, j++) {
     m_pMap[i] = pROM[j];
@@ -48,20 +53,21 @@ void Memory::LoadROM(uint8_t *pROM) {
 }
 void Memory::Load(uint16_t address, uint8_t *bytes, size_t numBytes) {
   /* YOLO */
-  memcpy(m_pMap + (address & 0x1FFF), bytes, numBytes);
+  memcpy(m_pMap + (address & 0x1FFFu), bytes, numBytes);
 }
 
 void Memory::Load(uint16_t address, uint8_t byte) {
   /* YOLO */
-  m_pMap[address & 0x1FFF] = byte;
+  m_pMap[address & 0x1FFFu] = byte;
 }
 
 uint8_t Memory::Read(uint16_t address) {
 
   /* MOS 6507 doesn't have address lines 13-15 connected. Only the first 13 bits of the address actually matter */
-  uint16_t actualAddress = address & 0x1FFF;
+  uint16_t actualAddress = address & 0x1FFFu;
 
   if (actualAddress >= TIA_START_ADDR && actualAddress <= TIA_END_ADDR) {
+    m_pTIA->Read(actualAddress);
     return m_pMap[actualAddress];
   } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_END_ADDR) {
     return m_pMap[actualAddress];
@@ -78,11 +84,12 @@ uint8_t Memory::Read(uint16_t address) {
 
 void Memory::Write(uint16_t address, uint8_t value) {
   /* MOS 6507 doesn't have address lines 13-15 connected. Only the first 13 bits of the address actually matter */
-  uint16_t actualAddress = address & 0x1FFF;
+  uint16_t actualAddress = address & 0x1FFFu;
 
   if (actualAddress >= TIA_START_ADDR && actualAddress <= TIA_END_ADDR) {
-    m_pMap[actualAddress] = value;
-    /* Dispatch to TIA core */
+    /* For convenience reads and write requests will be buffered in m_pMap, consider removing if this isn't useful */
+    m_pMap[actualAddress] = value; /* Note: Buffered value may not be valid */
+    m_pTIA->Write(actualAddress, value);
   } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_END_ADDR) {
     m_pMap[actualAddress] = value;
   } else if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
