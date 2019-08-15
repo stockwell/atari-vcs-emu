@@ -74,6 +74,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x66] = &MOS6502Core::OPCode0x66;
   m_OPCodes[0x68] = &MOS6502Core::OPCode0x68;
   m_OPCodes[0x69] = &MOS6502Core::OPCode0x69;
+  m_OPCodes[0x6A] = &MOS6502Core::OPCode0x6A;
   m_OPCodes[0x6C] = &MOS6502Core::OPCode0x6C;
   m_OPCodes[0x6D] = &MOS6502Core::OPCode0x6D;
   m_OPCodes[0x6E] = &MOS6502Core::OPCode0x6E;
@@ -575,7 +576,16 @@ void MOS6502Core::OPCode0x69() {
 
 /* ROR A */
 void MOS6502Core::OPCode0x6A() {
+  uint16_t val = m_AC;
 
+  if (m_SR & CARRY) val |= 0x100;
+  val & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
+
+  val >>= 1u;
+
+  val & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
+  m_AC = val & 0xFF;
 }
 
 /* JMP Indirect */
@@ -1334,7 +1344,7 @@ void MOS6502Core::OPCodesLSR(uint16_t address) {
 
 void MOS6502Core::OPCodesROR(uint16_t address) {
   uint16_t val = m_pMemory->Read(address);
-  
+
   if (m_SR & CARRY) val |= 0x100;
   val & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
 
@@ -1343,7 +1353,7 @@ void MOS6502Core::OPCodesROR(uint16_t address) {
   val & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 
-  m_pMemory->Write(address, val);
+  m_pMemory->Write(address, val & 0xFF);
 }
 
 void MOS6502Core::OPCodesROL(uint16_t address) {
@@ -1354,7 +1364,7 @@ void MOS6502Core::OPCodesROL(uint16_t address) {
   val & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 
-  m_pMemory->Write(address, val);
+  m_pMemory->Write(address, val & 0xFF);
 }
 
 void MOS6502Core::OPCodesBIT(uint16_t address) {
