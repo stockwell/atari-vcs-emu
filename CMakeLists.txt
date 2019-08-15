@@ -15,7 +15,7 @@ add_executable(atari-vcs-emu
         src/HexDump.cpp
         src/Memory.cpp
         src/RIOTCore.cpp
-        src/Opcodes.cpp)
+        src/Opcodes.cpp src/TIACore.h)
 
 target_include_directories(atari-vcs-emu PUBLIC src)
 target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1)
