@@ -10,6 +10,63 @@ public:
     void Init();
     void Write(uint8_t address, uint8_t value);
     uint8_t Read(uint8_t address);
+
+private:
+  void(TIACore::*m_WriteRegisters[0x2E])(uint8_t value);
+  uint8_t *m_pMem;
+
+private:
+  uint8_t TIARead(uint8_t address);
+
+  void TIAWrite0x00(uint8_t value);
+  void TIAWrite0x01(uint8_t value);
+  void TIAWrite0x02(uint8_t value);
+  void TIAWrite0x03(uint8_t value);
+  void TIAWrite0x04(uint8_t value);
+  void TIAWrite0x05(uint8_t value);
+  void TIAWrite0x06(uint8_t value);
+  void TIAWrite0x07(uint8_t value);
+  void TIAWrite0x08(uint8_t value);
+  void TIAWrite0x09(uint8_t value);
+  void TIAWrite0x0A(uint8_t value);
+  void TIAWrite0x0B(uint8_t value);
+  void TIAWrite0x0C(uint8_t value);
+  void TIAWrite0x0D(uint8_t value);
+  void TIAWrite0x0E(uint8_t value);
+  void TIAWrite0x0F(uint8_t value);
+
+  void TIAWrite0x10(uint8_t value);
+  void TIAWrite0x11(uint8_t value);
+  void TIAWrite0x12(uint8_t value);
+  void TIAWrite0x13(uint8_t value);
+  void TIAWrite0x14(uint8_t value);
+  void TIAWrite0x15(uint8_t value);
+  void TIAWrite0x16(uint8_t value);
+  void TIAWrite0x17(uint8_t value);
+  void TIAWrite0x18(uint8_t value);
+  void TIAWrite0x19(uint8_t value);
+  void TIAWrite0x1A(uint8_t value);
+  void TIAWrite0x1B(uint8_t value);
+  void TIAWrite0x1C(uint8_t value);
+  void TIAWrite0x1D(uint8_t value);
+  void TIAWrite0x1E(uint8_t value);
+  void TIAWrite0x1F(uint8_t value);
+
+  void TIAWrite0x20(uint8_t value);
+  void TIAWrite0x21(uint8_t value);
+  void TIAWrite0x22(uint8_t value);
+  void TIAWrite0x23(uint8_t value);
+  void TIAWrite0x24(uint8_t value);
+  void TIAWrite0x25(uint8_t value);
+  void TIAWrite0x26(uint8_t value);
+  void TIAWrite0x27(uint8_t value);
+  void TIAWrite0x28(uint8_t value);
+  void TIAWrite0x29(uint8_t value);
+  void TIAWrite0x2A(uint8_t value);
+  void TIAWrite0x2B(uint8_t value);
+  void TIAWrite0x2C(uint8_t value);
+  void TIAWrite0x2D(uint8_t value);
+
 };
 
 static const char* kTIAReadRegisterNames[0x0E] = {
