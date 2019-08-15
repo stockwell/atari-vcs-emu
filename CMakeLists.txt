@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsa
 set(PROJECT_ROOT ${PROJECT_SOURCE_DIR})
 
 add_executable(atari-vcs-emu
-        src/main.cpp
+        platform/Linux-x86_64/main.cpp
         src/Cart.cpp
         src/AtariVCS.cpp
         src/MOS6502Core.cpp
@@ -17,6 +17,7 @@ add_executable(atari-vcs-emu
         src/RIOTCore.cpp
         src/Opcodes.cpp)
 
+target_include_directories(atari-vcs-emu PUBLIC src)
 target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1)
 
 # subproject for unit tests

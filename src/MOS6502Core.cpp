@@ -46,6 +46,7 @@ void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
       m_SR & OVERFLOW ? "O ": "",
       m_SR & NEGATIVE ? "N ": "");
   (this->*m_OPCodes[opcode])();
+  // TODO: OPCode handler should return how many cycles it took to execute.
 }
 
 uint8_t MOS6502Core::Tick() {
