@@ -35,6 +35,7 @@ void MOS6502Core::InitOpcodeTable() {
   m_OPCodes[0x26] = &MOS6502Core::OPCode0x26;
   m_OPCodes[0x28] = &MOS6502Core::OPCode0x28;
   m_OPCodes[0x29] = &MOS6502Core::OPCode0x29;
+  m_OPCodes[0x2A] = &MOS6502Core::OPCode0x2A;
   m_OPCodes[0x2C] = &MOS6502Core::OPCode0x2C;
   m_OPCodes[0x2D] = &MOS6502Core::OPCode0x2D;
   m_OPCodes[0x2E] = &MOS6502Core::OPCode0x2E;
@@ -342,7 +343,14 @@ void MOS6502Core::OPCode0x29() {
 
 /* ROL A */
 void MOS6502Core::OPCode0x2A() {
+  uint16_t val = m_AC;
 
+  if (m_SR & CARRY) val |= 0x01;
+  val > 0xFF ? m_SR |= CARRY : m_SR &= ~CARRY;
+  val & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
+
+  m_AC = val & 0xFF;
 }
 
 /* BIT ABS */
