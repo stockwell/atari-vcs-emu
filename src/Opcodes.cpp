@@ -465,9 +465,9 @@ void MOS6502Core::OPCode0x49() {
 
 /* LSR A */
 void MOS6502Core::OPCode0x4A() {
-  m_AC & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
+  m_AC & 0x01u ? m_SR |= CARRY : m_SR &= ~CARRY;
 
-  m_AC >>= 1;
+  m_AC >>= 1u;
 
   m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
@@ -494,8 +494,11 @@ void MOS6502Core::OPCode0x4E() {
 
 /* BVC */
 void MOS6502Core::OPCode0x50() {
-  (m_SR & OVERFLOW) == 0x00 ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
-  ++m_PC;
+  if ((m_SR & OVERFLOW) == 0x00) {
+    int offset = (int8_t)m_pMemory->Read(m_PC + 1);
+    m_PC += offset;
+  }
+  m_PC += 2;
 }
 
 /* EOR Y-Indirect */
