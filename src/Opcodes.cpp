@@ -1333,15 +1333,27 @@ void MOS6502Core::OPCodesLSR(uint16_t address) {
 }
 
 void MOS6502Core::OPCodesROR(uint16_t address) {
+  uint16_t val = m_pMemory->Read(address);
+  
+  if (m_SR & CARRY) val |= 0x100;
+  val & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
 
+  val >>= 1u;
+
+  val & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
+
+  m_pMemory->Write(address, val);
 }
 
 void MOS6502Core::OPCodesROL(uint16_t address) {
   uint16_t val = m_pMemory->Read(address) << 1u;
+
   if (m_SR & CARRY) val |= 0x01;
   val > 0xFF ? m_SR |= CARRY : m_SR &= ~CARRY;
   val & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
-  val ? m_SR &= ~NEGATIVE : m_SR |= NEGATIVE;
+  val ? m_SR &= ~ZERO : m_SR |= ZERO;
+
   m_pMemory->Write(address, val);
 }
 
