@@ -351,6 +351,7 @@ void MOS6502Core::OPCode0x2A() {
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 
   m_AC = val & 0xFF;
+  ++m_PC;
 }
 
 /* BIT ABS */
@@ -464,13 +465,14 @@ void MOS6502Core::OPCode0x49() {
 
 /* LSR A */
 void MOS6502Core::OPCode0x4A() {
-  ++m_PC;
   m_AC & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
 
   m_AC >>= 1;
 
   m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
+
+  ++m_PC;
 }
 
 /* JMP abs */
@@ -593,7 +595,10 @@ void MOS6502Core::OPCode0x6A() {
 
   val & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
+
   m_AC = val & 0xFF;
+
+  ++m_PC;
 }
 
 /* JMP Indirect */
