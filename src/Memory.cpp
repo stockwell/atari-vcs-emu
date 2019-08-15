@@ -67,6 +67,8 @@ uint8_t Memory::Read(uint16_t address) {
     return m_pMap[actualAddress];
   } else if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
     return m_pMap[actualAddress];
+  } else if (actualAddress >= RIOT_START_ADDR && actualAddress <= RIOT_END_ADDR) {
+    return m_pMap[actualAddress];
   } else if (actualAddress >= ROM_START_ADDR && actualAddress <= ROM_END_ADDR) {
     return m_pMap[actualAddress];
   }

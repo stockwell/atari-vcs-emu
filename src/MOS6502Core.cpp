@@ -26,6 +26,8 @@ void MOS6502Core::Reset() {
   m_YR = 0x00;
   m_SR = CONSTANT;
   m_SP = 0xFD;
+
+  this->Resume();
 }
 
 uint8_t MOS6502Core::FetchOPCode() {
@@ -48,4 +50,12 @@ void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
 
 uint8_t MOS6502Core::Tick() {
   ExecuteOPCode(FetchOPCode());
+}
+
+void MOS6502Core::Halt() {
+  m_Running = false;
+}
+
+void MOS6502Core::Resume() {
+  m_Running = true;
 }

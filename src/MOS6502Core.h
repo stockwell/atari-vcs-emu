@@ -31,6 +31,8 @@ public:
   void Reset();
   void InitOpcodeTable();
   uint8_t Tick();
+  void Halt();
+  void Resume();
 
 public:
   uint16_t m_PC;
@@ -43,6 +45,7 @@ public:
 
 private:
   void(MOS6502Core::*m_OPCodes[0x100])();
+  bool m_Running;
 
 private:
   uint8_t FetchOPCode();

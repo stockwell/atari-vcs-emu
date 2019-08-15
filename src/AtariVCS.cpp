@@ -41,5 +41,23 @@ void AtariVCS::Reset() {
 }
 
 void AtariVCS::RunToVBlank(CRGBA *pFrameBuffer, int16_t *pSampleBuffer, int *pSampleCount) {
-  m_pProcessor->Tick();
+  int pixel_idx = 0;
+  m_pProcessor->Resume(); // Resume 6507 which was halted due to write to WSYNC
+
+  /* 262 scanlines per frame */
+  for (size_t scan_line = 0; scan_line < 262; scan_line++) {
+    /* 228 clock counts per scanline */
+    for (size_t v_clock = 0; v_clock < 228; v_clock++) {
+      if ((v_clock % 3) == 0)
+        m_pProcessor->Tick();
+
+      // First 3 scanlines are vertical sync, followed by 37 scanlines of vertical blank.
+      // Last 30 scanlines are overscan
+      // First 68 clock cycles are the horizontal blanking period
+      // 160 x 192 effective pixels
+      if (scan_line >= 40 && scan_line <= 132 && v_clock >= 68) {
+        //pFrameBuffer[pixel_idx] = tia.getPixel(pixel_idx++);
+      }
+    }
+  }
 }
