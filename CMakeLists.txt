@@ -6,6 +6,10 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsa
 
 set(PROJECT_ROOT ${PROJECT_SOURCE_DIR})
 
+set( SDL_STATIC ON CACHE BOOL "" FORCE )
+set( SDL_SHARED OFF CACHE BOOL "" FORCE )
+add_subdirectory( vendor/SDL-mirror )
+
 add_executable(atari-vcs-emu
         platform/Linux-x86_64/main.cpp
         src/Cart.cpp
@@ -19,6 +23,7 @@ add_executable(atari-vcs-emu
 
 target_include_directories(atari-vcs-emu PUBLIC src)
 target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1)
+target_link_libraries(atari-vcs-emu SDL2main SDL2-static)
 
 # subproject for unit tests
 add_subdirectory(vendor/googletest)
