@@ -90,6 +90,3 @@ void AtariVCS::RunToVBlank(CRGBA *pFrameBuffer, int16_t *pSampleBuffer, int *pSa
     }
   }
 }
-
-//37120
-
