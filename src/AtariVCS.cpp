@@ -51,22 +51,45 @@ void AtariVCS::Reset() {
 void AtariVCS::RunToVBlank(CRGBA *pFrameBuffer, int16_t *pSampleBuffer, int *pSampleCount) {
   int pixel_idx = 0;
 
+  static int offset = 0;
+  static bool direction = true;
+
+  if (direction) {
+    if (++offset == 0xFF) {
+      direction = false;
+    }
+  } else {
+    if (--offset == 0) {
+      direction = true;
+    }
+  }
+
   /* 262 scanlines per frame */
   for (size_t scan_line = 0; scan_line < 262; scan_line++) {
     m_pProcessor->Resume(); // Resume 6507 which was halted due to write to WSYNC
 
     /* 228 clock counts per scanline */
-    for (size_t v_clock = 0; v_clock < 228; v_clock++) {
-      if ((v_clock % 3) == 0)
+    for (size_t h_clock = 0; h_clock < 228; h_clock++) {
+      if ((h_clock % 3) == 0)
         m_pProcessor->Tick();
 
       // First 3 scanlines are vertical sync, followed by 37 scanlines of vertical blank.
       // Last 30 scanlines are overscan
       // First 68 clock cycles are the horizontal blanking period
       // 160 x 192 effective pixels
-      if (scan_line >= 40 && scan_line <= 132 && v_clock >= 68) {
-        //pFrameBuffer[pixel_idx] = tia.getPixel(pixel_idx++);
+      if (scan_line >= 40 && scan_line < 232 && h_clock >= 68) {
+        /* Test pattern */
+        CRGBA colour;
+        colour.red = (offset) & 0xFF;
+        colour.green = (offset << 1) & 0xFF;
+        colour.blue =  (offset << 2) & 0xFF;
+        colour.alpha = 0xFF;
+
+        pFrameBuffer[pixel_idx++] = colour; //tia.getPixel(pixel_idx++);
       }
     }
   }
 }
+
+//37120
+
