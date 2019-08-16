@@ -8,8 +8,8 @@ public:
     TIACore();
     ~TIACore();
     void Init();
-    void Write(uint8_t address, uint8_t value);
-    uint8_t Read(uint8_t address);
+    void Write(uint16_t address, uint8_t value);
+    uint8_t Read(uint16_t address);
 
 private:
   void(TIACore::*m_WriteRegisters[0x2E])(uint8_t value);

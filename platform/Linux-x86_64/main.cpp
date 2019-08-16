@@ -122,7 +122,7 @@ int main() {
   /* Loop, waiting for QUIT or the escape key */
 
   do {
-    //emulator->RunToVBlank(framebuffer);
+    emulator->RunToVBlank(framebuffer);
     if (!draw(framebuffer)) {
       emulator->Stop();
     }
