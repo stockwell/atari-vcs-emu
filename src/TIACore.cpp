@@ -62,14 +62,14 @@ void TIACore::Init() {
 
 uint8_t TIACore::Read(uint16_t address) {
   if (address < (sizeof kTIAReadRegisterNames / sizeof kTIAReadRegisterNames[0]))
-    printf("TIA Read: %s\n", kTIAReadRegisterNames[address]);
+    Log("TIA Read: %s", kTIAReadRegisterNames[address]);
 
-  return 0x00;
+  return m_pMem[address];
 }
 
 void TIACore::Write(uint16_t address, uint8_t value) {
   if (address < (sizeof kTIAWriteRegisterNames / sizeof kTIAWriteRegisterNames[0]))
-    printf("TIA Write: %s (%u)\n", kTIAWriteRegisterNames[address], value);
+    Log("TIA Write: %s (%u)", kTIAWriteRegisterNames[address], value);
 }
 
 void TIACore::TIAWrite0x00(uint8_t value){
@@ -109,7 +109,7 @@ void TIACore::TIAWrite0x08(uint8_t value){
 }
 
 void TIACore::TIAWrite0x09(uint8_t value){
-
+  __asm("NOP");
 }
 
 void TIACore::TIAWrite0x0A(uint8_t value){
