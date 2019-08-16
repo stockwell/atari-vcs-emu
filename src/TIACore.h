@@ -16,8 +16,6 @@ private:
   uint8_t *m_pMem;
 
 private:
-  uint8_t TIARead(uint8_t address);
-
   void TIAWrite0x00(uint8_t value);
   void TIAWrite0x01(uint8_t value);
   void TIAWrite0x02(uint8_t value);

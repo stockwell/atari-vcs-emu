@@ -62,14 +62,12 @@ void TIACore::Init() {
 
 uint8_t TIACore::Read(uint8_t address) {
   printf("TIA Read: %s\n", kTIAReadRegisterNames[address]);
+
+  return 0x00;
 }
 
 void TIACore::Write(uint8_t address, uint8_t value) {
   printf("TIA Write: %s (%u)\n", kTIAWriteRegisterNames[address], value);
-}
-
-uint8_t TIACore::TIARead(uint8_t address) {
-
 }
 
 void TIACore::TIAWrite0x00(uint8_t value){
