@@ -11,6 +11,10 @@ AtariVCS::AtariVCS() {
 }
 
 AtariVCS::~AtariVCS() {
+  SafeDelete(m_pCartridge)
+  SafeDelete(m_pMemory)
+  SafeDelete(m_pProcessor)
+  SafeDelete(m_pTIA)
 
 }
 
