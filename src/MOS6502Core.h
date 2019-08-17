@@ -25,8 +25,8 @@
 
 class MOS6502Core {
 public:
-  MOS6502Core(Memory* pMemory);
-  ~MOS6502Core();
+  explicit MOS6502Core(Memory* pMemory);
+  ~MOS6502Core() = default;
   void Reset();
   void InitOpcodeTable();
   void Tick();

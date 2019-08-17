@@ -29,7 +29,7 @@ bool AtariVCS::LoadROM(const char *szFilePath) {
     return false;
   }
 
-  m_pMemory->LoadROM(m_pCartridge->GetROM());
+  m_pMemory->LoadROM(m_pCartridge->GetROM(), m_pCartridge->GetRomSize());
 
   return true;
 }
@@ -39,7 +39,7 @@ bool AtariVCS::LoadROM(std::vector<uint8_t>* romBuffer) {
     return false;
   }
 
-  m_pMemory->LoadROM(m_pCartridge->GetROM());
+  m_pMemory->LoadROM(m_pCartridge->GetROM(), m_pCartridge->GetRomSize());
   return true;
 }
 
@@ -48,6 +48,10 @@ void AtariVCS::Reset() {
 }
 
 void AtariVCS::RunToVBlank(uint8_t *pFrameBuffer, int16_t *pSampleBuffer, int *pSampleCount) {
-  m_pProcessor->Tick();
-  m_pTIA->Tick(pFrameBuffer);
+  while (1) {
+    m_pProcessor->Tick();
+
+    if (m_pTIA->Tick(pFrameBuffer))
+      break;
+  }
 }

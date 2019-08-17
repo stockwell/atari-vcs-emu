@@ -41,12 +41,13 @@ void Memory::Reset() {
   }
 }
 
-void Memory::LoadROM(const uint8_t *pROM) {
-  /* Careful - this assumes a 4K ROM */
+void Memory::LoadROM(const uint8_t *pROM, uint16_t romSize) {
+  /* For a 2K ROM cart A11 isn't connected - effectively 0x1000 - 0x17FF is mirrored from 0x1800 - 0x1FFF */
   for (int i = ROM_START_ADDR, j = 0; i < ROM_END_ADDR; i++, j++) {
-    m_pMap[i] = pROM[j];
+    m_pMap[i] = pROM[j % romSize];
   }
 }
+
 void Memory::Load(uint16_t address, uint8_t *bytes, size_t numBytes) {
   /* YOLO */
   memcpy(m_pMap + (address & 0x1FFFu), bytes, numBytes);

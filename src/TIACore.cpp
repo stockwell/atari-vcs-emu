@@ -13,6 +13,11 @@ TIACore::TIACore(MOS6502Core *Processor) {
   m_Ball = new Ball();
   m_Background = new Background();
 
+  m_PixelIndex = 0x00;
+  m_Clock = 0x00;
+  m_Vblank = false;
+  m_Vsync = false;
+
   m_WriteRegisters[0x00] = &TIACore::TIAWrite0x00;
   m_WriteRegisters[0x01] = &TIACore::TIAWrite0x01;
   m_WriteRegisters[0x02] = &TIACore::TIAWrite0x02;
@@ -67,8 +72,6 @@ TIACore::~TIACore() {
   SafeDeleteArray(m_pMem)
 }
 bool TIACore::Tick(uint8_t *pFramebuffer) {
-  ++m_Clock;
-
   // Scanlines consist of:
   // Horizontal Blank -|- Game Draw Space
   //     68 ticks      |    160 ticks
@@ -80,22 +83,31 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
   //  192   | Game Draw Space
   //   30   | Overscan
 
-  // New scanline, resume processor if it was suspended by WSYNC
-  if (m_Clock % 228) {
+  int currentLine = m_Clock / 228;
+  int currentPos = m_Clock % 228;
+
+  /* New scanline, resume processor if it was suspended by WSYNC */
+  if (currentPos == 0x00) {
     m_pProcessor->Resume();
   }
 
-  /* Do something */
-  m_Background->GetColor();
+  /* Game Draw Space */
+  if ((currentLine >= 40) && (currentLine < 232) && (currentPos >= 68)) {
+    // TODO: Work out what colour this pixel should be..
+    pFramebuffer[m_PixelIndex++] = m_Background->GetColour();
+  }
 
-  if (m_Vblank) {
-    m_Vblank = false;
+  if (m_Vsync || (currentLine == 262)) {
+    m_Vsync = false;
 
     // New Frame
+    m_PixelIndex = 0x00;
     m_Clock = 0x00;
     m_pProcessor->Resume();
     return true;
   }
+
+  ++m_Clock;
 
   return false;
 }

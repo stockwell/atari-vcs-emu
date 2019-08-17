@@ -7,10 +7,6 @@
 #include "Common.h"
 
 
-Cartridge::Cartridge() {
-
-}
-
 Cartridge::~Cartridge() {
   SafeDeleteArray(m_pROM)
 }
@@ -93,6 +89,10 @@ uint8_t* Cartridge::GetROM() {
   }
 
   return m_bLoaded ?  m_pROM : nullptr;
+}
+
+uint16_t Cartridge::GetRomSize() {
+  return (uint16_t)m_iTotalSize;
 }
 
 void Cartridge::Reset() {

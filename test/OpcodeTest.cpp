@@ -1310,6 +1310,35 @@ TEST_F(MOS6502Test, OpcodeCMP_ABS) {
   ASSERT_EQ(0xf009, m_pProcessor->m_PC);
 }
 
+/* 0xD0 */
+TEST_F(MOS6502Test, OPcodeBNE) {
+  uint8_t instr[] = {0xD0, 0xFB,  /* BNE -5*/
+                     0xD0, 0xFB,  /* BNE -5 */
+                     0xD0, 0x05,  /* BNE 5 */
+                     0xD0, 0x05}; /* BNE 5 */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->m_SR |= ZERO;
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF002, m_pProcessor->m_PC);
+
+  m_pProcessor->m_SR &= ~ZERO;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xEFFF, m_pProcessor->m_PC);
+
+  m_pProcessor->m_PC = 0xF004;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF00B, m_pProcessor->m_PC);
+
+  m_pProcessor->m_SR |= ZERO;
+  m_pProcessor->m_PC = 0xF006;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF008, m_pProcessor->m_PC);
+}
+
+
 /* 0xD5 */
 TEST_F(MOS6502Test, OpcodeCMP_ZPG_X) {
   uint8_t instr[] = {0xD5, 0x80,   /* CMP $80, X */
@@ -1456,6 +1485,34 @@ TEST_F(MOS6502Test, OpcodeNOP) {
   m_pProcessor->Tick();
 
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
+/* 0xF0 */
+TEST_F(MOS6502Test, OPcodeBEQ) {
+  uint8_t instr[] = {0xF0, 0xFB,  /* BEQ -5*/
+                     0xF0, 0xFB,  /* BEQ -5 */
+                     0xF0, 0x05,  /* BEQ 5 */
+                     0xF0, 0x05}; /* BEQ 5 */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+
+  m_pProcessor->m_SR &= ~ZERO;
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF002, m_pProcessor->m_PC);
+
+  m_pProcessor->m_SR |= ZERO;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xEFFF, m_pProcessor->m_PC);
+
+  m_pProcessor->m_PC = 0xF004;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF00B, m_pProcessor->m_PC);
+
+  m_pProcessor->m_SR &= ~ZERO;
+  m_pProcessor->m_PC = 0xF006;
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xF008, m_pProcessor->m_PC);
 }
 
 /* 0xF8 */

@@ -10,10 +10,6 @@ MOS6502Core::MOS6502Core(Memory* pMemory) {
   m_pMemory->SetProcessor(this);
 }
 
-MOS6502Core::~MOS6502Core() {
-
-}
-
 void MOS6502Core::Reset() {
   /* Load reset vector */
   m_PC = (unsigned)m_pMemory->Read(RESET_VECTOR + 1) << 8u | m_pMemory->Read(RESET_VECTOR);
@@ -49,7 +45,7 @@ uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode) {
   (this->*m_OPCodes[opcode])();
 
   // TODO: This doesn't account for extra cycles due to crossing a page boundary or branching
-  return cycletime[opcode];
+    return cycletime[opcode];
 }
 
 void MOS6502Core::Tick() {
@@ -59,9 +55,14 @@ void MOS6502Core::Tick() {
   }
 
   /* MOS6507 clock is 1/3 the graphics clock */
+  #ifndef DISABLE_CPU_CYCLE_ACCURACY
   if (!--m_Delay) {
     m_Delay = (ExecuteOPCode(FetchOPCode())) * 3;
   }
+  #else
+    m_Delay = (ExecuteOPCode(FetchOPCode())) * 3;
+  #endif
+
 }
 
 void MOS6502Core::Halt() {

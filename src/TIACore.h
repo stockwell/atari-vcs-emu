@@ -159,7 +159,7 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
 class Background {
 public:
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColor() { return m_Colour; };
+  uint8_t GetColour() { return m_Colour; };
 
 private:
   uint8_t m_Colour;
@@ -168,7 +168,7 @@ private:
 class Missile {
 public:
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColor() { return m_Colour; };
+  uint8_t GetColour() { return m_Colour; };
 
 private:
   uint8_t m_Colour;
@@ -177,7 +177,7 @@ private:
 class Player {
 public:
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColor() { return m_Colour; };
+  uint8_t GetColour() { return m_Colour; };
 
 private:
   uint8_t m_Colour;
@@ -186,7 +186,7 @@ private:
 class Ball {
 public:
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColor() { return m_Colour; };
+  uint8_t GetColour() { return m_Colour; };
 
 private:
   uint8_t m_Colour;
@@ -195,7 +195,7 @@ private:
 class Playfield {
 public:
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColor() { return m_Colour; };
+  uint8_t GetColour() { return m_Colour; };
 
 private:
   uint8_t m_Colour;

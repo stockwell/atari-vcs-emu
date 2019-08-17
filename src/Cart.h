@@ -7,12 +7,13 @@
 class Cartridge
 {
 public:
-  Cartridge();
+  Cartridge() = default;
   ~Cartridge();
   void Reset();
   bool LoadFromFile(const char* path);
   bool LoadFromBuffer(const uint8_t* buffer, int size);
   uint8_t* GetROM();
+  uint16_t GetRomSize();
 
 private:
   uint8_t* m_pROM;

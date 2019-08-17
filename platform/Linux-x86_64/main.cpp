@@ -80,7 +80,7 @@ void UpdateTexture(SDL_Texture *texture, uint8_t *framebuffer) {
   for (row = 0; row < ATARI_2600_H; ++row) {
     dst = (Uint32*)((Uint8*)pixels + row * pitch);
     for (col = 0; col < ATARI_2600_W; ++col) {
-      *dst++ = (0xFF000000|(ColourLUT[framebuffer[src++]]));
+      *dst++ = (0xFF000000|(ColourLUT[framebuffer[src++] & 0xFEu]));
     }
   }
   SDL_UnlockTexture(texture);
@@ -157,10 +157,12 @@ int main() {
 #endif
 
   /* Loop, waiting for QUIT or the escape key */
-
+  uint8_t frames = 2;
   do {
     emulator->RunToVBlank(framebuffer);
-    //emulator->Stop();
+    if (!--frames) {
+      //emulator->Stop();
+    }
 
 #ifndef DISABLE_RENDERER
     if (!draw(framebuffer)) {
