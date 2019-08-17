@@ -4,3 +4,6 @@
 [submodule "vendor/SDL-mirror"]
 	path = vendor/SDL-mirror
 	url = git@github.com:spurious/SDL-mirror.git
+[submodule "platform/ESP32/vendor/esp-idf"]
+	path = platform/ESP32/vendor/esp-idf
+	url = git@github.com:espressif/esp-idf.git
