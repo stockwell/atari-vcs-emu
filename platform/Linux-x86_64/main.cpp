@@ -24,8 +24,11 @@ private:
   std::mutex m;
 };
 
-#define ATARI_2600_W 160
-#define ATARI_2600_H 192
+#define ATARI_2600_FB_W 160
+#define ATARI_2600_FB_H 192
+
+#define EMU_WINDOW_W  900
+#define EMU_WINDOW_H  600
 
 SDL_Renderer *renderer;
 int frame;
@@ -77,9 +80,9 @@ void UpdateTexture(SDL_Texture *texture, uint8_t *framebuffer) {
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't lock texture: %s\n", SDL_GetError());
   }
 
-  for (row = 0; row < ATARI_2600_H; ++row) {
+  for (row = 0; row < ATARI_2600_FB_H; ++row) {
     dst = (Uint32*)((Uint8*)pixels + row * pitch);
-    for (col = 0; col < ATARI_2600_W; ++col) {
+    for (col = 0; col < ATARI_2600_FB_W; ++col) {
       *dst++ = (0xFF000000|(ColourLUT[framebuffer[src++] & 0xFEu]));
     }
   }
@@ -127,7 +130,7 @@ void SDL_Init(void) {
   window = SDL_CreateWindow("Atari 2600 Emu",
                             SDL_WINDOWPOS_UNDEFINED,
                             SDL_WINDOWPOS_UNDEFINED,
-                            ATARI_2600_W*4, ATARI_2600_H*3,
+                            EMU_WINDOW_W, EMU_WINDOW_H,
                             SDL_WINDOW_RESIZABLE);
   if (!window) {
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create window: %s\n", SDL_GetError());
@@ -138,7 +141,7 @@ void SDL_Init(void) {
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create renderer: %s\n", SDL_GetError());
   }
 
-  EmuTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, ATARI_2600_W, ATARI_2600_H);
+  EmuTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, ATARI_2600_FB_W, ATARI_2600_FB_H);
   if (!EmuTexture) {
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create texture: %s\n", SDL_GetError());
   }
