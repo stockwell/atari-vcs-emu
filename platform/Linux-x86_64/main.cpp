@@ -5,6 +5,8 @@
 
 #include "AtariVCS.h"
 
+#define DISABLE_RENDERER
+
 class Emulator
 {
 public:
@@ -92,7 +94,7 @@ void SDL_Init(void) {
   window = SDL_CreateWindow("Atari 2600 Emu",
                             SDL_WINDOWPOS_UNDEFINED,
                             SDL_WINDOWPOS_UNDEFINED,
-                            ATARI_2600_W*4, ATARI_2600_H*4,
+                            ATARI_2600_W*4, ATARI_2600_H*3,
                             SDL_WINDOW_RESIZABLE);
   if (!window) {
     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create window: %s\n", SDL_GetError());
@@ -117,18 +119,28 @@ int main() {
   // NTSC Resolution
   auto *framebuffer = new CRGBA[160*192];
 
+#ifndef DISABLE_RENDERER
   SDL_Init();
-
+#endif
+  
   /* Loop, waiting for QUIT or the escape key */
 
   do {
     emulator->RunToVBlank(framebuffer);
+    emulator->Stop();
+
+#ifndef DISABLE_RENDERER
     if (!draw(framebuffer)) {
       emulator->Stop();
     }
+#endif
+
   } while (emulator->Running());
 
+#ifndef DISABLE_RENDERER
   SDL_DestroyRenderer(renderer);
+#endif
+
   SafeDelete(emulator)
   SafeDeleteArray(framebuffer)
 
