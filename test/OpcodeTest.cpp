@@ -14,11 +14,9 @@ class MOS6502Test : public ::testing::Test {
 protected:
     void SetUp() override {
       m_pMemory = new Memory();
-      m_pMemory->Init();
       m_pMemory->Reset();
 
-      m_pProcessor = new MOS6502Core();
-      m_pProcessor->Init(m_pMemory);
+      m_pProcessor = new MOS6502Core(m_pMemory);
       m_pProcessor->Reset();
       m_pMemory->Load(0xfffd, 0xf0);
       m_pProcessor->m_PC = 0xf000;

@@ -3,6 +3,8 @@
 
 #include "Common.h"
 
+#include <vector>
+
 class Cartridge;
 class MOS6502Core;
 class Memory;
@@ -16,6 +18,7 @@ public:
 
   void Init();
   bool LoadROM(const char* szFilePath);
+  bool LoadROM(const std::vector<uint8_t>* romBuffer);
   void RunToVBlank(CRGBA* pFrameBuffer, int16_t* pSampleBuffer, int* pSampleCount);
   void Reset();
 

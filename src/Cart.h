@@ -9,14 +9,10 @@ class Cartridge
 public:
   Cartridge();
   ~Cartridge();
-  void Init();
   void Reset();
   bool LoadFromFile(const char* path);
   bool LoadFromBuffer(const uint8_t* buffer, int size);
   uint8_t* GetROM();
-
-private:
-  bool GatherMetadata();
 
 private:
   uint8_t* m_pROM;

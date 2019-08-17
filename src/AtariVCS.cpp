@@ -21,13 +21,8 @@ AtariVCS::~AtariVCS() {
 void AtariVCS::Init() {
   m_pCartridge = new Cartridge();
   m_pMemory = new Memory();
-  m_pProcessor = new MOS6502Core();
-  m_pTIA = new TIACore();
-
-  m_pCartridge->Init();
-  m_pMemory->Init();
-  m_pProcessor->Init(m_pMemory);
-  m_pTIA->Init();
+  m_pProcessor = new MOS6502Core(m_pMemory);
+  m_pTIA = new TIACore(m_pProcessor);
 
   m_pMemory->SetProcessor(m_pProcessor);
   m_pMemory->SetTIA(m_pTIA);
@@ -42,6 +37,14 @@ bool AtariVCS::LoadROM(const char *szFilePath) {
   m_pMemory->LoadROM(m_pCartridge->GetROM());
 
   return true;
+}
+
+bool AtariVCS::LoadROM(const std::vector<uint8_t>* romBuffer) {
+  if (!m_pCartridge->LoadFromBuffer(romBuffer->data(), romBuffer->size())) {
+    return false;
+  }
+
+  m_pMemory->LoadROM(m_pCartridge->GetROM());
 }
 
 void AtariVCS::Reset() {
@@ -67,6 +70,7 @@ void AtariVCS::RunToVBlank(CRGBA *pFrameBuffer, int16_t *pSampleBuffer, int *pSa
   /* 262 scanlines per frame */
   for (size_t scan_line = 0; scan_line < 262; scan_line++) {
     m_pProcessor->Resume(); // Resume 6507 which was halted due to write to WSYNC
+    m_pTIA->Tick();
 
     /* 228 clock counts per scanline */
     for (size_t h_clock = 0; h_clock < 228; h_clock++) {

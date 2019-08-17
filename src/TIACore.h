@@ -3,17 +3,20 @@
 
 #include "Common.h"
 
+class MOS6502Core;
+
 class TIACore {
 public:
-    TIACore();
+    TIACore(MOS6502Core *Processor);
     ~TIACore();
-    void Init();
     void Write(uint16_t address, uint8_t value);
     uint8_t Read(uint16_t address);
+    void Tick();
 
 private:
   void(TIACore::*m_WriteRegisters[0x2E])(uint8_t value);
   uint8_t *m_pMem;
+  MOS6502Core *m_pProcessor;
 
 private:
   void TIAWrite0x00(uint8_t value);
@@ -131,7 +134,5 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Hmclr",  /* Clear Horizontal Move Registers      */
     "Cxclr"  /* Clear Collision Latches               */
 };
-
-
 
 #endif //ATARI_VCS_EMU_TIACORE_H

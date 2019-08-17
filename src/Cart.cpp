@@ -15,10 +15,6 @@ Cartridge::~Cartridge() {
   SafeDeleteArray(m_pROM)
 }
 
-void Cartridge::Init() {
-
-}
-
 bool Cartridge::LoadFromFile(const char *path) {
   using namespace std;
 

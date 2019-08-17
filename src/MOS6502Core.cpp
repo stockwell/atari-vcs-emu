@@ -3,19 +3,15 @@
 #include "MOS6502Core.h"
 #include "Opcodes.h"
 
-MOS6502Core::MOS6502Core() {
-  m_pMemory = nullptr;
-
+MOS6502Core::MOS6502Core(Memory* pMemory) {
   InitOpcodeTable();
+
+  m_pMemory = pMemory;
+  m_pMemory->SetProcessor(this);
 }
 
 MOS6502Core::~MOS6502Core() {
 
-}
-
-void MOS6502Core::Init(Memory* pMemory) {
-  m_pMemory = pMemory;
-  pMemory->SetProcessor(this);
 }
 
 void MOS6502Core::Reset() {
@@ -35,6 +31,9 @@ uint8_t MOS6502Core::FetchOPCode() {
 }
 
 void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
+  if (!m_Running)
+    return;
+
   Log("Opcode: %s(0x%02X), PC 0x%04X", kOPCodeNames[opcode], opcode, m_PC);
   Log("SR: 0x%02X  |  AC: 0x%02X  |  XR: 0x%02X | YR: 0x%02X | SP: 0x%02X [ %s%s%s%s%s%s%s]",
       m_SR, m_AC, m_XR, m_YR, m_SP,

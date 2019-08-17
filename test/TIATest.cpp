@@ -14,7 +14,6 @@ class MOS6502Test : public ::testing::Test {
 protected:
   void SetUp() override {
     m_pMemory = new Memory();
-    m_pMemory->Init();
     m_pMemory->Reset();
 
     m_pMemory->SetTIA(m_pTIA);

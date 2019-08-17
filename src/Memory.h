@@ -10,7 +10,6 @@ class Memory {
 public:
   Memory();
   ~Memory();
-  void Init();
   void Reset();
   void SetProcessor(MOS6502Core* pProcessor);
   void SetTIA(TIACore *pTIA);

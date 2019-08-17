@@ -20,7 +20,7 @@
 #define ROM_END_ADDR    0x1FFF
 
 Memory::Memory() {
-
+  m_pMap = new uint8_t[65536];
 }
 
 Memory::~Memory() {
@@ -33,10 +33,6 @@ void Memory::SetProcessor(MOS6502Core *pProcessor) {
 
 void Memory::SetTIA(TIACore *pTIA) {
   m_pTIA = pTIA;
-}
-
-void Memory::Init() {
-  m_pMap = new uint8_t[65536];
 }
 
 void Memory::Reset() {

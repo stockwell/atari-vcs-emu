@@ -1,15 +1,11 @@
 #include <cstdio>
 #include "TIACore.h"
+#include "MOS6502Core.h"
 
-TIACore::TIACore() {
+TIACore::TIACore(MOS6502Core *Processor) {
   m_pMem = new uint8_t[0xFF];
-}
+  m_pProcessor = Processor;
 
-TIACore::~TIACore() {
-  SafeDeleteArray(m_pMem)
-}
-
-void TIACore::Init() {
   m_WriteRegisters[0x00] = &TIACore::TIAWrite0x00;
   m_WriteRegisters[0x01] = &TIACore::TIAWrite0x01;
   m_WriteRegisters[0x02] = &TIACore::TIAWrite0x02;
@@ -60,6 +56,14 @@ void TIACore::Init() {
   m_WriteRegisters[0x2D] = &TIACore::TIAWrite0x2D;
 }
 
+TIACore::~TIACore() {
+  SafeDeleteArray(m_pMem)
+}
+
+void TIACore::Tick() {
+
+}
+
 uint8_t TIACore::Read(uint16_t address) {
   if (address < (sizeof kTIAReadRegisterNames / sizeof kTIAReadRegisterNames[0]))
     Log("TIA Read: %s", kTIAReadRegisterNames[address]);
@@ -80,14 +84,16 @@ void TIACore::TIAWrite0x01(uint8_t value){
 
 }
 
+/* Wait for Horizontal blank */
 void TIACore::TIAWrite0x02(uint8_t value){
-
+  m_pProcessor->Halt();
 }
 
 void TIACore::TIAWrite0x03(uint8_t value){
 
 }
 
+/* Number-Size player/missle 0 */
 void TIACore::TIAWrite0x04(uint8_t value){
 
 }

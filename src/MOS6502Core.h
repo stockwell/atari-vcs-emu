@@ -25,9 +25,8 @@
 
 class MOS6502Core {
 public:
-  MOS6502Core();
+  MOS6502Core(Memory* pMemory);
   ~MOS6502Core();
-  void Init(Memory* pMemory);
   void Reset();
   void InitOpcodeTable();
   uint8_t Tick();
