@@ -108,7 +108,7 @@ void AtariVCS::RunToVBlank(CRGBA *pFrameBuffer, int16_t *pSampleBuffer, int *pSa
 
         /* It makes more sense to make the platform responsible for this conversion as a non-standard
          * or just selectable palette may be desired. But we have more important things to do */
-        uint32_t pixelColour = ColourLUT[m_pTIA->GetPixel()];
+        uint32_t pixelColour = ColourLUT[m_pTIA->GetPixel() & 0xFE];
         pFrameBuffer[pixel_idx++] = CRGBA(pixelColour >> 16u, pixelColour >> 8u, pixelColour, 0xFF);
       }
     }
