@@ -1,10 +1,11 @@
-#include <cstdio>
 #include "TIACore.h"
 #include "MOS6502Core.h"
 
 TIACore::TIACore(MOS6502Core *Processor) {
   m_pMem = new uint8_t[0xFF];
   m_pProcessor = Processor;
+
+  m_Background = new Background();
 
   m_WriteRegisters[0x00] = &TIACore::TIAWrite0x00;
   m_WriteRegisters[0x01] = &TIACore::TIAWrite0x01;
@@ -74,6 +75,12 @@ uint8_t TIACore::Read(uint16_t address) {
 void TIACore::Write(uint16_t address, uint8_t value) {
   if (address < (sizeof kTIAWriteRegisterNames / sizeof kTIAWriteRegisterNames[0]))
     Log("TIA Write: %s (%u)", kTIAWriteRegisterNames[address], value);
+
+  (this->*m_WriteRegisters[address])(value);
+}
+
+uint8_t TIACore::GetPixel() {
+  return m_Background->GetColor();
 }
 
 void TIACore::TIAWrite0x00(uint8_t value){
@@ -114,8 +121,9 @@ void TIACore::TIAWrite0x08(uint8_t value){
 
 }
 
+/* Colubk */
 void TIACore::TIAWrite0x09(uint8_t value){
-  __asm("NOP");
+  m_Background->SetColor(value);
 }
 
 void TIACore::TIAWrite0x0A(uint8_t value){

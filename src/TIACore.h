@@ -4,19 +4,27 @@
 #include "Common.h"
 
 class MOS6502Core;
+class Background;
 
 class TIACore {
 public:
     TIACore(MOS6502Core *Processor);
+
     ~TIACore();
+
     void Write(uint16_t address, uint8_t value);
+
     uint8_t Read(uint16_t address);
+
     void Tick();
+
+    uint8_t GetPixel();
 
 private:
   void(TIACore::*m_WriteRegisters[0x2E])(uint8_t value);
   uint8_t *m_pMem;
   MOS6502Core *m_pProcessor;
+  Background *m_Background;
 
 private:
   void TIAWrite0x00(uint8_t value);
@@ -133,6 +141,52 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Hmove",  /* Apply Horizontal Motion              */
     "Hmclr",  /* Clear Horizontal Move Registers      */
     "Cxclr"  /* Clear Collision Latches               */
+};
+
+/* Temporary until I get a better idea of how the TIA works so I can structure this better */
+class Background {
+public:
+  void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
+  uint8_t GetColor() { return m_Colour; };
+
+private:
+  uint8_t m_Colour;
+};
+
+class Missile {
+public:
+  void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
+  uint8_t GetColor() { return m_Colour; };
+
+private:
+  uint8_t m_Colour;
+};
+
+class Player {
+public:
+  void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
+  uint8_t GetColor() { return m_Colour; };
+
+private:
+  uint8_t m_Colour;
+};
+
+class Ball {
+public:
+  void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
+  uint8_t GetColor() { return m_Colour; };
+
+private:
+  uint8_t m_Colour;
+};
+
+class Playfield {
+public:
+  void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
+  uint8_t GetColor() { return m_Colour; };
+
+private:
+  uint8_t m_Colour;
 };
 
 #endif //ATARI_VCS_EMU_TIACORE_H
