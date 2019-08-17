@@ -5,7 +5,7 @@
 
 #include "AtariVCS.h"
 
-#define DISABLE_RENDERER
+//#define DISABLE_RENDERER
 
 class Emulator
 {
@@ -13,7 +13,7 @@ public:
   Emulator();
   ~Emulator();
   void Init();
-  void RunToVBlank(CRGBA* pFrameBuffer);
+  void RunToVBlank(uint32_t* pFrameBuffer);
   void LoadRom(const char* szFilePath);
   bool Running();
   void Stop();
@@ -31,8 +31,8 @@ SDL_Renderer *renderer;
 int frame;
 SDL_Texture *EmuTexture;
 
-void UpdateTexture(SDL_Texture *texture, CRGBA *framebuffer) {
-  CRGBA *color;
+void UpdateTexture(SDL_Texture *texture, uint32_t *framebuffer) {
+  uint32_t *color;
   Uint32 src = 0;
   Uint32 *dst;
   int row, col;
@@ -47,13 +47,13 @@ void UpdateTexture(SDL_Texture *texture, CRGBA *framebuffer) {
     dst = (Uint32*)((Uint8*)pixels + row * pitch);
     for (col = 0; col < ATARI_2600_W; ++col) {
       color = &framebuffer[src++];
-      *dst++ = (0xFF000000|(color->red<<16)|(color->green<<8)|color->blue);
+      *dst++ = (0xFF000000|(*color));
     }
   }
   SDL_UnlockTexture(texture);
 }
 
-bool draw(CRGBA* framebuffer)
+bool draw(uint32_t* framebuffer)
 {
   SDL_Event event;
 
@@ -114,26 +114,28 @@ void SDL_Init(void) {
 int main() {
   auto emulator = new Emulator();
   emulator->Init();
-  emulator->LoadRom("adventure.bin");
+  emulator->LoadRom("kernel_01.bin");
 
   // NTSC Resolution
-  auto *framebuffer = new CRGBA[160*192];
+  auto *framebuffer = new uint32_t[160*192];
 
 #ifndef DISABLE_RENDERER
   SDL_Init();
 #endif
-  
+
   /* Loop, waiting for QUIT or the escape key */
 
   do {
     emulator->RunToVBlank(framebuffer);
-    emulator->Stop();
+    //emulator->Stop();
 
 #ifndef DISABLE_RENDERER
     if (!draw(framebuffer)) {
       emulator->Stop();
     }
 #endif
+
+
 
   } while (emulator->Running());
 
@@ -161,7 +163,7 @@ void Emulator::Init()
   m_pAtariVCS->Init();
 }
 
-void Emulator::RunToVBlank(CRGBA* pFrameBuffer) {
+void Emulator::RunToVBlank(uint32_t* pFrameBuffer) {
   m.lock();
   m_pAtariVCS->RunToVBlank(pFrameBuffer, nullptr, nullptr);
   m.unlock();

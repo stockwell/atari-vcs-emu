@@ -75,19 +75,20 @@ bool AtariVCS::LoadROM(const char *szFilePath) {
   return true;
 }
 
-bool AtariVCS::LoadROM(const std::vector<uint8_t>* romBuffer) {
+bool AtariVCS::LoadROM(std::vector<uint8_t>* romBuffer) {
   if (!m_pCartridge->LoadFromBuffer(romBuffer->data(), romBuffer->size())) {
     return false;
   }
 
   m_pMemory->LoadROM(m_pCartridge->GetROM());
+  return true;
 }
 
 void AtariVCS::Reset() {
   m_pProcessor->Reset();
 }
 
-void AtariVCS::RunToVBlank(CRGBA *pFrameBuffer, int16_t *pSampleBuffer, int *pSampleCount) {
+void AtariVCS::RunToVBlank(uint32_t *pFrameBuffer, int16_t *pSampleBuffer, int *pSampleCount) {
   int pixel_idx = 0;
 
   /* 262 scanlines per frame */
@@ -108,8 +109,8 @@ void AtariVCS::RunToVBlank(CRGBA *pFrameBuffer, int16_t *pSampleBuffer, int *pSa
 
         /* It makes more sense to make the platform responsible for this conversion as a non-standard
          * or just selectable palette may be desired. But we have more important things to do */
-        uint32_t pixelColour = ColourLUT[m_pTIA->GetPixel() & 0xFE];
-        pFrameBuffer[pixel_idx++] = CRGBA(pixelColour >> 16u, pixelColour >> 8u, pixelColour, 0xFF);
+        if (pFrameBuffer != nullptr)
+          pFrameBuffer[pixel_idx++] = ColourLUT[m_pTIA->GetPixel() & 0xFE];
       }
     }
   }

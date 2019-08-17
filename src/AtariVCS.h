@@ -18,8 +18,8 @@ public:
 
   void Init();
   bool LoadROM(const char* szFilePath);
-  bool LoadROM(const std::vector<uint8_t>* romBuffer);
-  void RunToVBlank(CRGBA* pFrameBuffer, int16_t* pSampleBuffer, int* pSampleCount);
+  bool LoadROM(std::vector<uint8_t>* romBuffer);
+  void RunToVBlank(uint32_t* pFrameBuffer, int16_t* pSampleBuffer, int* pSampleCount);
   void Reset();
 
 private:

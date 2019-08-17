@@ -1201,13 +1201,13 @@ void MOS6502Core::OPCodesADC(uint16_t address) {
   uint16_t result = m_AC + val + carry;
 
   if (m_SR & DECIMAL) {
-    if (m_AC & 0x0F + val & 0x0F + carry > 0x09)
+    if (((m_AC & 0x0F) + (val & 0x0F) + carry) > 0x09)
       result += 0x06;
 
     result & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
     ((m_AC ^ result) & (val ^ m_AC) & 0x80) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
 
-    if (carry = result > 0x99)
+    if ((carry = result) > 0x99)
       result += 0x60;
 
     carry ? m_SR |= CARRY : m_SR &= ~CARRY;
