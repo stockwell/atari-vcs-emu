@@ -6,6 +6,12 @@ TIACore::TIACore(MOS6502Core *Processor) {
   m_pProcessor = Processor;
 
   m_Background = new Background();
+  m_Player1 = new Player();
+  m_Player2 = new Player();
+  m_Missile1 = new Missile();
+  m_Missile2 = new Missile();
+  m_Ball = new Ball();
+  m_Background = new Background();
 
   m_WriteRegisters[0x00] = &TIACore::TIAWrite0x00;
   m_WriteRegisters[0x01] = &TIACore::TIAWrite0x01;
@@ -60,9 +66,38 @@ TIACore::TIACore(MOS6502Core *Processor) {
 TIACore::~TIACore() {
   SafeDeleteArray(m_pMem)
 }
+bool TIACore::Tick(uint8_t *pFramebuffer) {
+  ++m_Clock;
 
-void TIACore::Tick() {
+  // Scanlines consist of:
+  // Horizontal Blank -|- Game Draw Space
+  //     68 ticks      |    160 ticks
 
+  // Each full frame consists of
+  // Lines -|- Description
+  //    3   | Vertical sync
+  //   37   | Vertical blank
+  //  192   | Game Draw Space
+  //   30   | Overscan
+
+  // New scanline, resume processor if it was suspended by WSYNC
+  if (m_Clock % 228) {
+    m_pProcessor->Resume();
+  }
+
+  /* Do something */
+  m_Background->GetColor();
+
+  if (m_Vblank) {
+    m_Vblank = false;
+
+    // New Frame
+    m_Clock = 0x00;
+    m_pProcessor->Resume();
+    return true;
+  }
+
+  return false;
 }
 
 uint8_t TIACore::Read(uint16_t address) {
@@ -79,16 +114,14 @@ void TIACore::Write(uint16_t address, uint8_t value) {
   (this->*m_WriteRegisters[address])(value);
 }
 
-uint8_t TIACore::GetPixel() {
-  return m_Background->GetColor();
-}
-
+/* Vertical Sync Set-Clear              */
 void TIACore::TIAWrite0x00(uint8_t value){
-
+  m_Vsync = value & 0x02u;
 }
 
+/* Vertical Blank Set-Clear             */
 void TIACore::TIAWrite0x01(uint8_t value){
-
+  m_Vblank = value & 0x02u;
 }
 
 /* Wait for Horizontal blank */

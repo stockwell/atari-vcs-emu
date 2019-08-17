@@ -29,11 +29,12 @@ public:
   ~MOS6502Core();
   void Reset();
   void InitOpcodeTable();
-  uint8_t Tick();
+  void Tick();
   void Halt();
   void Resume();
 
 public:
+  uint8_t m_Delay;
   uint16_t m_PC;
   uint8_t m_AC;
   uint8_t m_XR;
@@ -48,7 +49,7 @@ private:
 
 private:
   uint8_t FetchOPCode();
-  void ExecuteOPCode(uint8_t opcode);
+  uint8_t ExecuteOPCode(uint8_t opcode);
   void OPCodeInvalid();
 
   void OPCode0x00();

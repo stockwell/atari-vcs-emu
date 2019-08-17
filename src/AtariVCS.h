@@ -13,13 +13,13 @@ class TIACore;
 class AtariVCS
 {
 public:
-  AtariVCS();
+  AtariVCS() = default;
   ~AtariVCS();
 
   void Init();
   bool LoadROM(const char* szFilePath);
   bool LoadROM(std::vector<uint8_t>* romBuffer);
-  void RunToVBlank(uint32_t* pFrameBuffer, int16_t* pSampleBuffer, int* pSampleCount);
+  void RunToVBlank(uint8_t* pFrameBuffer, int16_t* pSampleBuffer, int* pSampleCount);
   void Reset();
 
 private:

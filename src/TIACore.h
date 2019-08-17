@@ -5,26 +5,38 @@
 
 class MOS6502Core;
 class Background;
+class Missile;
+class Player;
+class Ball;
+class Playfield;
 
 class TIACore {
 public:
-    TIACore(MOS6502Core *Processor);
-
-    ~TIACore();
-
-    void Write(uint16_t address, uint8_t value);
-
-    uint8_t Read(uint16_t address);
-
-    void Tick();
-
-    uint8_t GetPixel();
+  TIACore(MOS6502Core *Processor);
+  ~TIACore();
+  void Write(uint16_t address, uint8_t value);
+  uint8_t Read(uint16_t address);
+  bool Tick(uint8_t *pFramebuffer);
 
 private:
   void(TIACore::*m_WriteRegisters[0x2E])(uint8_t value);
   uint8_t *m_pMem;
   MOS6502Core *m_pProcessor;
+
+private:
+  bool m_Vsync;
+  bool m_Vblank;
+  uint16_t m_Clock;
+  uint16_t m_PixelIndex;
+
+private:
   Background *m_Background;
+  Player *m_Player1;
+  Player *m_Player2;
+  Missile *m_Missile1;
+  Missile *m_Missile2;
+  Ball *m_Ball;
+  Playfield *m_Playfield;
 
 private:
   void TIAWrite0x00(uint8_t value);
@@ -140,7 +152,7 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Resmp1", /* Reset Missle 1 to Player 1           */
     "Hmove",  /* Apply Horizontal Motion              */
     "Hmclr",  /* Clear Horizontal Move Registers      */
-    "Cxclr"  /* Clear Collision Latches               */
+    "Cxclr"   /* Clear Collision Latches              */
 };
 
 /* Temporary until I get a better idea of how the TIA works so I can structure this better */

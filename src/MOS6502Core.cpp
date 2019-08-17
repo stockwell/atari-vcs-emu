@@ -23,6 +23,8 @@ void MOS6502Core::Reset() {
   m_SR = CONSTANT;
   m_SP = 0xFD;
 
+  m_Delay = 1;
+
   this->Resume();
 }
 
@@ -30,9 +32,9 @@ uint8_t MOS6502Core::FetchOPCode() {
   return m_pMemory->Read(m_PC);
 }
 
-void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
+uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode) {
   if (!m_Running)
-    return;
+    return 0x00;
 
   Log("Opcode: %s(0x%02X), PC 0x%04X", kOPCodeNames[opcode], opcode, m_PC);
   Log("SR: 0x%02X  |  AC: 0x%02X  |  XR: 0x%02X | YR: 0x%02X | SP: 0x%02X [ %s%s%s%s%s%s%s]",
@@ -45,12 +47,21 @@ void MOS6502Core::ExecuteOPCode(uint8_t opcode) {
       m_SR & OVERFLOW ? "O ": "",
       m_SR & NEGATIVE ? "N ": "");
   (this->*m_OPCodes[opcode])();
-  // TODO: OPCode handler should return how many cycles it took to execute.
+
+  // TODO: This doesn't account for extra cycles due to crossing a page boundary or branching
+  return cycletime[opcode];
 }
 
-uint8_t MOS6502Core::Tick() {
-  ExecuteOPCode(FetchOPCode());
-  return 1;
+void MOS6502Core::Tick() {
+  if (!m_Running) {
+    m_Delay = 0x01;
+    return;
+  }
+
+  /* MOS6507 clock is 1/3 the graphics clock */
+  if (!--m_Delay) {
+    m_Delay = (ExecuteOPCode(FetchOPCode())) * 3;
+  }
 }
 
 void MOS6502Core::Halt() {
