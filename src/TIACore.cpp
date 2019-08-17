@@ -50,7 +50,7 @@ TIACore::TIACore(MOS6502Core *Processor) {
   m_WriteRegisters[0x1C] = &TIACore::TIAWrite0x1C;
   m_WriteRegisters[0x1D] = &TIACore::TIAWrite0x1D;
   m_WriteRegisters[0x1E] = &TIACore::TIAWrite0x1E;
-  m_WriteRegisters[0x1E] = &TIACore::TIAWrite0x1F;
+  m_WriteRegisters[0x1F] = &TIACore::TIAWrite0x1F;
 
   m_WriteRegisters[0x20] = &TIACore::TIAWrite0x20;
   m_WriteRegisters[0x21] = &TIACore::TIAWrite0x21;
@@ -120,10 +120,10 @@ uint8_t TIACore::Read(uint16_t address) {
 }
 
 void TIACore::Write(uint16_t address, uint8_t value) {
-  if (address < (sizeof kTIAWriteRegisterNames / sizeof kTIAWriteRegisterNames[0]))
+  if (address < (sizeof kTIAWriteRegisterNames / sizeof kTIAWriteRegisterNames[0])) {
     Log("TIA Write: %s (%u)", kTIAWriteRegisterNames[address], value);
-
-  (this->*m_WriteRegisters[address])(value);
+    (this->*m_WriteRegisters[address])(value);
+  }
 }
 
 /* Vertical Sync Set-Clear              */
