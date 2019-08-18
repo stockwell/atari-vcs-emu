@@ -210,7 +210,6 @@ private:
   uint8_t m_Colour;
   uint8_t m_Sprite;
   uint8_t m_Position;
-
 };
 
 class Ball {
