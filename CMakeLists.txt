@@ -22,7 +22,7 @@ add_executable(atari-vcs-emu
         src/Opcodes.cpp)
 
 target_include_directories(atari-vcs-emu PUBLIC src)
-#target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1)
+target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1)
 target_link_libraries(atari-vcs-emu SDL2main SDL2-static)
 
 # subproject for unit tests
