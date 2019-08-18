@@ -187,11 +187,30 @@ private:
 
 class Player {
 public:
-  void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColour() { return m_Colour; };
+  void SetColor(uint8_t colour) { m_Colour = colour; };
+  void SetGraphics(uint8_t value) { m_Sprite = bitreverse(value); };
+  void ResetPos(uint8_t value) { m_Position = 0; };
+  void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
+    if (m_Position == 0) {
+      m_Position = currentPos;
+    }
+
+    if (currentPos < m_Position) {
+      return;
+    }
+
+    uint8_t pixel_index = currentPos - m_Position;
+
+    if (pixel_index < 8 && (m_Sprite & (1u << pixel_index))) {
+      *pixel = m_Colour;
+    }
+  }
 
 private:
   uint8_t m_Colour;
+  uint8_t m_Sprite;
+  uint8_t m_Position;
+
 };
 
 class Ball {

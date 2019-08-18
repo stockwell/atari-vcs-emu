@@ -111,6 +111,10 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
 
     m_Playfield->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
+    m_Player0->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+
+    m_Player1->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+
     ++m_PixelIndex;
   }
 
@@ -171,12 +175,14 @@ void TIACore::TIAWrite0x05(uint8_t value) {
 
 }
 
+/* Colup0 */
 void TIACore::TIAWrite0x06(uint8_t value) {
-
+  m_Player0->SetColor(value);
 }
 
+/* Colup1 */
 void TIACore::TIAWrite0x07(uint8_t value) {
-
+  m_Player1->SetColor(value);
 }
 
 /* Colupf */
@@ -189,7 +195,7 @@ void TIACore::TIAWrite0x09(uint8_t value) {
   m_Background->SetColor(value);
 }
 
-/* CTRLPF */
+/* Ctrlpf */
 void TIACore::TIAWrite0x0A(uint8_t value) {
   m_Playfield->SetCTRL(value);
 }
@@ -218,12 +224,14 @@ void TIACore::TIAWrite0x0F(uint8_t value) {
   m_Playfield->SetPF2(value);
 }
 
+/* Resp0 */
 void TIACore::TIAWrite0x10(uint8_t value) {
-
+  m_Player0->ResetPos(value);
 }
 
+/* Resp1 */
 void TIACore::TIAWrite0x11(uint8_t value) {
-
+  m_Player1->ResetPos(value);
 }
 
 void TIACore::TIAWrite0x12(uint8_t value) {
@@ -258,18 +266,18 @@ void TIACore::TIAWrite0x19(uint8_t value) {
 
 }
 
-/* Grp0 */
 void TIACore::TIAWrite0x1A(uint8_t value) {
 
 }
 
-/* Grp1 */
+/* Grp0 */
 void TIACore::TIAWrite0x1B(uint8_t value) {
-
+  m_Player0->SetGraphics(value);
 }
 
+/* Grp1 */
 void TIACore::TIAWrite0x1C(uint8_t value) {
-
+  m_Player1->SetGraphics(value);
 }
 
 void TIACore::TIAWrite0x1D(uint8_t value) {
