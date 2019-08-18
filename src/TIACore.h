@@ -31,10 +31,10 @@ private:
 
 private:
   Background *m_Background;
+  Player *m_Player0;
   Player *m_Player1;
-  Player *m_Player2;
+  Missile *m_Missile0;
   Missile *m_Missile1;
-  Missile *m_Missile2;
   Ball *m_Ball;
   Playfield *m_Playfield;
 
@@ -117,9 +117,9 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Nusiz1", /* Number-Size player/missle 1          */
     "Colup0", /* Color-Luminance Player 0             */
     "Colup1", /* Color-Luminance Player 1             */
-    "Colupf", /* Color-Luminance Playfield            */
 
     /* 0x08 */
+    "Colupf", /* Color-Luminance Playfield            */
     "Colubk", /* Color-Luminance Background           */
     "Ctrlpf", /* Control Playfield, Ball, Collisions  */
     "Refp0",  /* Reflection Player 0                  */
@@ -127,6 +127,8 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Pf0",    /* Playfield Register Byte 0            */
     "Pf1",    /* Playfield Register Byte 1            */
     "Pf2",    /* Playfield Register Byte 2            */
+
+    /* 0x10 */
     "Resp0",  /* Reset Player 0                       */
     "Resp1",  /* Reset Player 1                       */
     "Resm0",  /* Reset Missle 0                       */
@@ -135,6 +137,8 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Audc0",  /* Audio Control 0                      */
     "Audc1",  /* Audio Control 1                      */
     "Audf0",  /* Audio Frequency 0                    */
+
+    /* 0x18 */
     "Audf1",  /* Audio Frequency 1                    */
     "Audv0",  /* Audio Volume 0                       */
     "Audv1",  /* Audio Volume 1                       */
@@ -143,6 +147,8 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Enam0",  /* Graphics Enable Missle 0             */
     "Enam1",  /* Graphics Enable Missle 1             */
     "Enabl",  /* Graphics Enable Ball                 */
+
+    /* 0x20 */
     "Hmp0",   /* Horizontal Motion Player 0           */
     "Hmp1",   /* Horizontal Motion Player 1           */
     "Hmm0",   /* Horizontal Motion Missle 0           */
@@ -151,6 +157,8 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Vdelp0", /* Vertical Delay Player 0              */
     "Vdelp1", /* Vertical Delay Player 1              */
     "Vdelbl", /* Vertical Delay Ball                  */
+
+    /* 0x28 */
     "Resmp0", /* Reset Missle 0 to Player 0           */
     "Resmp1", /* Reset Missle 1 to Player 1           */
     "Hmove",  /* Apply Horizontal Motion              */

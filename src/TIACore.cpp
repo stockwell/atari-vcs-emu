@@ -6,10 +6,10 @@ TIACore::TIACore(MOS6502Core *Processor) {
   m_pProcessor = Processor;
 
   m_Background = new Background();
+  m_Player0 = new Player();
   m_Player1 = new Player();
-  m_Player2 = new Player();
+  m_Missile0 = new Missile();
   m_Missile1 = new Missile();
-  m_Missile2 = new Missile();
   m_Ball = new Ball();
   m_Playfield = new Playfield();
 
@@ -71,10 +71,10 @@ TIACore::TIACore(MOS6502Core *Processor) {
 TIACore::~TIACore() {
   SafeDelete(m_Background)
   SafeDelete(m_Playfield)
+  SafeDelete(m_Player0)
   SafeDelete(m_Player1)
-  SafeDelete(m_Player2)
+  SafeDelete(m_Missile0)
   SafeDelete(m_Missile1)
-  SafeDelete(m_Missile2)
   SafeDelete(m_Ball)
 
   SafeDeleteArray(m_pMem)
@@ -258,10 +258,12 @@ void TIACore::TIAWrite0x19(uint8_t value) {
 
 }
 
+/* Grp0 */
 void TIACore::TIAWrite0x1A(uint8_t value) {
 
 }
 
+/* Grp1 */
 void TIACore::TIAWrite0x1B(uint8_t value) {
 
 }
