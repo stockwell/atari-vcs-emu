@@ -11,6 +11,7 @@ TIACore::TIACore(MOS6502Core *Processor) {
   m_Missile1 = new Missile();
   m_Missile2 = new Missile();
   m_Ball = new Ball();
+  m_Playfield = new Playfield();
 
   m_PixelIndex = 0x00;
   m_Clock = 0x00;
