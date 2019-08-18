@@ -108,6 +108,7 @@ static const char* kTIAReadRegisterNames[0x0E] = {
 };
 
 static const char* kTIAWriteRegisterNames[0x2D] = {
+    /* 0x00 */
     "Vsync",  /* Vertical Sync Set-Clear              */
     "Vblank", /* Vertical Blank Set-Clear             */
     "Wsync",  /* Wait for Horizontal Blank            */
@@ -117,6 +118,8 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     "Colup0", /* Color-Luminance Player 0             */
     "Colup1", /* Color-Luminance Player 1             */
     "Colupf", /* Color-Luminance Playfield            */
+
+    /* 0x08 */
     "Colubk", /* Color-Luminance Background           */
     "Ctrlpf", /* Control Playfield, Ball, Collisions  */
     "Refp0",  /* Reflection Player 0                  */
@@ -194,11 +197,30 @@ private:
 
 class Playfield {
 public:
+  void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
+    uint32_t PF = (m_PF0>>4) | (m_PF1 << 4u) | (m_PF2 << 12);
+
+    if (currentPos < 148) {
+      if (PF & (1 << ((currentPos - 68) >> 2))) {
+        *pixel = m_Colour;
+      }
+    } else if (currentPos >= 148) {
+      if (PF & (1 << ((currentPos - 148) >> 2))) {
+        *pixel = m_Colour;
+      }
+    }
+  };
+
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColour() { return m_Colour; };
+  void SetPF0(uint8_t val) { m_PF0 = val; };
+  void SetPF1(uint8_t val) { m_PF1 = val; };
+  void SetPF2(uint8_t val) { m_PF2 = val; };
 
 private:
   uint8_t m_Colour;
+  uint8_t m_PF0;
+  uint8_t m_PF1;
+  uint8_t m_PF2;
 };
 
 #endif //ATARI_VCS_EMU_TIACORE_H

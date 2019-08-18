@@ -106,8 +106,12 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
 
   /* Game Draw Space */
   if ((currentLine >= 40) && (currentLine < 232) && (currentPos >= 68)) {
-    // TODO: Work out what colour this pixel should be..
-    pFramebuffer[m_PixelIndex++] = m_Background->GetColour();
+
+    pFramebuffer[m_PixelIndex] = m_Background->GetColour();
+    
+    m_Playfield->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+
+    ++m_PixelIndex;
   }
 
   if (m_Vsync || (currentLine == 282)) {
@@ -175,8 +179,9 @@ void TIACore::TIAWrite0x07(uint8_t value) {
 
 }
 
+/* Colupf */
 void TIACore::TIAWrite0x08(uint8_t value) {
-
+  m_Playfield->SetColor(value);
 }
 
 /* Colubk */
@@ -192,20 +197,24 @@ void TIACore::TIAWrite0x0B(uint8_t value) {
 
 }
 
+
 void TIACore::TIAWrite0x0C(uint8_t value) {
 
 }
 
+/* PF0 */
 void TIACore::TIAWrite0x0D(uint8_t value) {
-
+  m_Playfield->SetPF0(value);
 }
 
+/* PF1 */
 void TIACore::TIAWrite0x0E(uint8_t value) {
-
+  m_Playfield->SetPF1(value);
 }
 
+/* PF2 */
 void TIACore::TIAWrite0x0F(uint8_t value) {
-
+  m_Playfield->SetPF2(value);
 }
 
 void TIACore::TIAWrite0x10(uint8_t value) {
