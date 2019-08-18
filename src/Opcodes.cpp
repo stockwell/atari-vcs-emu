@@ -780,6 +780,8 @@ void MOS6502Core::OPCode0x98() {
 
   m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
+
+  ++m_PC;
 }
 
 /* STA abs, Y */
