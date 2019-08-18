@@ -70,6 +70,7 @@ TIACore::TIACore(MOS6502Core *Processor) {
 
 TIACore::~TIACore() {
   SafeDelete(m_Background)
+  SafeDelete(m_Playfield)
   SafeDelete(m_Player1)
   SafeDelete(m_Player2)
   SafeDelete(m_Missile1)
