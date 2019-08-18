@@ -2,10 +2,13 @@
 #include <mutex>
 #include <vector>
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+#include "emu.h"
+#include "display.h"
 #include "kernel.h"
 #include "AtariVCS.h"
-
-//#define DISABLE_RENDERER
 
 #define ATARI_2600_W 160
 #define ATARI_2600_H 192
@@ -20,19 +23,16 @@ public:
   void LoadRom(std::vector<uint8_t> &buffer);
   bool Running();
   void Stop();
+  void Draw();
 
 public:
-  uint32_t m_Framebuffer[160*192];
+  uint8_t m_Framebuffer[160*192];
 
 private:
   bool running = true;
   AtariVCS *m_pAtariVCS = nullptr;
   std::mutex m;
 };
-
-bool draw(uint32_t* framebuffer) {
-  return true;
-}
 
 void emu() {
   auto emulator = new Emulator();
@@ -42,18 +42,22 @@ void emu() {
   emulator->LoadRom(rom);
 
   /* Loop forever */
-
   do {
+    uint32_t start = (uint32_t)esp_timer_get_time();
     emulator->RunToVBlank();
-    //emulator->Stop();
-
+    emulator->Draw();
+    //vTaskDelay(1);
+    uint32_t time = (uint32_t)esp_timer_get_time();
+    std::cout << (time - start) << std::endl;
   } while (emulator->Running());
 
   SafeDelete(emulator)
 }
 
-extern "C" void emulator_main(void) {
+extern "C" void emulator_main(void *arg) {
+  printf("Starting Atari VCS Emu..\n");
   emu();
+  printf("Emulator shutting down..\n");
 }
 
 Emulator::~Emulator() {
@@ -88,3 +92,6 @@ void Emulator::Stop() {
   m.unlock();
 }
 
+void Emulator::Draw() {
+  write_frame_atari2600_async(m_Framebuffer, ColourLUT_16b, false);
+}
