@@ -940,19 +940,19 @@ void MOS6502Core::OPCode0xBA() {
 /* LDY abs, X */
 void MOS6502Core::OPCode0xBC() {
   OPCodesLDY((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_XR);
-  ++m_PC;
+  m_PC += 3;
 }
 
 /* LDA abs, X */
 void MOS6502Core::OPCode0xBD() {
   OPCodesLDA((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_XR);
-  ++m_PC;
+  m_PC += 3;
 }
 
 /* LDX abs, Y */
 void MOS6502Core::OPCode0xBE() {
   OPCodesLDX((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_YR);
-  ++m_PC;
+  m_PC += 3;
 }
 
 /* CPY # */

@@ -872,7 +872,6 @@ TEST_F(MOS6502Test, OpcodeSTA_ABS_X) {
   m_pMemory->Load(0xf000, instr, sizeof instr);
   m_pMemory->Load(0x81, 0xAA);
 
-
   m_pProcessor->m_XR = 0x01;
   m_pProcessor->m_AC = 0x55;
   m_pProcessor->Tick();
@@ -1245,6 +1244,126 @@ TEST_F(MOS6502Test, OpcodeCLV) {
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & OVERFLOW);
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
+}
+
+/* 0xBC */
+TEST_F(MOS6502Test, OpcodeLDY_ABS_X) {
+  uint8_t instr[] = {0xBC, 0x80, 0x00,   /* LDY $80, X */
+                     0xBC, 0x80, 0x00,   /* LDY $80, X */
+                     0xBC, 0x80, 0x00,   /* LDY $80, X */
+                     0xBC, 0x80, 0x00 }; /* LDY $80, X */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x81, 0x20);
+  m_pProcessor->m_XR = 0x01;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x20, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x81, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_YR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x81, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_YR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF00C, m_pProcessor->m_PC);
+}
+
+/* 0xBD */
+TEST_F(MOS6502Test, OpcodeLDA_ABS_X) {
+  uint8_t instr[] = {0xBD, 0x80, 0x00,   /* LDA $80, X */
+                     0xBD, 0x80, 0x00,   /* LDA $80, X */
+                     0xBD, 0x80, 0x00,   /* LDA $80, X */
+                     0xBD, 0x80, 0x00 }; /* LDA $80, X */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x81, 0x20);
+  m_pProcessor->m_XR = 0x01;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x20, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x81, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x81, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF00C, m_pProcessor->m_PC);
+}
+
+/* 0xBE */
+TEST_F(MOS6502Test, OpcodeLDX_ABS_Y) {
+  uint8_t instr[] = {0xBE, 0x80, 0x00,   /* LDX $80, Y */
+                     0xBE, 0x80, 0x00,   /* LDX $80, Y */
+                     0xBE, 0x80, 0x00,   /* LDX $80, Y */
+                     0xBE, 0x80, 0x00 }; /* LDX $80, Y */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pMemory->Load(0x81, 0x20);
+  m_pProcessor->m_YR = 0x01;
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x20, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x81, 0x80);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_XR);
+  ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
+
+  m_pMemory->Load(0x81, 0x00);
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_XR);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
+  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+
+  ASSERT_EQ(0xF00C, m_pProcessor->m_PC);
 }
 
 /* 0xCA */
