@@ -3,6 +3,7 @@
 
 #include "Memory.h"
 #include "TIACore.h"
+#include "RIOTCore.h"
 
 #define TIA_START_ADDR  0x00
 #define TIA_END_ADDR    0x7F
@@ -35,6 +36,10 @@ void Memory::SetTIA(TIACore *pTIA) {
   m_pTIA = pTIA;
 }
 
+void Memory::SetRIOT(RIOTCore *pRIOT) {
+  m_pRIOT = pRIOT;
+}
+
 void Memory::Reset() {
   for (int i = 0; i < 65536; i++) {
     m_pMap[i] = 0x00;
@@ -63,38 +68,56 @@ uint8_t Memory::Read(uint16_t address) {
   /* MOS 6507 doesn't have address lines 13-15 connected. Only the first 13 bits of the address actually matter */
   uint16_t actualAddress = address & 0x1FFFu;
 
-  if (actualAddress >= TIA_START_ADDR && actualAddress <= TIA_END_ADDR) {
-    m_pTIA->Read(actualAddress);
-    return m_pMap[actualAddress];
-  } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_END_ADDR) {
-    return m_pMap[actualAddress];
-  } else if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
-    return m_pMap[actualAddress];
-  } else if (actualAddress >= RIOT_START_ADDR && actualAddress <= RIOT_END_ADDR) {
-    return m_pMap[actualAddress];
-  } else if (actualAddress >= ROM_START_ADDR && actualAddress <= ROM_END_ADDR) {
+  /* Additionally, when addressing RAM, RIOT & TIA not all address lines are connected so are mirrored on different
+   * addresses depending on what you're talking to */
+
+  /* The TIA chip is addressed by A12=0, A7=0
+   * RAM is selected by A12=0, A9=0, A7=1
+   * RIOT is selected by A12=0, A9=1, A7=1 */
+
+  /* TIA */
+  if ((actualAddress & 0x1080) == 0x00) {
+    actualAddress &= 0x7F;
+    return m_pMap[actualAddress] = m_pTIA->Read(actualAddress);
+  /* RAM */
+  } else if ((actualAddress & 0x1280) == 0x80) {
+    return m_pMap[actualAddress & 0xFF];
+  /* RIOT */
+  } else if ((actualAddress & 0x1280) == 0x280) {
+    actualAddress &= 0x2FF;
+    return m_pMap[actualAddress & 0x2FF];
+  /* ROM Cart */
+  } else {
     return m_pMap[actualAddress];
   }
-
-  return 0xFF;
 }
 
 void Memory::Write(uint16_t address, uint8_t value) {
   /* MOS 6507 doesn't have address lines 13-15 connected. Only the first 13 bits of the address actually matter */
   uint16_t actualAddress = address & 0x1FFFu;
 
-  if (actualAddress >= TIA_START_ADDR && actualAddress <= TIA_END_ADDR) {
-    /* For convenience reads and write requests will be buffered in m_pMap, consider removing if this isn't useful */
-    m_pMap[actualAddress] = value; /* Note: Buffered value may not be valid */
+  /* Additionally, when addressing RAM, RIOT & TIA not all address lines are connected so are mirrored on different
+   * addresses depending on what you're talking to */
+
+  /* The TIA chip is addressed by A12=0, A7=0
+   * RAM is selected by A12=0, A9=0, A7=1
+   * RIOT is selected by A12=0, A9=1, A7=1 */
+
+  /* TIA */
+  if ((actualAddress & 0x1080) == 0x00) {
+    actualAddress &= 0x7F;
+    m_pMap[actualAddress] = value;
     m_pTIA->Write(actualAddress, value);
-  } else if (actualAddress >= RAM_START_ADDR && actualAddress <= RAM_END_ADDR) {
+  /* RAM */
+  } else if ((actualAddress & 0x1280) == 0x80) {
+    m_pMap[actualAddress & 0xFF] = value;
+  /* RIOT */
+  } else if ((actualAddress & 0x1280) == 0x280) {
+    actualAddress &= 0x2FF;
     m_pMap[actualAddress] = value;
-  } else if (actualAddress >= STACK_START_ADDR && actualAddress <= STACK_END_ADDR) {
-    m_pMap[actualAddress] = value;
-  } else if (actualAddress >= RIOT_START_ADDR && actualAddress <= RIOT_END_ADDR) {
-    m_pMap[actualAddress] = value;
-    /* Dispatch to RIOT core */
+    m_pRIOT->Write(actualAddress, value);
   } else {
     std::cout << "Invalid write address! Addr = " << std::hex << address << std::endl;
   }
+
 }

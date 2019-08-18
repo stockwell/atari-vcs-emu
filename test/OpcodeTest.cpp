@@ -507,9 +507,9 @@ TEST_F(MOS6502Test, OpcodeSEC) {
 TEST_F(MOS6502Test, OpcodeRTI) {
   m_pMemory->Load(0xf000, 0x40); /* RTI */
 
-  m_pMemory->Load(STACK_BASE + 0xF0, 0xAA);
-  m_pMemory->Load(STACK_BASE + 0xF1, 0x00);
-  m_pMemory->Load(STACK_BASE + 0xF2, 0xF0);
+  m_pMemory->Write(STACK_BASE + 0xF0, 0xAA);
+  m_pMemory->Write(STACK_BASE + 0xF1, 0x00);
+  m_pMemory->Write(STACK_BASE + 0xF2, 0xF0);
 
   m_pProcessor->m_SR = 0x55;
   m_pProcessor->m_SP = 0xEF;
