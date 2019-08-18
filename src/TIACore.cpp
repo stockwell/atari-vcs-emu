@@ -75,13 +75,17 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
   // Scanlines consist of:
   // Horizontal Blank -|- Game Draw Space
   //     68 ticks      |    160 ticks
+  // ------------------------------------
+  //      268 ticks per scanline
 
-  // Each full frame consists of
+  // Each full frame consists of:
   // Lines -|- Description
   //    3   | Vertical sync
   //   37   | Vertical blank
   //  192   | Game Draw Space
   //   30   | Overscan
+  // -------------------------
+  //      282 scanlines
 
   int currentLine = m_Clock / 228;
   int currentPos = m_Clock % 228;
@@ -97,7 +101,7 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
     pFramebuffer[m_PixelIndex++] = m_Background->GetColour();
   }
 
-  if (m_Vsync || (currentLine == 262)) {
+  if (m_Vsync || (currentLine == 282)) {
     m_Vsync = false;
 
     // New Frame
