@@ -128,10 +128,8 @@ Emulator::~Emulator() {
   SafeDelete(m_pAtariVCS)
 }
 
-void Emulator::Init()
-{
+void Emulator::Init() {
   m_pAtariVCS = new AtariVCS();
-  m_pAtariVCS->Init();
 }
 
 void Emulator::RunToVBlank(uint8_t* pFrameBuffer) {

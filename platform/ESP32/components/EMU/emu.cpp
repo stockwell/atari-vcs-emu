@@ -65,7 +65,6 @@ Emulator::~Emulator() {
 
 void Emulator::Init() {
   m_pAtariVCS = new AtariVCS();
-  m_pAtariVCS->Init();
 }
 
 void Emulator::RunToVBlank() {
