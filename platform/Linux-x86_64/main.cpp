@@ -53,7 +53,7 @@ void UpdateTexture(SDL_Texture *texture, const uint8_t *framebuffer) {
   SDL_UnlockTexture(texture);
 }
 
-void SDL_Init(void) {
+void SDL_Init() {
   SDL_Window *window;
   SDL_RWops *handle;
 

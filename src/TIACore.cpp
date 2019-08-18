@@ -11,7 +11,6 @@ TIACore::TIACore(MOS6502Core *Processor) {
   m_Missile1 = new Missile();
   m_Missile2 = new Missile();
   m_Ball = new Ball();
-  m_Background = new Background();
 
   m_PixelIndex = 0x00;
   m_Clock = 0x00;
@@ -69,8 +68,16 @@ TIACore::TIACore(MOS6502Core *Processor) {
 }
 
 TIACore::~TIACore() {
+  SafeDelete(m_Background)
+  SafeDelete(m_Player1)
+  SafeDelete(m_Player2)
+  SafeDelete(m_Missile1)
+  SafeDelete(m_Missile2)
+  SafeDelete(m_Ball)
+
   SafeDeleteArray(m_pMem)
 }
+
 bool TIACore::Tick(uint8_t *pFramebuffer) {
   // Scanlines consist of:
   // Horizontal Blank -|- Game Draw Space
@@ -131,167 +138,167 @@ void TIACore::Write(uint16_t address, uint8_t value) {
 }
 
 /* Vertical Sync Set-Clear              */
-void TIACore::TIAWrite0x00(uint8_t value){
+void TIACore::TIAWrite0x00(uint8_t value) {
   m_Vsync = value & 0x02u;
 }
 
 /* Vertical Blank Set-Clear             */
-void TIACore::TIAWrite0x01(uint8_t value){
+void TIACore::TIAWrite0x01(uint8_t value) {
   m_Vblank = value & 0x02u;
 }
 
 /* Wait for Horizontal blank */
-void TIACore::TIAWrite0x02(uint8_t value){
+void TIACore::TIAWrite0x02(uint8_t value) {
   m_pProcessor->Halt();
 }
 
-void TIACore::TIAWrite0x03(uint8_t value){
+void TIACore::TIAWrite0x03(uint8_t value) {
 
 }
 
 /* Number-Size player/missle 0 */
-void TIACore::TIAWrite0x04(uint8_t value){
+void TIACore::TIAWrite0x04(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x05(uint8_t value){
+void TIACore::TIAWrite0x05(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x06(uint8_t value){
+void TIACore::TIAWrite0x06(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x07(uint8_t value){
+void TIACore::TIAWrite0x07(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x08(uint8_t value){
+void TIACore::TIAWrite0x08(uint8_t value) {
 
 }
 
 /* Colubk */
-void TIACore::TIAWrite0x09(uint8_t value){
+void TIACore::TIAWrite0x09(uint8_t value) {
   m_Background->SetColor(value);
 }
 
-void TIACore::TIAWrite0x0A(uint8_t value){
+void TIACore::TIAWrite0x0A(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x0B(uint8_t value){
+void TIACore::TIAWrite0x0B(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x0C(uint8_t value){
+void TIACore::TIAWrite0x0C(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x0D(uint8_t value){
+void TIACore::TIAWrite0x0D(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x0E(uint8_t value){
+void TIACore::TIAWrite0x0E(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x0F(uint8_t value){
+void TIACore::TIAWrite0x0F(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x10(uint8_t value){
+void TIACore::TIAWrite0x10(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x11(uint8_t value){
+void TIACore::TIAWrite0x11(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x12(uint8_t value){
+void TIACore::TIAWrite0x12(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x13(uint8_t value){
+void TIACore::TIAWrite0x13(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x14(uint8_t value){
+void TIACore::TIAWrite0x14(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x15(uint8_t value){
+void TIACore::TIAWrite0x15(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x16(uint8_t value){
+void TIACore::TIAWrite0x16(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x17(uint8_t value){
+void TIACore::TIAWrite0x17(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x18(uint8_t value){
+void TIACore::TIAWrite0x18(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x19(uint8_t value){
+void TIACore::TIAWrite0x19(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x1A(uint8_t value){
+void TIACore::TIAWrite0x1A(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x1B(uint8_t value){
+void TIACore::TIAWrite0x1B(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x1C(uint8_t value){
+void TIACore::TIAWrite0x1C(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x1D(uint8_t value){
+void TIACore::TIAWrite0x1D(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x1E(uint8_t value){
+void TIACore::TIAWrite0x1E(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x1F(uint8_t value){
+void TIACore::TIAWrite0x1F(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x20(uint8_t value){
+void TIACore::TIAWrite0x20(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x21(uint8_t value){
+void TIACore::TIAWrite0x21(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x22(uint8_t value){
+void TIACore::TIAWrite0x22(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x23(uint8_t value){
+void TIACore::TIAWrite0x23(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x24(uint8_t value){
+void TIACore::TIAWrite0x24(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x25(uint8_t value){
+void TIACore::TIAWrite0x25(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x26(uint8_t value){
+void TIACore::TIAWrite0x26(uint8_t value) {
 
 }
 
-void TIACore::TIAWrite0x27(uint8_t value){
+void TIACore::TIAWrite0x27(uint8_t value) {
 
 }
 

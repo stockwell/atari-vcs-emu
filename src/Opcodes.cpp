@@ -778,7 +778,7 @@ void MOS6502Core::OPCode0x96() {
 void MOS6502Core::OPCode0x98() {
   m_AC = m_YR;
 
-  m_AC & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_AC & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_AC ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
@@ -844,7 +844,7 @@ void MOS6502Core::OPCode0xA8() {
   m_YR = m_AC;
   ++m_PC;
 
-  m_YR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_YR & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_YR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
@@ -859,7 +859,7 @@ void MOS6502Core::OPCode0xAA() {
   m_XR = m_AC;
   ++m_PC;
 
-  m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  m_XR & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   m_XR ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
