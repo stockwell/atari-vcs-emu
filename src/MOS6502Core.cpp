@@ -52,18 +52,18 @@ void MOS6502Core::Tick() {
 
   /* MOS6507 clock is 1/3 the graphics clock */
   #ifndef DISABLE_CPU_CYCLE_ACCURACY
-  if (!--m_Delay) {
-    m_Delay = (ExecuteOPCode(FetchOPCode()));
+  if (m_Delay) {
+    --m_Delay;
+    return;
   }
-  #else
-    m_Delay = (ExecuteOPCode(FetchOPCode()));
   #endif
 
+  m_Delay = (ExecuteOPCode(FetchOPCode()));
 }
 
 void MOS6502Core::Halt() {
   m_Running = false;
-  m_Delay = 0x01;
+  m_Delay = 0x00;
 }
 
 void MOS6502Core::Resume() {

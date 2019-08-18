@@ -198,29 +198,47 @@ private:
 class Playfield {
 public:
   void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
-    uint32_t PF = (m_PF0>>4) | (m_PF1 << 4u) | (m_PF2 << 12);
+    bool pixelEnabled = false;
+
+    uint32_t PF = (m_PF0 >> 4u) | (m_PF1 << 4u) | (m_PF2 << 12u);
 
     if (currentPos < 148) {
-      if (PF & (1 << ((currentPos - 68) >> 2))) {
-        *pixel = m_Colour;
+      if (PF & (1u << ((currentPos - 68u) >> 2u))) {
+        pixelEnabled = true;
       }
-    } else if (currentPos >= 148) {
-      if (PF & (1 << ((currentPos - 148) >> 2))) {
-        *pixel = m_Colour;
+    } else {
+      // Check if PF is reversed
+      if ((m_CTRL & 0x01u) == 0x01u) {
+        if (PF & (1u << (19 - ((currentPos - 148u) >> 2))) ) {
+          pixelEnabled = true;
+        }
+      } else {
+        if (PF & (1u << (((currentPos - 148u)) >> 2u))) {
+          pixelEnabled = true;
+        }
       }
     }
+
+    if (!pixelEnabled)
+      return;
+
+    // TODO: If m_CTRL & 0x02u -> Use P1 & P2 colours instead of playfield colour
+    *pixel = m_Colour;
+
   };
 
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  void SetPF0(uint8_t val) { m_PF0 = val; };
-  void SetPF1(uint8_t val) { m_PF1 = val; };
-  void SetPF2(uint8_t val) { m_PF2 = val; };
+  void SetPF0(uint8_t val)  { m_PF0  = val; };
+  void SetPF1(uint8_t val)  { m_PF1  = bitreverse(val); };
+  void SetPF2(uint8_t val)  { m_PF2  = val; };
+  void SetCTRL(uint8_t val) { m_CTRL = val; };
 
 private:
   uint8_t m_Colour;
   uint8_t m_PF0;
   uint8_t m_PF1;
   uint8_t m_PF2;
+  uint8_t m_CTRL;
 };
 
 #endif //ATARI_VCS_EMU_TIACORE_H

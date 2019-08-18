@@ -108,7 +108,7 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
   if ((currentLine >= 40) && (currentLine < 232) && (currentPos >= 68)) {
 
     pFramebuffer[m_PixelIndex] = m_Background->GetColour();
-    
+
     m_Playfield->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
     ++m_PixelIndex;
@@ -189,8 +189,9 @@ void TIACore::TIAWrite0x09(uint8_t value) {
   m_Background->SetColor(value);
 }
 
+/* CTRLPF */
 void TIACore::TIAWrite0x0A(uint8_t value) {
-
+  m_Playfield->SetCTRL(value);
 }
 
 void TIACore::TIAWrite0x0B(uint8_t value) {
