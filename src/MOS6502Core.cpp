@@ -50,7 +50,6 @@ uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode) {
 
 void MOS6502Core::Tick() {
   if (!m_Running) {
-    m_Delay = 0x01;
     return;
   }
 
@@ -67,6 +66,7 @@ void MOS6502Core::Tick() {
 
 void MOS6502Core::Halt() {
   m_Running = false;
+  m_Delay = 0x01;
 }
 
 void MOS6502Core::Resume() {
