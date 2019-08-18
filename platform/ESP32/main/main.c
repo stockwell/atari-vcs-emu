@@ -23,7 +23,7 @@ void app_main(void)
           (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
   ili9341_init();
-  xTaskCreatePinnedToCore(&emulator_main, "Emulator Task", 1024, NULL, 5, NULL, 0);
+  xTaskCreate(&emulator_main, "Emulator Task", 2048, NULL, 5, NULL);
 
   vTaskDelete(NULL);
 }

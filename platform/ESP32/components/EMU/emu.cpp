@@ -46,7 +46,6 @@ void emu() {
     uint32_t start = (uint32_t)esp_timer_get_time();
     emulator->RunToVBlank();
     emulator->Draw();
-    //vTaskDelay(1);
     uint32_t time = (uint32_t)esp_timer_get_time();
     std::cout << (time - start) << std::endl;
   } while (emulator->Running());
