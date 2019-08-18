@@ -13,13 +13,16 @@ public:
 
   uint8_t Read(uint16_t address);
 
-private:
-  void (RIOTCore::*m_WriteRegisters[0x2E])(uint8_t value);
+  void Tick();
 
+private:
   uint8_t *m_pMem;
+  uint8_t m_TimerCnt;
+  uint8_t m_TimerPrescale;
+  uint8_t m_TimerPrescaleCnt;
 };
 
-static const char* kTIAReadRegisterNames[0x09] = {
+static const char* kRIOTReadRegisterNames[0x09] = {
     "Swcha",    /* 280 - Port A data register (joysticks...) */
     "Swacnt",   /* 281 - Port A data direction register (DDR) */
     "Swchb",    /* 282 - Port B data (console switches) */
