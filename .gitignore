@@ -41,3 +41,4 @@ cmake-build*
 test/bin
 
 platform/ESP32/build
+platform/ESP32/sdkconfig.old
