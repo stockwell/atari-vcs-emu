@@ -1,6 +1,8 @@
 #ifndef ATARI_VCS_EMU_MAIN_H
 #define ATARI_VCS_EMU_MAIN_H
 
+#include "AtariVCS.h"
+
 //#define DISABLE_RENDERER
 
 static const uint32_t ColourLUT[0x100] = {
@@ -37,5 +39,28 @@ static const uint32_t ColourLUT[0x100] = {
     0x482c00, 0, 0x694d14, 0, 0x866a26, 0, 0xa28638, 0,
     0xbb9f47, 0, 0xd2b656, 0, 0xe8cc63, 0, 0xfce070, 0
 };
+
+class Emulator {
+public:
+  Emulator();
+  ~Emulator();
+  void RunToVBlank(uint8_t* pFrameBuffer);
+  void LoadRom(const char* szFilePath);
+  bool Running();
+  void Stop();
+  bool Draw(uint8_t* pFramebuffer);
+  void KeypressEvent(keypress_event_t evt, bool pressed);
+
+private:
+  bool running = true;
+  AtariVCS *m_pAtariVCS = nullptr;
+  std::mutex m;
+};
+
+#define ATARI_2600_FB_W 160
+#define ATARI_2600_FB_H 192
+
+#define EMU_WINDOW_W  900
+#define EMU_WINDOW_H  600
 
 #endif //ATARI_VCS_EMU_MAIN_H

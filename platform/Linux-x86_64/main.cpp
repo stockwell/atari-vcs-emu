@@ -4,33 +4,10 @@
 #include "SDL.h"
 
 #include "main.h"
-#include "AtariVCS.h"
 
-class Emulator
-{
-public:
-  Emulator() = default;
-  ~Emulator();
-  void Init();
-  void RunToVBlank(uint8_t* pFrameBuffer);
-  void LoadRom(const char* szFilePath);
-  bool Running();
-  void Stop();
-  bool Draw(uint8_t* pFramebuffer);
-private:
-  bool running = true;
-  AtariVCS *m_pAtariVCS = nullptr;
-  std::mutex m;
-};
-
-#define ATARI_2600_FB_W 160
-#define ATARI_2600_FB_H 192
-
-#define EMU_WINDOW_W  900
-#define EMU_WINDOW_H  600
+int frame;
 
 SDL_Renderer *renderer;
-int frame;
 SDL_Texture *EmuTexture;
 
 void UpdateTexture(SDL_Texture *texture, const uint8_t *framebuffer) {
@@ -86,10 +63,89 @@ void SDL_Init() {
   }
 }
 
+Emulator::Emulator() {
+  m_pAtariVCS = new AtariVCS();
+}
+
+Emulator::~Emulator() {
+  SafeDelete(m_pAtariVCS)
+}
+
+void Emulator::RunToVBlank(uint8_t* pFrameBuffer) {
+  m_pAtariVCS->RunToVBlank(pFrameBuffer, nullptr, nullptr);
+}
+
+void Emulator::LoadRom(const char *szFilePath) {
+  m_pAtariVCS->LoadROM(szFilePath);
+  m_pAtariVCS->Reset();
+}
+
+bool Emulator::Running() {
+  return running;
+}
+
+void Emulator::Stop() {
+  running = false;
+}
+
+void Emulator::KeypressEvent(keypress_event_t evt, bool pressed) {
+  m_pAtariVCS->KeypressEvent(evt, pressed);
+}
+
+bool Emulator::Draw(uint8_t* pFramebuffer) {
+  SDL_Event event;
+
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+      case SDL_KEYUP:
+      case SDL_KEYDOWN: {
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            return false;
+
+          case SDLK_RIGHT:
+            KeypressEvent(KEYPRESS_RIGHT, event.type == SDL_KEYDOWN);
+            break;
+
+          case SDLK_LEFT:
+            KeypressEvent(KEYPRESS_LEFT, event.type == SDL_KEYDOWN);
+            break;
+
+          case SDLK_UP:
+            KeypressEvent(KEYPRESS_UP, event.type == SDL_KEYDOWN);
+            break;
+
+          case SDLK_DOWN:
+            KeypressEvent(KEYPRESS_DOWN, event.type == SDL_KEYDOWN);
+            break;
+
+          case SDLK_SPACE:
+            KeypressEvent(KEYPRESS_SPACE, event.type == SDL_KEYDOWN);
+            break;
+
+          default:
+            break;
+        }
+      } break;
+
+      case SDL_QUIT:
+        return false;
+    }
+  }
+
+  UpdateTexture(EmuTexture, pFramebuffer);
+
+  SDL_RenderClear(renderer);
+  SDL_RenderCopy(renderer, EmuTexture, NULL, NULL);
+  SDL_RenderPresent(renderer);
+
+  return true;
+}
+
 int main() {
   auto emulator = new Emulator();
-  emulator->Init();
-  emulator->LoadRom("kernel_01.bin");
+
+  emulator->LoadRom("pitfall.bin");
 
   // NTSC Resolution
   auto *framebuffer = new uint8_t[160*192];
@@ -99,12 +155,8 @@ int main() {
 #endif
 
   /* Loop, waiting for QUIT or the escape key */
-  uint8_t frames = 2;
   do {
     emulator->RunToVBlank(framebuffer);
-    if (!--frames) {
-      //emulator->Stop();
-    }
 
 #ifndef DISABLE_RENDERER
     if (!emulator->Draw(framebuffer)) {
@@ -122,59 +174,4 @@ int main() {
   SafeDeleteArray(framebuffer)
 
   return 0;
-}
-
-Emulator::~Emulator() {
-  SafeDelete(m_pAtariVCS)
-}
-
-void Emulator::Init() {
-  m_pAtariVCS = new AtariVCS();
-}
-
-void Emulator::RunToVBlank(uint8_t* pFrameBuffer) {
-  m.lock();
-  m_pAtariVCS->RunToVBlank(pFrameBuffer, nullptr, nullptr);
-  m.unlock();
-}
-
-void Emulator::LoadRom(const char *szFilePath) {
-  m.lock();
-  m_pAtariVCS->LoadROM(szFilePath);
-  m_pAtariVCS->Reset();
-  m.unlock();
-}
-
-bool Emulator::Running() {
-  return running;
-}
-
-void Emulator::Stop() {
-  m.lock();
-  running = false;
-  m.unlock();
-}
-
-bool Emulator::Draw(uint8_t* pFramebuffer) {
-  SDL_Event event;
-
-  while (SDL_PollEvent(&event)) {
-    switch (event.type) {
-      case SDL_KEYDOWN:
-        if (event.key.keysym.sym == SDLK_ESCAPE) {
-          return false;
-        }
-        break;
-      case SDL_QUIT:
-        return false;
-    }
-  }
-
-  UpdateTexture(EmuTexture, pFramebuffer);
-
-  SDL_RenderClear(renderer);
-  SDL_RenderCopy(renderer, EmuTexture, NULL, NULL);
-  SDL_RenderPresent(renderer);
-
-  return true;
 }
