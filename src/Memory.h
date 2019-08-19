@@ -20,6 +20,7 @@ public:
   void Load(uint16_t address, uint8_t value);
   void Load(uint16_t address, uint8_t *bytes, size_t numBytes);
   void LoadROM(const uint8_t* pROM, uint16_t offset);
+  void DumpRAM();
 
 private:
   MOS6502Core *m_pProcessor;

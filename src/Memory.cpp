@@ -85,7 +85,7 @@ uint8_t Memory::Read(uint16_t address) {
   /* RIOT */
   } else if ((actualAddress & 0x1280) == 0x280) {
     actualAddress &= 0x2FF;
-    return m_pMap[actualAddress & 0x2FF];
+    return m_pMap[actualAddress & 0x2FF] = m_pRIOT->Read(actualAddress);
   /* ROM Cart */
   } else {
     return m_pMap[actualAddress];
@@ -119,5 +119,8 @@ void Memory::Write(uint16_t address, uint8_t value) {
   } else {
     std::cout << "Invalid write address! Addr = " << std::hex << address << std::endl;
   }
+}
 
+void Memory::DumpRAM() {
+  hexDump("Mem", &m_pMap[0x80], 0x80);
 }
