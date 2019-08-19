@@ -24,8 +24,8 @@ public:
   void ClearSWCHB(uint8_t val);
 
 private:
-  uint8_t m_TimerPrescale;
-  uint8_t m_TimerPrescaleCnt;
+  uint16_t m_TimerPrescale;
+  uint16_t m_TimerPrescaleCnt;
   uint8_t m_SWCHA;
   uint8_t m_SWCHB;
   uint8_t m_SWACNT;
