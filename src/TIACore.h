@@ -190,8 +190,10 @@ public:
   void SetColor(uint8_t colour) { m_Colour = colour; };
   void SetGraphics(uint8_t value) { m_Sprite = bitreverse(value); };
   void ResetPos(uint8_t value) { m_Position = 0; };
+  uint8_t GetColour() { return m_Colour; };
+  void SetVdelay(uint8_t value) { m_Vdelay = value;}
   void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
-    if (m_Position == 0) {
+    if (m_Position == 0 && !m_Vdelay) {
       m_Position = currentPos;
     }
 
@@ -207,6 +209,7 @@ public:
   }
 
 private:
+  bool m_Vdelay;
   uint8_t m_Colour;
   uint8_t m_Sprite;
   uint8_t m_Position;
@@ -216,15 +219,23 @@ class Ball {
 public:
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
   uint8_t GetColour() { return m_Colour; };
+  void SetVdelay(uint8_t value) { m_Vdelay = value;}
 
 private:
   uint8_t m_Colour;
+  bool m_Vdelay;
 };
 
 class Playfield {
 public:
+  Playfield(Player *Player0, Player *Player1) {
+    m_Player0 = Player0;
+    m_Player1 = Player1;
+  }
+
   void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
     bool pixelEnabled = false;
+    bool secondHalf = false;
 
     uint32_t PF = (m_PF0 >> 4u) | (m_PF1 << 4u) | (m_PF2 << 12u);
 
@@ -241,6 +252,7 @@ public:
       } else {
         if (PF & (1u << (((currentPos - 148u)) >> 2u))) {
           pixelEnabled = true;
+          secondHalf = true;
         }
       }
     }
@@ -248,9 +260,15 @@ public:
     if (!pixelEnabled)
       return;
 
-    // TODO: If m_CTRL & 0x02u -> Use P1 & P2 colours instead of playfield colour
-    *pixel = m_Colour;
-
+    if ((m_CTRL & 0x02u) == 0x02u) {
+      if (secondHalf) {
+        *pixel = m_Player1->GetColour();
+      } else {
+        *pixel = m_Player0->GetColour();
+      }
+    } else {
+      *pixel = m_Colour;
+    }
   };
 
   void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
@@ -260,6 +278,9 @@ public:
   void SetCTRL(uint8_t val) { m_CTRL = val; };
 
 private:
+  Player *m_Player0;
+  Player *m_Player1;
+
   uint8_t m_Colour;
   uint8_t m_PF0;
   uint8_t m_PF1;

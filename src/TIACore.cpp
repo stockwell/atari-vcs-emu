@@ -11,7 +11,7 @@ TIACore::TIACore(MOS6502Core *Processor) {
   m_Missile0 = new Missile();
   m_Missile1 = new Missile();
   m_Ball = new Ball();
-  m_Playfield = new Playfield();
+  m_Playfield = new Playfield(m_Player0, m_Player1);
 
   m_PixelIndex = 0x00;
   m_Clock = 0x00;
@@ -102,6 +102,9 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
   /* New scanline, resume processor if it was suspended by WSYNC */
   if (currentPos == 0x00) {
     m_pProcessor->Resume();
+    m_Player0->SetVdelay(0x00);
+    m_Player1->SetVdelay(0x00);
+    m_Ball->SetVdelay(0x00);
   }
 
   /* Game Draw Space */
@@ -312,16 +315,19 @@ void TIACore::TIAWrite0x24(uint8_t value) {
 
 }
 
+/* Vdelp0 */
 void TIACore::TIAWrite0x25(uint8_t value) {
-
+  m_Player0->SetVdelay(value);
 }
 
+/* Vdelp1 */
 void TIACore::TIAWrite0x26(uint8_t value) {
-
+  m_Player1->SetVdelay(value);
 }
 
+/* Vdelbl */
 void TIACore::TIAWrite0x27(uint8_t value) {
-
+  m_Ball->SetVdelay(value);
 }
 
 void TIACore::TIAWrite0x28(uint8_t value) {
