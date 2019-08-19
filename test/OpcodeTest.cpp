@@ -1423,21 +1423,21 @@ TEST_F(MOS6502Test, OpcodeCMP_ABS) {
   m_pProcessor->Tick();
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->m_AC = 0xCD;
   m_pProcessor->Tick();
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->m_AC = 0xCC;
   m_pProcessor->Tick();
 
   ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 
   ASSERT_EQ(0xf009, m_pProcessor->m_PC);
@@ -1487,21 +1487,21 @@ TEST_F(MOS6502Test, OpcodeCMP_ZPG_X) {
   m_pProcessor->Tick();
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->m_AC = 0x01;
   m_pProcessor->Tick();
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->m_AC = 0x00;
   m_pProcessor->Tick();
 
   ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 
   ASSERT_EQ(0xf006, m_pProcessor->m_PC);
@@ -1533,21 +1533,21 @@ TEST_F(MOS6502Test, OpcodeCMP_ABS_Y) {
   m_pProcessor->Tick();
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->m_AC = 0x01;
   m_pProcessor->Tick();
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->m_AC = 0x00;
   m_pProcessor->Tick();
 
   ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 }
 
@@ -1566,21 +1566,21 @@ TEST_F(MOS6502Test, OpcodeCMP_ABS_X) {
   m_pProcessor->Tick();
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->m_AC = 0x01;
   m_pProcessor->Tick();
 
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->m_AC = 0x00;
   m_pProcessor->Tick();
 
   ASSERT_EQ(NEGATIVE, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(CARRY, m_pProcessor->m_SR & CARRY);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & CARRY);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 }
 

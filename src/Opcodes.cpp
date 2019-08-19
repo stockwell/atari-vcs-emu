@@ -1271,21 +1271,21 @@ void MOS6502Core::OPCodesASL(uint16_t address) {
 
 void MOS6502Core::OPCodesCMP(uint16_t address) {
   uint16_t val = m_AC - m_pMemory->Read(address);
-  val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
+  m_AC >= val ? m_SR |= CARRY : m_SR &= ~CARRY;
   val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesCPX(uint16_t address) {
   uint16_t val = m_XR - m_pMemory->Read(address);
-  val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
+  m_XR >= val ? m_SR |= CARRY : m_SR &= ~CARRY;
   val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
 
 void MOS6502Core::OPCodesCPY(uint16_t address) {
   uint16_t val = m_YR - m_pMemory->Read(address);
-  val < 0x100 ? m_SR &= ~CARRY : m_SR |= CARRY;
+  m_YR >= val ? m_SR |= CARRY : m_SR &= ~CARRY;
   val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 }
