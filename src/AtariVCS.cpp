@@ -61,3 +61,42 @@ void AtariVCS::RunToVBlank(uint8_t *pFrameBuffer, int16_t *pSampleBuffer, int *p
       break;
   }
 }
+
+void AtariVCS::KeypressEvent(keypress_event_t evt, bool pressed) {
+  switch (evt) {
+    case KEYPRESS_UP:
+      if (pressed) {
+        m_pRIOT->SetSWCHA(0x10);
+      } else {
+        m_pRIOT->ClearSWCHA(0x10);
+      }
+      break;
+
+    case KEYPRESS_DOWN:
+      if (pressed) {
+        m_pRIOT->SetSWCHA(0x20);
+      } else {
+        m_pRIOT->ClearSWCHA(0x20);
+      }
+      break;
+
+    case KEYPRESS_LEFT:
+      if (pressed) {
+        m_pRIOT->SetSWCHA(0x40);
+      } else {
+        m_pRIOT->ClearSWCHA(0x40);
+      }
+      break;
+
+    case KEYPRESS_RIGHT:
+      if (pressed) {
+        m_pRIOT->SetSWCHA(0x80);
+      } else {
+        m_pRIOT->ClearSWCHA(0x80);
+      }
+      break;
+
+    case KEYPRESS_SPACE:
+      break;
+  }
+}

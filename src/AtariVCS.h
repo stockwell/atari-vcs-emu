@@ -11,8 +11,15 @@ class Memory;
 class TIACore;
 class RIOTCore;
 
-class AtariVCS
-{
+typedef enum {
+  KEYPRESS_UP,
+  KEYPRESS_DOWN,
+  KEYPRESS_LEFT,
+  KEYPRESS_RIGHT,
+  KEYPRESS_SPACE
+} keypress_event_t;
+
+class AtariVCS {
 public:
   AtariVCS();
   ~AtariVCS();
@@ -21,6 +28,7 @@ public:
   bool LoadROM(std::vector<uint8_t>* romBuffer);
   void RunToVBlank(uint8_t* pFrameBuffer, int16_t* pSampleBuffer, int* pSampleCount);
   void Reset();
+  void KeypressEvent(keypress_event_t evt, bool pressed);
 
 private:
   Cartridge* m_pCartridge;
