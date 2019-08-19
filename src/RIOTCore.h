@@ -7,7 +7,7 @@ class RIOTCore {
 public:
   RIOTCore();
 
-  ~RIOTCore();
+  ~RIOTCore() = default;
 
   void Write(uint16_t address, uint8_t value);
 
@@ -15,19 +15,32 @@ public:
 
   void Tick();
 
+  void SetSWCHA(uint8_t val);
+
+  void ClearSWCHA(uint8_t val);
+
+  void SetSWCHB(uint8_t val);
+
+  void ClearSWCHB(uint8_t val);
+
 private:
-  uint8_t *m_pMem;
-  uint8_t m_TimerCnt;
   uint8_t m_TimerPrescale;
   uint8_t m_TimerPrescaleCnt;
+  uint8_t m_SWCHA;
+  uint8_t m_SWCHB;
+  uint8_t m_SWACNT;
+  uint8_t m_SWBCNT;
+  uint8_t m_INTIM;
+  uint8_t m_TIMINT;
 };
 
-static const char* kRIOTReadRegisterNames[0x09] = {
+static const char* kRIOTReadRegisterNames[0x0A] = {
     "Swcha",    /* 280 - Port A data register (joysticks...) */
     "Swacnt",   /* 281 - Port A data direction register (DDR) */
     "Swchb",    /* 282 - Port B data (console switches) */
     "Swbcnt",   /* 283 - Port B DDR */
     "Intim",    /* 284 - Timer output */
+    "Timint",   /* 285 - Timer Interrupt */
 
     "Tim1t",    /* 294 - set 1 clock interval */
     "Tim8t",    /* 295 - set 8 clock interval */
