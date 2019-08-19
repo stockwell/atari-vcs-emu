@@ -19,7 +19,8 @@ set(vcs-emu-source
         ${PROJECT_ROOT}/src/Opcodes.cpp
         ${PROJECT_ROOT}/src/RIOTCore.cpp
         ${PROJECT_ROOT}/src/TIACore.cpp
-        ${PROJECT_ROOT}/src/Cart.cpp)
+        ${PROJECT_ROOT}/src/Cart.cpp
+        ${PROJECT_ROOT}/src/HexDump.cpp)
 
 set(test-source
         OpcodeTest.cpp TIATest.cpp)
