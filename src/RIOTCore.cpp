@@ -9,9 +9,16 @@ RIOTCore::RIOTCore() {
   m_INTIM = 0x80;
   m_TimerPrescale = 1024;
   m_TimerPrescaleCnt = 0x400;
+  m_Delay = 3;
 }
 
 void RIOTCore::Tick() {
+
+  if (--m_Delay)
+    return;
+
+  m_Delay = 3;
+
   if (!--m_TimerPrescaleCnt ) {
     if (--m_INTIM < 0x00) {
       /* After timer underflow the timer will switch to using no prescaler, but will enable the prescaler again after

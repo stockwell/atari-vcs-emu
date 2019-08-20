@@ -32,6 +32,7 @@ private:
   uint8_t m_SWBCNT;
   uint8_t m_INTIM;
   uint8_t m_TIMINT;
+  uint8_t m_Delay;
 };
 
 static const char* kRIOTReadRegisterNames[0x0A] = {
