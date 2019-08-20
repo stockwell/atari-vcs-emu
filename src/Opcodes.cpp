@@ -245,13 +245,7 @@ void MOS6502Core::OPCode0x0E() {
 
 /* BPL relative */
 void MOS6502Core::OPCode0x10() {
-  if ((m_SR & NEGATIVE) == 0x00) {
-    uint16_t _PC = m_PC;
-    m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
-
-    (m_PC / 256) == (_PC / 256) ? m_CycleTime = 1 : m_CycleTime = 2;
-  }
-
+  BranchRelative((m_SR & NEGATIVE) == 0x00);
   m_PC += 2;
 }
 
@@ -381,9 +375,7 @@ void MOS6502Core::OPCode0x2E() {
 
 /* BMI relative */
 void MOS6502Core::OPCode0x30() {
-  if (m_SR & NEGATIVE)
-    m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
-
+  BranchRelative(m_SR & NEGATIVE);
   m_PC += 2;
 }
 
@@ -502,10 +494,7 @@ void MOS6502Core::OPCode0x4E() {
 
 /* BVC */
 void MOS6502Core::OPCode0x50() {
-  if ((m_SR & OVERFLOW) == 0x00) {
-    int offset = (int8_t)m_pMemory->Read(m_PC + 1);
-    m_PC += offset;
-  }
+  BranchRelative((m_SR & OVERFLOW) == 0x00);
   m_PC += 2;
 }
 
@@ -600,14 +589,14 @@ void MOS6502Core::OPCode0x6A() {
   uint16_t val = m_AC;
 
   if (m_SR & CARRY) val |= 0x100;
-  val & 0x01 ? m_SR |= CARRY : m_SR &= ~CARRY;
+  val & 0x01u ? m_SR |= CARRY : m_SR &= ~CARRY;
 
   val >>= 1u;
 
-  val & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  val & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
 
-  m_AC = val & 0xFF;
+  m_AC = val & 0xFFu;
 
   ++m_PC;
 }
@@ -746,9 +735,7 @@ void MOS6502Core::OPCode0x8E() {
 
 /* BCC */
 void MOS6502Core::OPCode0x90() {
-  if ((m_SR & CARRY) == 0x00)
-    m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
-
+  BranchRelative((m_SR & CARRY) == 0x00);
   m_PC += 2;
 }
 
@@ -890,9 +877,7 @@ void MOS6502Core::OPCode0xAE() {
 
 /* BCS relative */
 void MOS6502Core::OPCode0xB0() {
-  if (m_SR & CARRY)
-    m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
-
+  BranchRelative(m_SR & CARRY);
   m_PC += 2;
 }
 
@@ -1057,9 +1042,7 @@ void MOS6502Core::OPCode0xCE() {
 
 /* BNE Relative */
 void MOS6502Core::OPCode0xD0() {
-  if ((m_SR & ZERO) == 0x00)
-    m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
-
+  BranchRelative((m_SR & ZERO) == 0x00);
   m_PC += 2;
 }
 
@@ -1181,9 +1164,7 @@ void MOS6502Core::OPCode0xEE() {
 
 /* BEQ, Relative */
 void MOS6502Core::OPCode0xF0() {
-  if (m_SR & ZERO)
-    m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
-
+  BranchRelative(m_SR & ZERO);
   m_PC += 2;
 }
 
@@ -1426,6 +1407,15 @@ void MOS6502Core::OPCodesBIT(uint16_t address) {
 
   val & 0x80u ? m_SR |= NEGATIVE : m_SR &=~NEGATIVE;
   val ? m_SR &= ~ZERO : m_SR |= ZERO;
+}
+
+void MOS6502Core::BranchRelative(bool condition) {
+  if (condition) {
+    uint16_t _PC = m_PC;
+    m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
+
+    (m_PC / 256) == (_PC / 256) ? m_CycleTime = 1 : m_CycleTime = 2;
+  }
 }
 
 void MOS6502Core::StackPush(uint16_t pushval) {

@@ -242,6 +242,7 @@ private:
   void OPCodesROL(uint16_t address);
   void OPCodesBIT(uint16_t address);
 
+  void BranchRelative(bool condition);
   uint8_t StackPull8();
   uint16_t StackPull16();
   void StackPush(uint8_t pushval);
