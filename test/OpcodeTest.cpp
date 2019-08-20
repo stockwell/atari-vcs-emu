@@ -423,7 +423,7 @@ TEST_F(MOS6502Test, OPcodeJSR) {
 
   ASSERT_EQ(0xFB, m_pProcessor->m_SP);
   ASSERT_EQ(0x80, m_pProcessor->m_PC);
-  ASSERT_EQ(0x03, m_pMemory->Read(STACK_BASE + 0xFC));
+  ASSERT_EQ(0x02, m_pMemory->Read(STACK_BASE + 0xFC));
   ASSERT_EQ(0xF0, m_pMemory->Read(STACK_BASE + 0xFD));
 
 }

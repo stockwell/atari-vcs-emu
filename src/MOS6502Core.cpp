@@ -19,7 +19,7 @@ void MOS6502Core::Reset() {
   m_SR = CONSTANT;
   m_SP = 0xFD;
 
-  m_Delay = 1;
+  m_Delay = 3;
 
   this->Resume();
 }
@@ -52,10 +52,8 @@ void MOS6502Core::Tick() {
 
   /* MOS6507 clock is 1/3 the graphics clock */
   #ifndef DISABLE_CPU_CYCLE_ACCURACY
-  if (m_Delay) {
-    --m_Delay;
+  if (--m_Delay)
     return;
-  }
   #endif
 
   m_Delay = (ExecuteOPCode(FetchOPCode()));

@@ -42,11 +42,11 @@ public:
   uint8_t m_YR;
   uint8_t m_SR;
   uint8_t m_SP;
-  Memory* m_pMemory;
 
 private:
   void(MOS6502Core::*m_OPCodes[0x100])();
   bool m_Running;
+  Memory* m_pMemory;
 
 private:
   uint8_t FetchOPCode();

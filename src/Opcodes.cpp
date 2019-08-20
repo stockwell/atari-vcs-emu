@@ -303,7 +303,7 @@ void MOS6502Core::OPCode0x1E() {
 
 /* JSR */
 void MOS6502Core::OPCode0x20() {
-  uint16_t addr = m_PC + 3;
+  uint16_t addr = m_PC + 2;
   StackPush(addr);
   m_PC = m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u;
 }
@@ -614,7 +614,8 @@ void MOS6502Core::OPCode0x6A() {
 
 /* JMP Indirect */
 void MOS6502Core::OPCode0x6C() {
-  m_PC = m_pMemory->Read(m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u);
+  uint16_t addr = m_pMemory->Read(m_PC + 1) | (unsigned)m_pMemory->Read(m_PC + 2) << 8u;
+  m_PC = m_pMemory->Read(addr) | m_pMemory->Read((addr & 0xFF00) + ((addr + 1) & 0x00FF)) << 8;
 }
 
 /* ADC abs */
