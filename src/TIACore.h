@@ -178,6 +178,7 @@ private:
 
 class Missile {
 public:
+  Missile() { m_Enabled = false; }
   void SetColor(uint8_t colour) { m_Colour = colour; };
   void SetEnable(bool enabled) { m_Enabled = enabled; }
   void SetSize(uint8_t value) { m_Size = value; }
@@ -190,8 +191,7 @@ public:
       if (currentPos != m_Position) {
         return;
       }
-
-      *pixel = m_Colour;
+      if (m_Enabled) *pixel = m_Colour;
     }
 
 private:
@@ -244,6 +244,7 @@ private:
 
 class Ball {
 public:
+  Ball() { m_Enabled = false; }
   void SetColor(uint8_t colour) { m_Colour = colour; };
   void SetEnable(bool enabled) { m_Enabled = enabled; }
   void SetVdelay(uint8_t value) { m_Vdelay = value;}
@@ -257,7 +258,7 @@ public:
       return;
     }
 
-    *pixel = m_Colour;
+    if (m_Enabled) *pixel = m_Colour;
   }
 
 private:
