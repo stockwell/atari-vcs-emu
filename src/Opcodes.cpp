@@ -786,7 +786,7 @@ void MOS6502Core::OPCode0x98() {
 
 /* STA abs, Y */
 void MOS6502Core::OPCode0x99() {
-  OPCodesSTA((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 1) << 8u) + m_YR);
+  OPCodesSTA((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_YR);
   m_PC += 3;
 }
 

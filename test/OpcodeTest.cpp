@@ -847,19 +847,19 @@ TEST_F(MOS6502Test, OpcodeTYA) {
 
 /* 0x99 */
 TEST_F(MOS6502Test, OpcodeSTA_ABS_Y) {
-  uint8_t instr[] = {0x99, 0x80, 0x00,  /* STA $0080,Y */
-                     0x99, 0x80, 0x00,  /* STA $0080,Y */
-                     0x99, 0x80, 0x00}; /* STA $0080,Y */
+  uint8_t instr[] = {0x99, 0x80, 0x01,  /* STA $0180,Y */
+                     0x99, 0x80, 0x01,  /* STA $0180,Y */
+                     0x99, 0x80, 0x01}; /* STA $0180,Y */
 
   m_pMemory->Load(0xf000, instr, sizeof instr);
-  m_pMemory->Load(0x81, 0xAA);
+  m_pMemory->Load(0x181, 0xAA);
 
 
   m_pProcessor->m_YR = 0x01;
   m_pProcessor->m_AC = 0x55;
   m_pProcessor->Tick();
 
-  ASSERT_EQ(0x55, m_pMemory->Read(0x81));
+  ASSERT_EQ(0x55, m_pMemory->Read(0x181));
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
@@ -879,18 +879,18 @@ TEST_F(MOS6502Test, OpcodeTXS) {
 
 /* 0x9D */
 TEST_F(MOS6502Test, OpcodeSTA_ABS_X) {
-  uint8_t instr[] = {0x9D, 0x80, 0x00,  /* STA $0080,X */
-                     0x9D, 0x80, 0x00,  /* STA $0080,X */
-                     0x9D, 0x80, 0x00}; /* STA $0080,X */
+  uint8_t instr[] = {0x9D, 0x80, 0x01,  /* STA $0180,X */
+                     0x9D, 0x80, 0x01,  /* STA $0180,X */
+                     0x9D, 0x80, 0x01}; /* STA $0180,X */
 
   m_pMemory->Load(0xf000, instr, sizeof instr);
-  m_pMemory->Load(0x81, 0xAA);
+  m_pMemory->Load(0x181, 0xAA);
 
   m_pProcessor->m_XR = 0x01;
   m_pProcessor->m_AC = 0x55;
   m_pProcessor->Tick();
 
-  ASSERT_EQ(0x55, m_pMemory->Read(0x81));
+  ASSERT_EQ(0x55, m_pMemory->Read(0x181));
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
 
