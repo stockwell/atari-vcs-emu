@@ -29,6 +29,7 @@ uint8_t MOS6502Core::FetchOPCode() {
 }
 
 uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode) {
+  m_CycleTime = 0;
   Log("Opcode: %s(0x%02X), PC 0x%04X", kOPCodeNames[opcode], opcode, m_PC);
   Log("SR: 0x%02X  |  AC: 0x%02X  |  XR: 0x%02X | YR: 0x%02X | SP: 0x%02X [ %s%s%s%s%s%s%s]",
       m_SR, m_AC, m_XR, m_YR, m_SP,
@@ -41,8 +42,7 @@ uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode) {
       m_SR & NEGATIVE ? "N ": "");
   (this->*m_OPCodes[opcode])();
 
-  // TODO: This doesn't account for extra cycles due to crossing a page boundary or branching
-  return cycletime[opcode];
+  return cycletime[opcode] + m_CycleTime;
 }
 
 void MOS6502Core::Tick() {

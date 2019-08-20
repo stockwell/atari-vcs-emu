@@ -35,6 +35,7 @@ public:
 
 public:
   uint8_t m_Delay;
+  uint8_t m_CycleTime;
   uint16_t m_PC;
   uint8_t m_AC;
   uint8_t m_XR;

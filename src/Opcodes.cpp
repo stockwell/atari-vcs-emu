@@ -245,8 +245,12 @@ void MOS6502Core::OPCode0x0E() {
 
 /* BPL relative */
 void MOS6502Core::OPCode0x10() {
-  if ((m_SR & NEGATIVE) == 0x00)
+  if ((m_SR & NEGATIVE) == 0x00) {
+    uint16_t _PC = m_PC;
     m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
+
+    (m_PC / 256) == (_PC / 256) ? m_CycleTime = 1 : m_CycleTime = 2;
+  }
 
   m_PC += 2;
 }
@@ -941,19 +945,37 @@ void MOS6502Core::OPCode0xBA() {
 
 /* LDY abs, X */
 void MOS6502Core::OPCode0xBC() {
-  OPCodesLDY((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_XR);
+  uint16_t addr = (m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  OPCodesLDY(addr + m_XR);
+
+  if ((addr / 256) != ((addr + m_XR) / 256)) {
+    ++m_CycleTime;
+  }
+
   m_PC += 3;
 }
 
 /* LDA abs, X */
 void MOS6502Core::OPCode0xBD() {
-  OPCodesLDA((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_XR);
+  uint16_t addr = (m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  OPCodesLDA(addr + m_XR);
+
+  if ((addr / 256) != ((addr + m_XR) / 256)) {
+    ++m_CycleTime;
+  }
+
   m_PC += 3;
 }
 
 /* LDX abs, Y */
 void MOS6502Core::OPCode0xBE() {
-  OPCodesLDX((m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u) + m_YR);
+  uint16_t addr = (m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  OPCodesLDX(addr + m_YR);
+
+  if ((addr / 256) != ((addr + m_YR) / 256)) {
+    ++m_CycleTime;
+  }
+
   m_PC += 3;
 }
 
