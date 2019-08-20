@@ -114,6 +114,12 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
 
     m_Playfield->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
+    m_Ball->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+
+    m_Missile0->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+
+    m_Missile1->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+
     m_Player0->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
     m_Player1->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
@@ -169,28 +175,34 @@ void TIACore::TIAWrite0x03(uint8_t value) {
 
 }
 
-/* Number-Size player/missle 0 */
+/* Nusiz0 */
 void TIACore::TIAWrite0x04(uint8_t value) {
-
+  m_Player0->SetSize(value & 0x07);
+  m_Missile0->SetSize(value & 0x30);
 }
 
+/* Nusiz1 */
 void TIACore::TIAWrite0x05(uint8_t value) {
-
+  m_Player1->SetSize(value & 0x07);
+  m_Missile1->SetSize(value & 0x30);
 }
 
 /* Colup0 */
 void TIACore::TIAWrite0x06(uint8_t value) {
   m_Player0->SetColor(value);
+  m_Missile0->SetColor(value);
 }
 
 /* Colup1 */
 void TIACore::TIAWrite0x07(uint8_t value) {
   m_Player1->SetColor(value);
+  m_Missile1->SetColor(value);
 }
 
 /* Colupf */
 void TIACore::TIAWrite0x08(uint8_t value) {
   m_Playfield->SetColor(value);
+  m_Ball->SetColor(value);
 }
 
 /* Colubk */
@@ -203,13 +215,14 @@ void TIACore::TIAWrite0x0A(uint8_t value) {
   m_Playfield->SetCTRL(value);
 }
 
+/* Refp0 */
 void TIACore::TIAWrite0x0B(uint8_t value) {
-
+  m_Player0->SetReflected(value & 0x08);
 }
 
-
+/* Refp1 */
 void TIACore::TIAWrite0x0C(uint8_t value) {
-
+  m_Player1->SetReflected(value & 0x08);
 }
 
 /* PF0 */
@@ -237,16 +250,19 @@ void TIACore::TIAWrite0x11(uint8_t value) {
   m_Player1->ResetPos(value);
 }
 
+/* Resm0 */
 void TIACore::TIAWrite0x12(uint8_t value) {
-
+  m_Missile0->ResetPos(value & 0x02u);
 }
 
+/* Resm1 */
 void TIACore::TIAWrite0x13(uint8_t value) {
-
+  m_Missile1->ResetPos(value & 0x02u);
 }
 
+/* Resbl */
 void TIACore::TIAWrite0x14(uint8_t value) {
-
+  m_Ball->ResetPos(value & 0x02u);
 }
 
 void TIACore::TIAWrite0x15(uint8_t value) {
@@ -283,16 +299,19 @@ void TIACore::TIAWrite0x1C(uint8_t value) {
   m_Player1->SetGraphics(value);
 }
 
+/* Enam0 */
 void TIACore::TIAWrite0x1D(uint8_t value) {
-
+  m_Missile0->SetEnable(value & 0x02u);
 }
 
+/* Enam1 */
 void TIACore::TIAWrite0x1E(uint8_t value) {
-
+  m_Missile1->SetEnable(value & 0x02u);
 }
 
+/* Enabl */
 void TIACore::TIAWrite0x1F(uint8_t value) {
-
+  m_Ball->SetEnable(value & 0x02u);
 }
 
 void TIACore::TIAWrite0x20(uint8_t value) {
@@ -330,12 +349,12 @@ void TIACore::TIAWrite0x27(uint8_t value) {
   m_Ball->SetVdelay(value);
 }
 
+/* Resmp0 */
 void TIACore::TIAWrite0x28(uint8_t value) {
-
 }
 
+/* Resmp1 */
 void TIACore::TIAWrite0x29(uint8_t value) {
-
 }
 
 void TIACore::TIAWrite0x2A(uint8_t value) {

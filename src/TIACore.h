@@ -131,8 +131,8 @@ static const char* kTIAWriteRegisterNames[0x2D] = {
     /* 0x10 */
     "Resp0",  /* Reset Player 0                       */
     "Resp1",  /* Reset Player 1                       */
-    "Resm0",  /* Reset Missle 0                       */
-    "Resm1",  /* Reset Missle 1                       */
+    "Resm0",  /* Reset Missile 0                       */
+    "Resm1",  /* Reset Missile 1                       */
     "Resbl",  /* Reset Ball                           */
     "Audc0",  /* Audio Control 0                      */
     "Audc1",  /* Audio Control 1                      */
@@ -178,11 +178,28 @@ private:
 
 class Missile {
 public:
-  void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColour() { return m_Colour; };
+  void SetColor(uint8_t colour) { m_Colour = colour; };
+  void SetEnable(bool enabled) { m_Enabled = enabled; }
+  void SetSize(uint8_t value) { m_Size = value; }
+  void ResetPos(uint8_t value) { m_Position = 0; };
+    void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
+      if (m_Position == 0 && !m_Vdelay) {
+        m_Position = currentPos;
+      }
+
+      if (currentPos != m_Position) {
+        return;
+      }
+
+      *pixel = m_Colour;
+    }
 
 private:
-  uint8_t m_Colour;
+    bool m_Enabled;
+    bool m_Vdelay;
+    uint8_t m_Size;
+    uint8_t m_Colour;
+    uint16_t m_Position;
 };
 
 class Player {
@@ -191,7 +208,9 @@ public:
   void SetGraphics(uint8_t value) { m_Sprite = bitreverse(value); };
   void ResetPos(uint8_t value) { m_Position = 0; };
   uint8_t GetColour() { return m_Colour; };
-  void SetVdelay(uint8_t value) { m_Vdelay = value;}
+  void SetVdelay(uint8_t value) { m_Vdelay = value; }
+  void SetSize(uint8_t value) { m_Size = value; }
+  void SetReflected(bool value) { m_Reflected = value; }
   void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
     if (m_Position == 0 && !m_Vdelay) {
       m_Position = currentPos;
@@ -201,7 +220,13 @@ public:
       return;
     }
 
-    uint8_t pixel_index = currentPos - m_Position;
+    uint8_t pixel_index;
+
+    if (m_Reflected) {
+      pixel_index = 7 - (currentPos - m_Position);
+    } else {
+      pixel_index = currentPos - m_Position;
+    }
 
     if (pixel_index < 8 && (m_Sprite & (1u << pixel_index))) {
       *pixel = m_Colour;
@@ -209,21 +234,38 @@ public:
   }
 
 private:
+  bool m_Reflected;
   bool m_Vdelay;
   uint8_t m_Colour;
   uint8_t m_Sprite;
   uint8_t m_Position;
+  uint8_t m_Size;
 };
 
 class Ball {
 public:
-  void SetColor(uint8_t bg_colour) { m_Colour = bg_colour; };
-  uint8_t GetColour() { return m_Colour; };
+  void SetColor(uint8_t colour) { m_Colour = colour; };
+  void SetEnable(bool enabled) { m_Enabled = enabled; }
   void SetVdelay(uint8_t value) { m_Vdelay = value;}
+  void ResetPos(uint8_t value) { m_Position = 0; };
+  void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
+    if (m_Position == 0 && !m_Vdelay) {
+      m_Position = currentPos;
+    }
+
+    if (currentPos != m_Position) {
+      return;
+    }
+
+    *pixel = m_Colour;
+  }
 
 private:
-  uint8_t m_Colour;
+  bool m_Enabled;
   bool m_Vdelay;
+  uint8_t m_Ball;
+  uint8_t m_Colour;
+  uint16_t m_Position;
 };
 
 class Playfield {
