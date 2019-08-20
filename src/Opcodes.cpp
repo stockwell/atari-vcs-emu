@@ -552,7 +552,7 @@ void MOS6502Core::OPCode0x5E() {
 
 /* RTS */
 void MOS6502Core::OPCode0x60() {
-  m_PC = StackPull16();
+  m_PC = StackPull16() + 1;
 }
 
 /* ADC X-Indirect */

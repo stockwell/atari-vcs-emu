@@ -586,6 +586,25 @@ TEST_F(MOS6502Test, OpcodeCLI) {
   ASSERT_EQ(0xF001, m_pProcessor->m_PC);
 }
 
+/* 0x60 */
+TEST_F(MOS6502Test, OPcodeRTS) {
+  uint8_t instr[] = {0x48,   /* PHA */
+                     0x48,   /* PHA */
+                     0x60};  /* RTS */
+
+  m_pMemory->Load(0xf000, instr, sizeof instr);
+  m_pProcessor->m_AC = 0xFB;
+  m_pProcessor->Tick();
+
+  m_pProcessor->m_AC = 0xCC;
+  m_pProcessor->Tick();
+
+  m_pProcessor->Tick();
+  ASSERT_EQ(0xCC, m_pProcessor->m_AC);
+
+  ASSERT_EQ(0xFBCD, m_pProcessor->m_PC);
+}
+
 /* 0x68 */
 TEST_F(MOS6502Test, OPcodePLA) {
   uint8_t instr[] = {0x08,  /* PHP */
