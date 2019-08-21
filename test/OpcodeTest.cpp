@@ -636,19 +636,47 @@ TEST_F(MOS6502Test, OPcodePLA) {
 
 /* 0x69 */
 TEST_F(MOS6502Test, OPcodeADC) {
+  uint8_t instr[] = {0x69, 0x01,  /* ADC #$1*/
+                     0x69, 0x09,  /* ADC #$9*/
+                     0x69, 0x03}; /* ADC #$3*/
+  m_pMemory->Load(0xF000, instr, sizeof instr);
 
+  m_pProcessor->m_AC = 0x09;
+  m_pProcessor->m_SR = DECIMAL;
+
+  // 0x09 + 1 (BCD) = (0x10)
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x10, m_pProcessor->m_AC);
+
+  // 0x11 + 0x09 (BCD) = 0x20
+  m_pProcessor->m_AC = 0x11;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x20, m_pProcessor->m_AC);
+
+  // 0x99 + 0x03 (BCD) = 0x02
+  m_pProcessor->m_AC = 0x99;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x02, m_pProcessor->m_AC);
+  ASSERT_EQ(OVERFLOW, m_pProcessor->m_SR & OVERFLOW);
 }
 
 /* 0x6C */
 TEST_F(MOS6502Test, OPcodeJMP_Indirect) {
   uint8_t instr[] = {0x6C, 0x80, 0x00};  /* JMP ($0080)*/
-
   m_pMemory->Load(0xF000, instr, sizeof instr);
   m_pMemory->Load(0x80, 0xFF);
 
   m_pProcessor->Tick();
 
   ASSERT_EQ(0xFF, m_pProcessor->m_PC);
+}
+
+/* 0x6D */
+TEST_F(MOS6502Test, OPcodeADC_ABS) {
+
 }
 
 /* 0x70 */

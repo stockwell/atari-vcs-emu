@@ -934,7 +934,7 @@ void MOS6502Core::OPCode0xBC() {
   uint16_t addr = (m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   OPCodesLDY(addr + m_XR);
 
-  if ((addr / 256) != ((addr + m_XR) / 256)) {
+  if ((addr / 0x100) != ((addr + m_XR) / 0x100)) {
     ++m_CycleTime;
   }
 
@@ -1215,26 +1215,21 @@ void MOS6502Core::OPCode0xFE() {
 
 void MOS6502Core::OPCodesADC(uint16_t address) {
   uint8_t val = m_pMemory->Read(address);
-  uint8_t carry = m_AC & CARRY ? 1 : 0;
+  uint8_t carry = m_SR & CARRY ? 1 : 0;
   uint16_t result = m_AC + val + carry;
 
   if (m_SR & DECIMAL) {
     if (((m_AC & 0x0Fu) + (val & 0x0Fu) + carry) > 0x09)
       result += 0x06;
 
-    result & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
-    ((m_AC ^ result) & (val ^ m_AC) & 0x80u) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
-
-    if ((carry = result) > 0x99)
-      result += 0x60;
-
-    carry ? m_SR |= CARRY : m_SR &= ~CARRY;
-  } else {
-    ((m_AC ^ result) & (val ^ m_AC) & 0x80u) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
-    result > 0xFF ? m_SR |= CARRY : m_SR &= ~CARRY;
-    result & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+    if (result > 0x99) {
+        result += 0x60;
+    }
   }
 
+  ((m_AC ^ result) & (val ^ m_AC) & 0x80u) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
+  result > 0xFF ? m_SR |= CARRY : m_SR &= ~CARRY;
+  result & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   result & 0xFF ? m_SR &= ~ZERO : m_SR |= ZERO;
 
   m_AC = result & 0xFF;
@@ -1248,9 +1243,8 @@ void MOS6502Core::OPCodesSBC(uint16_t address) {
   result & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
   result ? m_SR &= ~ZERO : m_SR |= ZERO;
 
-  ((m_AC ^ result) & (val ^ m_AC) & 0x80u) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
-
   if (m_SR & DECIMAL) {
+
     if (((m_AC & 0x0Fu) - carry) < (val & 0x0Fu))
       result -= 0x06;
 
@@ -1258,6 +1252,7 @@ void MOS6502Core::OPCodesSBC(uint16_t address) {
       result -= 0x60;
   }
 
+  ((m_AC ^ result) & (val ^ m_AC) & 0x80u) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
   result < 0x100 ? m_SR |= CARRY : m_SR &= ~CARRY;
   m_AC = result & 0xFFu;
 }
@@ -1414,7 +1409,7 @@ void MOS6502Core::BranchRelative(bool condition) {
     uint16_t _PC = m_PC;
     m_PC += (int8_t)m_pMemory->Read(m_PC + 1);
 
-    (m_PC / 256) == (_PC / 256) ? m_CycleTime = 1 : m_CycleTime = 2;
+    (m_PC / 0x100) == (_PC / 0x100) ? m_CycleTime = 1 : m_CycleTime = 2;
   }
 }
 
