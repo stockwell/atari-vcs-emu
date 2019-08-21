@@ -204,29 +204,35 @@ private:
 
 class Player {
 public:
+  Player() { m_Reflected = false; }
   void SetColor(uint8_t colour) { m_Colour = colour; };
-  void SetGraphics(uint8_t value) { m_Sprite = bitreverse(value); };
   void ResetPos(uint8_t value) { m_Position = 0; };
   uint8_t GetColour() { return m_Colour; };
   void SetVdelay(uint8_t value) { m_Vdelay = value; }
   void SetSize(uint8_t value) { m_Size = value; }
-  void SetReflected(bool value) { m_Reflected = value; }
+  void SetGraphics(uint8_t value) {
+    if (m_Reflected) {
+      m_Sprite = value;
+    } else {
+      m_Sprite = bitreverse(value);
+    }
+  }
+
+  void SetReflected(bool value) {
+    m_Reflected = value;
+    if (m_Reflected) m_Sprite = bitreverse(m_Sprite);
+  }
+
   void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
     if (m_Position == 0 && !m_Vdelay) {
-      m_Position = currentPos;
+      m_Position = currentPos + 16;
     }
 
     if (currentPos < m_Position) {
       return;
     }
 
-    uint8_t pixel_index;
-
-    if (m_Reflected) {
-      pixel_index = 7 - (currentPos - m_Position);
-    } else {
-      pixel_index = currentPos - m_Position;
-    }
+    uint8_t pixel_index = currentPos - m_Position;
 
     if (pixel_index < 8 && (m_Sprite & (1u << pixel_index))) {
       *pixel = m_Colour;
