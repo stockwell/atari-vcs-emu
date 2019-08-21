@@ -19,7 +19,7 @@ void MOS6502Core::Reset() {
   m_SR = CONSTANT;
   m_SP = 0xFD;
 
-  m_Delay = 3;
+  m_Delay = 1;
 
   this->Resume();
 }
@@ -42,11 +42,14 @@ uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode) {
       m_SR & NEGATIVE ? "N ": "");
   (this->*m_OPCodes[opcode])();
 
-  return cycletime[opcode] + m_CycleTime;
+  return cycletime[opcode] + (m_CycleTime * 3);
 }
 
 void MOS6502Core::Tick() {
   if (!m_Running) {
+    if (m_Delay > 1) {
+      --m_Delay;
+    }
     return;
   }
 
@@ -61,7 +64,6 @@ void MOS6502Core::Tick() {
 
 void MOS6502Core::Halt() {
   m_Running = false;
-  m_Delay = 0x00;
 }
 
 void MOS6502Core::Resume() {
