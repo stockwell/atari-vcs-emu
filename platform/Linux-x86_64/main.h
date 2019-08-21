@@ -45,7 +45,7 @@ public:
   Emulator();
   ~Emulator();
   void RunToVBlank(uint8_t* pFrameBuffer);
-  void LoadRom(const char* szFilePath);
+  bool LoadRom(const char* szFilePath);
   bool Running();
   void Stop();
   bool Draw(uint8_t* pFramebuffer);

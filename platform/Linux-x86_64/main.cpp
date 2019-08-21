@@ -75,9 +75,10 @@ void Emulator::RunToVBlank(uint8_t* pFrameBuffer) {
   m_pAtariVCS->RunToVBlank(pFrameBuffer, nullptr, nullptr);
 }
 
-void Emulator::LoadRom(const char *szFilePath) {
-  m_pAtariVCS->LoadROM(szFilePath);
+bool Emulator::LoadRom(const char *szFilePath) {
+  if (!m_pAtariVCS->LoadROM(szFilePath)) return false;
   m_pAtariVCS->Reset();
+  return true;
 }
 
 bool Emulator::Running() {
@@ -145,7 +146,9 @@ bool Emulator::Draw(uint8_t* pFramebuffer) {
 int main() {
   auto emulator = new Emulator();
 
-  emulator->LoadRom("pitfall.bin");
+  if (!emulator->LoadRom("kernel_21.bin")) {
+    exit(1);
+  }
 
   // NTSC Resolution
   auto *framebuffer = new uint8_t[160*192];
