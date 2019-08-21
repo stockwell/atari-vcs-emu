@@ -274,6 +274,9 @@ public:
   Playfield(Player *Player0, Player *Player1) {
     m_Player0 = Player0;
     m_Player1 = Player1;
+    m_PF0 = 0x00;
+    m_PF1 = 0x00;
+    m_PF2 = 0x00;
   }
 
   void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
