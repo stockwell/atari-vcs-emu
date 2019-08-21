@@ -9,7 +9,7 @@ RIOTCore::RIOTCore() {
   m_INTIM = 0x80;
   m_TimerPrescale = 1024;
   m_TimerPrescaleCnt = 0x400;
-  m_Delay = 3;
+  m_Delay = 1;
 }
 
 void RIOTCore::Tick() {
