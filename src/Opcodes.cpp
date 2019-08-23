@@ -898,7 +898,7 @@ void MOS6502Core::OPCode0xB9() {
 
 /* TSX */
 void MOS6502Core::OPCode0xBA() {
-  m_SP = m_XR;
+  m_XR = m_SP;
   ++m_PC;
 
   m_XR & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
