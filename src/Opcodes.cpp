@@ -183,9 +183,9 @@ void MOS6502Core::OPCodeInvalid() {
 
 /* BRK */
 void MOS6502Core::OPCode0x00() {
-  StackPush(m_PC);
+  StackPush(++m_PC);
   StackPush((uint8_t)(m_SR | BREAK));
-  m_PC = m_pMemory->Read(BRK_VECTOR) | (m_pMemory->Read(BRK_VECTOR + 1));
+  m_PC = m_pMemory->Read(BRK_VECTOR) | (m_pMemory->Read(BRK_VECTOR + 1) << 8);
 }
 
 /* ORA X-indexed, indirect */
