@@ -1103,7 +1103,7 @@ void MOS6502Core::OPCode0xE8() {
   m_XR == 0x00 ? m_SR |= ZERO : m_SR &= ~ZERO;
 }
 
-/* SBC */
+/* SBC # */
 void MOS6502Core::OPCode0xE9() {
   OPCodesSBC(++m_PC);
   ++m_PC;
@@ -1205,7 +1205,7 @@ void MOS6502Core::OPCodesADC(uint16_t address) {
 
 void MOS6502Core::OPCodesSBC(uint16_t address) {
   uint8_t val = m_pMemory->Read(address);
-  uint8_t carry = m_SR & CARRY ? 1 : 0;
+  uint8_t carry = m_SR & CARRY ? 0 : 1;
 
   uint16_t result = m_AC - val - carry;
   result & 0x80u ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
