@@ -270,14 +270,14 @@ TEST_F(MOS6502Test, OpcodeBPL) {
 
 /* 0x11 */
 TEST_F(MOS6502Test, OPcodeORA_IND_Y) {
-  uint8_t instr[] = {0x11, 0x7F};  /* ORA $7F, X */
+  uint8_t instr[] = {0x11, 0x80};  /* ORA ($80), Y */
 
   m_pMemory->Load(0xf000, instr, sizeof instr);
 
-  /* Effective address is in addresses 0x80 & 0x81 -> 0x85 */
+  /* Effective address is in addresses 0x80 & 0x81 -> 0x85 + Y = 0x86 */
   m_pMemory->Write(0x80, 0x85);
   m_pMemory->Write(0x81, 0x00);
-  m_pMemory->Write(0x85, 0x40);
+  m_pMemory->Write(0x86, 0x40);
 
   m_pProcessor->m_YR = 0x01;
   m_pProcessor->m_AC = 0x20;
