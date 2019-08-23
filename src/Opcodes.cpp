@@ -355,16 +355,16 @@ void MOS6502Core::OPCode0x2C() {
   m_PC += 3;
 }
 
-/* AND ABS */
+/* AND Abs */
 void MOS6502Core::OPCode0x2D() {
-  OPCodesAND( m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  OPCodesAND(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
   m_PC += 3;
 }
 
-/* ROL # */
+/* ROL Abs */
 void MOS6502Core::OPCode0x2E() {
-  OPCodesROL(++m_PC);
-  ++m_PC;
+  OPCodesROL(m_pMemory->Read(m_PC + 1) | m_pMemory->Read(m_PC + 2) << 8u);
+  m_PC += 3;
 }
 
 /* BMI relative */
