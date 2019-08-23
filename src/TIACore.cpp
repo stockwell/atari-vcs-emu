@@ -99,14 +99,6 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
   int currentLine = m_Clock / 228;
   int currentPos = m_Clock % 228;
 
-  /* New scanline, resume processor if it was suspended by WSYNC */
-  if (currentPos == 0x00) {
-    m_pProcessor->Resume();
-    m_Player0->SetVdelay(0x00);
-    m_Player1->SetVdelay(0x00);
-    m_Ball->SetVdelay(0x00);
-  }
-
   /* Game Draw Space */
   if ((currentLine >= 40) && (currentLine < 232) && (currentPos >= 68)) {
 
@@ -127,13 +119,19 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
     ++m_PixelIndex;
   }
 
-  if (m_Vsync || (currentLine == 282)) {
-    m_Vsync = false;
 
+  /* New scanline, resume processor if it was suspended by WSYNC */
+  if (currentPos == 0x00) {
+    m_pProcessor->Resume();
+    m_Player0->SetVdelay(0x00);
+    m_Player1->SetVdelay(0x00);
+    m_Ball->SetVdelay(0x00);
+  }
+
+  if (m_Vsync || (currentLine == 282)) {
     // New Frame
     m_PixelIndex = 0x00;
     m_Clock = 0x00;
-    m_pProcessor->Resume();
     return true;
   }
 
@@ -153,6 +151,18 @@ void TIACore::Write(uint16_t address, uint8_t value) {
   if (address < (sizeof kTIAWriteRegisterNames / sizeof kTIAWriteRegisterNames[0])) {
     Log("TIA Write: %s (%u)", kTIAWriteRegisterNames[address], value);
     (this->*m_WriteRegisters[address])(value);
+  }
+}
+
+void TIACore::SetTrigger(uint8_t port, bool state) {
+  switch (port) {
+    case 0: {
+      m_pMem[0x0C] = state ? 0x00 : 0x80;
+    } break;
+
+    case 1: {
+      m_pMem[0x0D] = state ? 0x00 : 0x80;
+    } break;
   }
 }
 

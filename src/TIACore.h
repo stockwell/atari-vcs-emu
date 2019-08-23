@@ -17,6 +17,7 @@ public:
   void Write(uint16_t address, uint8_t value);
   uint8_t Read(uint16_t address);
   bool Tick(uint8_t *pFramebuffer);
+  void SetTrigger(uint8_t port, bool state);
 
 private:
   void(TIACore::*m_WriteRegisters[0x2E])(uint8_t value);
