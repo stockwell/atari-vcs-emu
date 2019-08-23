@@ -337,7 +337,7 @@ void MOS6502Core::OPCode0x29() {
 
 /* ROL A */
 void MOS6502Core::OPCode0x2A() {
-  uint16_t val = m_AC;
+  uint16_t val = m_AC << 1u;
 
   if (m_SR & CARRY) val |= 0x01;
   val > 0xFF ? m_SR |= CARRY : m_SR &= ~CARRY;
