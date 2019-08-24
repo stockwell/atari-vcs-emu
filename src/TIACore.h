@@ -40,6 +40,8 @@ private:
   Playfield *m_Playfield;
 
 private:
+  void TIAClearCollisions();
+
   void TIAWrite0x00(uint8_t value);
   void TIAWrite0x01(uint8_t value);
   void TIAWrite0x02(uint8_t value);
@@ -183,21 +185,20 @@ public:
   void SetColor(uint8_t colour) { m_Colour = colour; };
   void SetEnable(bool enabled) { m_Enabled = enabled; }
   void SetSize(uint8_t value) { m_Size = value; }
+  void SetVdelay(uint8_t value) { m_Vdelay = value;}
+  void SetHMove(int8_t value) { m_HMove = value >> 4; }
+  void ApplyHMove() { m_Position -= m_HMove; }
   void ResetPos(uint8_t value) { m_Position = 0; };
-    void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
-      if (m_Position == 0 && !m_Vdelay) {
-        m_Position = currentPos;
-      }
-
-      if (currentPos != m_Position) {
-        return;
-      }
-      if (m_Enabled) *pixel = m_Colour;
-    }
+  void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
+    if (m_Position == 0 && !m_Vdelay) m_Position = currentPos;
+    if (currentPos != m_Position) return;    
+    if (m_Enabled) *pixel = m_Colour;
+  }
 
 private:
     bool m_Enabled;
     bool m_Vdelay;
+    int8_t m_HMove;
     uint8_t m_Size;
     uint8_t m_Colour;
     uint16_t m_Position;
@@ -209,6 +210,8 @@ public:
   void SetColor(uint8_t colour) { m_Colour = colour; };
   void ResetPos(uint8_t value) { m_Position = 0; };
   uint8_t GetColour() { return m_Colour; };
+  void SetHMove(int8_t value) { m_HMove = value >> 4; }
+  void ApplyHMove() { m_Position -= m_HMove; }
   void SetVdelay(uint8_t value) { m_Vdelay = value; }
   void SetSize(uint8_t value) { m_Size = value; }
   void SetGraphics(uint8_t value) {
@@ -243,6 +246,7 @@ public:
 private:
   bool m_Reflected;
   bool m_Vdelay;
+  int8_t m_HMove;
   uint8_t m_Colour;
   uint8_t m_Sprite;
   uint8_t m_Position;
@@ -255,23 +259,19 @@ public:
   void SetColor(uint8_t colour) { m_Colour = colour; };
   void SetEnable(bool enabled) { m_Enabled = enabled; }
   void SetVdelay(uint8_t value) { m_Vdelay = value;}
+  void SetHMove(int8_t value) { m_HMove = value >> 4; }
+  void ApplyHMove() { m_Position -= m_HMove; }
   void ResetPos(uint8_t value) { m_Position = 0; };
   void UpdatePixel(uint16_t currentPos, uint8_t *pixel) {
-    if (m_Position == 0 && !m_Vdelay) {
-      m_Position = currentPos;
-    }
-
-    if (currentPos != m_Position) {
-      return;
-    }
-
+    if (m_Position == 0 && !m_Vdelay) m_Position = currentPos;
+    if (currentPos != m_Position) return;
     if (m_Enabled) *pixel = m_Colour;
   }
 
 private:
   bool m_Enabled;
   bool m_Vdelay;
-  uint8_t m_Ball;
+  int8_t m_HMove;
   uint8_t m_Colour;
   uint16_t m_Position;
 };

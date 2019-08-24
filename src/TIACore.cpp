@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "TIACore.h"
 #include "MOS6502Core.h"
 
@@ -99,6 +101,8 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
   int currentLine = m_Clock / 228;
   int currentPos = m_Clock % 228;
 
+  TIAClearCollisions();
+
   /* Game Draw Space */
   if ((currentLine >= 40) && (currentLine < 232) && (currentPos >= 68)) {
 
@@ -129,7 +133,6 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
   }
 
   if (m_Vsync || (currentLine == 282)) {
-    // New Frame
     m_PixelIndex = 0x00;
     m_Clock = 0x00;
     return true;
@@ -164,6 +167,10 @@ void TIACore::SetTrigger(uint8_t port, bool state) {
       m_pMem[0x0D] = state ? 0x00 : 0x80;
     } break;
   }
+}
+
+void TIACore::TIAClearCollisions() {
+  memset(m_pMem, 0x00, 0x07);
 }
 
 /* Vertical Sync Set-Clear              */
@@ -324,24 +331,29 @@ void TIACore::TIAWrite0x1F(uint8_t value) {
   m_Ball->SetEnable(value & 0x02u);
 }
 
+/* Hmp0 */
 void TIACore::TIAWrite0x20(uint8_t value) {
-
+  m_Player0->SetHMove(value);
 }
 
+/* Hmp1 */
 void TIACore::TIAWrite0x21(uint8_t value) {
-
+  m_Player1->SetHMove(value);
 }
 
+/* Hmm0 */
 void TIACore::TIAWrite0x22(uint8_t value) {
-
+  m_Missile0->SetHMove(value);
 }
 
+/* Hmm1 */
 void TIACore::TIAWrite0x23(uint8_t value) {
-
+  m_Missile1->SetHMove(value);
 }
 
+/* Hmbl */
 void TIACore::TIAWrite0x24(uint8_t value) {
-
+  m_Ball->SetHMove(value);
 }
 
 /* Vdelp0 */
@@ -361,24 +373,37 @@ void TIACore::TIAWrite0x27(uint8_t value) {
 
 /* Resmp0 */
 void TIACore::TIAWrite0x28(uint8_t value) {
+
 }
 
 /* Resmp1 */
 void TIACore::TIAWrite0x29(uint8_t value) {
 }
 
+/* Hmove */
 void TIACore::TIAWrite0x2A(uint8_t value) {
-
+  m_Missile0->ApplyHMove();
+  m_Missile1->ApplyHMove();
+  m_Player0->ApplyHMove();
+  m_Player1->ApplyHMove();
+  m_Ball->ApplyHMove();
 }
 
+/* Hmclr */
 void TIACore::TIAWrite0x2B(uint8_t value) {
-
+  m_Missile0->SetHMove(0x00);
+  m_Missile1->SetHMove(0x00);
+  m_Player0->SetHMove(0x00);
+  m_Player1->SetHMove(0x00);
+  m_Ball->SetHMove(0x00);
 }
 
+/* Cxclr */
 void TIACore::TIAWrite0x2C(uint8_t value) {
-
+  TIAClearCollisions();
 }
 
 void TIACore::TIAWrite0x2D(uint8_t value) {
 
 }
+
