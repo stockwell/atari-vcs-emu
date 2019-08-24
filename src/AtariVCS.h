@@ -16,7 +16,9 @@ typedef enum {
   KEYPRESS_DOWN,
   KEYPRESS_LEFT,
   KEYPRESS_RIGHT,
-  KEYPRESS_SPACE
+  KEYPRESS_SPACE,
+  KEYPRESS_RESET,
+  KEYPRESS_SELECT
 } keypress_event_t;
 
 class AtariVCS {

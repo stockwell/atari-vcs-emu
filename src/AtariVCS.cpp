@@ -99,5 +99,21 @@ void AtariVCS::KeypressEvent(keypress_event_t evt, bool pressed) {
     case KEYPRESS_SPACE:
       m_pTIA->SetTrigger(0, pressed);
       break;
+
+    case KEYPRESS_SELECT:
+      if (!pressed) {
+        m_pRIOT->SetSWCHB(0x02);
+      } else {
+        m_pRIOT->ClearSWCHB(0x02);
+      }
+      break;
+
+    case KEYPRESS_RESET:
+      if (!pressed) {
+        m_pRIOT->SetSWCHB(0x01);
+      } else {
+        m_pRIOT->ClearSWCHB(0x01);
+      }
+      break;
   }
 }

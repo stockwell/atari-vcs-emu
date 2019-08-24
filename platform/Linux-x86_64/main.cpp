@@ -124,6 +124,14 @@ bool Emulator::Draw(uint8_t* pFramebuffer) {
             KeypressEvent(KEYPRESS_SPACE, event.type == SDL_KEYDOWN);
             break;
 
+          case SDLK_F11:
+            KeypressEvent(KEYPRESS_SELECT, event.type == SDL_KEYDOWN);
+            break;
+
+          case SDLK_F12:
+            KeypressEvent(KEYPRESS_RESET, event.type == SDL_KEYDOWN);
+            break;
+
           default:
             break;
         }
@@ -146,7 +154,7 @@ bool Emulator::Draw(uint8_t* pFramebuffer) {
 int main() {
   auto emulator = new Emulator();
 
-  if (!emulator->LoadRom("kernel_21.bin")) {
+  if (!emulator->LoadRom("pitfall.bin")) {
     exit(1);
   }
 
