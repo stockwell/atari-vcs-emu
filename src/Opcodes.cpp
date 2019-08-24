@@ -209,7 +209,7 @@ void MOS6502Core::OPCode0x06() {
 
 /* PHP */
 void MOS6502Core::OPCode0x08() {
-  StackPush(m_SR);
+  StackPush((uint8_t)(m_SR | BREAK));
   ++m_PC;
 }
 

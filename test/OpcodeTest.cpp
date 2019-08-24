@@ -622,9 +622,9 @@ TEST_F(MOS6502Test, OPcodePLA) {
   m_pProcessor->Tick();
 
   m_pProcessor->Tick();
-  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(0x10, m_pProcessor->m_AC);
   ASSERT_EQ(0x00, m_pProcessor->m_SR & NEGATIVE);
-  ASSERT_EQ(ZERO, m_pProcessor->m_SR & ZERO);
+  ASSERT_EQ(0x00, m_pProcessor->m_SR & ZERO);
 
   m_pProcessor->Tick();
   ASSERT_EQ(0xF0, m_pProcessor->m_AC);
