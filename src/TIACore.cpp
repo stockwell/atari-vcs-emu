@@ -229,7 +229,8 @@ void TIACore::TIAWrite0x09(uint8_t value) {
 
 /* Ctrlpf */
 void TIACore::TIAWrite0x0A(uint8_t value) {
-  m_Playfield->SetCTRL(value);
+  m_Playfield->SetCTRL(value & 0x07);
+  m_Ball->SetSize(value & 0x60);
 }
 
 /* Refp0 */
@@ -373,11 +374,12 @@ void TIACore::TIAWrite0x27(uint8_t value) {
 
 /* Resmp0 */
 void TIACore::TIAWrite0x28(uint8_t value) {
-
+  m_Missile0->SetPos(m_Player0->GetPos());
 }
 
 /* Resmp1 */
 void TIACore::TIAWrite0x29(uint8_t value) {
+  m_Missile1->SetPos(m_Player1->GetPos());
 }
 
 /* Hmove */
