@@ -67,7 +67,6 @@ TIACore::TIACore(MOS6502Core *Processor) {
   m_WriteRegisters[0x2A] = &TIACore::TIAWrite0x2A;
   m_WriteRegisters[0x2B] = &TIACore::TIAWrite0x2B;
   m_WriteRegisters[0x2C] = &TIACore::TIAWrite0x2C;
-  m_WriteRegisters[0x2D] = &TIACore::TIAWrite0x2D;
 }
 
 TIACore::~TIACore() {
@@ -112,13 +111,13 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
 
     m_Ball->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
-    m_Missile0->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+    m_Player1->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
     m_Missile1->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
-    m_Player0->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+    m_Missile0->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
-    m_Player1->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
+    m_Player0->UpdatePixel(currentPos, &pFramebuffer[m_PixelIndex]);
 
     ++m_PixelIndex;
   }
@@ -145,14 +144,17 @@ bool TIACore::Tick(uint8_t *pFramebuffer) {
 
 uint8_t TIACore::Read(uint16_t address) {
   if (address < (sizeof kTIAReadRegisterNames / sizeof kTIAReadRegisterNames[0]))
-    Log("TIA Read: %s", kTIAReadRegisterNames[address]);
+    Log("TIA Read: Addr %u (%s) - %u\n", address, kTIAReadRegisterNames[address]), m_pMem[address];
+
+  if (address <= 0x07)
+    return 0x00;
 
   return m_pMem[address];
 }
 
 void TIACore::Write(uint16_t address, uint8_t value) {
   if (address < (sizeof kTIAWriteRegisterNames / sizeof kTIAWriteRegisterNames[0])) {
-    Log("TIA Write: %s (%u)", kTIAWriteRegisterNames[address], value);
+    Log("TIA Write: %s (%u)\n", kTIAWriteRegisterNames[address], value);
     (this->*m_WriteRegisters[address])(value);
   }
 }
@@ -188,6 +190,7 @@ void TIACore::TIAWrite0x02(uint8_t value) {
   m_pProcessor->Halt();
 }
 
+/* Rsync */
 void TIACore::TIAWrite0x03(uint8_t value) {
 
 }
@@ -283,26 +286,32 @@ void TIACore::TIAWrite0x14(uint8_t value) {
   m_Ball->ResetPos(value & 0x02u);
 }
 
+/* Audc0 */
 void TIACore::TIAWrite0x15(uint8_t value) {
 
 }
 
+/* Audc0 */
 void TIACore::TIAWrite0x16(uint8_t value) {
 
 }
 
+/* Audf0 */
 void TIACore::TIAWrite0x17(uint8_t value) {
 
 }
 
+/* Audf1 */
 void TIACore::TIAWrite0x18(uint8_t value) {
 
 }
 
+/* Audv0 */
 void TIACore::TIAWrite0x19(uint8_t value) {
 
 }
 
+/* Audv1 */
 void TIACore::TIAWrite0x1A(uint8_t value) {
 
 }
@@ -404,8 +413,3 @@ void TIACore::TIAWrite0x2B(uint8_t value) {
 void TIACore::TIAWrite0x2C(uint8_t value) {
   TIAClearCollisions();
 }
-
-void TIACore::TIAWrite0x2D(uint8_t value) {
-
-}
-
