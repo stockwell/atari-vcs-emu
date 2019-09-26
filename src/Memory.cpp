@@ -42,7 +42,7 @@ void Memory::SetRIOT(RIOTCore *pRIOT) {
 
 void Memory::Reset() {
   for (int i = 0; i < 65536; i++) {
-    m_pMap[i] = 0x00;
+    m_pMap[i] = rand();
   }
 }
 
@@ -78,7 +78,7 @@ uint8_t Memory::Read(uint16_t address) {
   /* TIA */
   if ((actualAddress & 0x1080) == 0x00) {
     actualAddress &= 0x7F;
-    return m_pMap[actualAddress] = m_pTIA->Read(actualAddress);
+    return m_pTIA->Read(actualAddress);
   /* RAM */
   } else if ((actualAddress & 0x1280) == 0x80) {
     return m_pMap[actualAddress & 0xFF];
@@ -106,7 +106,6 @@ void Memory::Write(uint16_t address, uint8_t value) {
   /* TIA */
   if ((actualAddress & 0x1080) == 0x00) {
     actualAddress &= 0x7F;
-    m_pMap[actualAddress] = value;
     m_pTIA->Write(actualAddress, value);
   /* RAM */
   } else if ((actualAddress & 0x1280) == 0x80) {
