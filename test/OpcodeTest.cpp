@@ -668,6 +668,7 @@ TEST_F(MOS6502Test, OPcodeJMP_Indirect) {
   uint8_t instr[] = {0x6C, 0x80, 0x00};  /* JMP ($0080)*/
   m_pMemory->Load(0xF000, instr, sizeof instr);
   m_pMemory->Load(0x80, 0xFF);
+  m_pMemory->Load(0x81, 0x00);
 
   m_pProcessor->Tick();
 
