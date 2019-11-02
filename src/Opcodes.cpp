@@ -1215,23 +1215,30 @@ void MOS6502Core::OPCodesADC(uint16_t address) {
 }
 
 void MOS6502Core::OPCodesSBC(uint16_t address) {
-  uint8_t value = m_pMemory->Read(address);
-  uint16_t result = m_AC - value - (m_SR & CARRY ? 0 : 1);
+  uint8_t operand = m_pMemory->Read(address);
+  int32_t sum = m_AC - operand - (m_SR & CARRY ? 0 : 1);
+  sum & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
+  (m_AC ^ operand) & (m_AC ^ sum) & 0x80 ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
+  sum & 0xff ? m_SR &= ~ZERO : m_SR |= ZERO;
 
-  result & 0x80 ? m_SR |= NEGATIVE : m_SR &= ~NEGATIVE;
-  result & 0xFF ? m_SR &= ~ZERO : m_SR |= ZERO;
-  (((result) ^ (uint16_t)(m_AC)) && ((result) ^ (value)) & 0x0080) ? m_SR |= OVERFLOW : m_SR &= ~OVERFLOW;
+  if(m_SR & DECIMAL) {
+    int32_t lo = (m_AC & 0x0f) - (operand & 0x0f) - (m_SR & CARRY ? 0 : 1);
+    int32_t hi = (m_AC & 0xf0) - (operand & 0xf0);
+    if(lo & 0x10)
+    {
+      lo -= 6;
+      hi--;
+    }
+    if(hi & 0x0100)
+      hi -= 0x60;
 
-  if (m_SR & DECIMAL) {
-    if ( ((m_AC & 0x0F) - (m_SR & CARRY ? 0 : 1)) < (value & 0x0F))
-      result -= 6;
-
-    if (result > 0x99)
-      result -= 0x60;
-
+    m_AC = (lo & 0x0f) | (hi & 0xf0);
   }
-  result < 0x100 ?  m_SR |= CARRY : m_SR &= ~CARRY;
-  m_AC = (result & 0xFF);
+  else {
+    m_AC = sum & 0xFF;
+  }
+
+  (sum & 0xff00) == 0 ? m_SR |= CARRY : m_SR &= ~CARRY;
 }
 
 void MOS6502Core::OPCodesASL(uint16_t address) {

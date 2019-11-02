@@ -744,7 +744,6 @@ TEST_F(MOS6502Test, OPcodeADC) {
 
   ASSERT_EQ(0x76, m_pProcessor->m_AC);
   ASSERT_EQ(CONSTANT | DECIMAL, m_pProcessor->m_SR);
-
 }
 
 /* 0x6C */
@@ -1742,6 +1741,76 @@ TEST_F(MOS6502Test, OpcodeINX) {
 
   ASSERT_EQ(0xF003, m_pProcessor->m_PC);
 }
+
+/* 0xE9 */
+TEST_F(MOS6502Test, OPcodeSBC) {
+  uint8_t instr[] = {0xE9, 0x00,  /* SBC #$00*/
+                     0xE9, 0x00,  /* SBC #$00*/
+                     0xE9, 0x01,  /* SBC #$01*/
+                     0xE9, 0x00,  /* SBC #$00*/
+                     0xE9, 0x00,  /* SBC #$00*/
+                     0xE9, 0x00,  /* SBC #$00*/
+                     0xE9, 0x00}; /* SBC #$00*/
+
+  m_pMemory->Load(0xF000, instr, sizeof instr);
+
+  // 00 - 00 and C=0 gives 99 and N=1 V=0 Z=0 C=0
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x00;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x99, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 00 - 00 and C=1 gives 00 and N=0 V=0 Z=1 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL | CARRY;
+  m_pProcessor->m_AC = 0x00;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(ZERO | CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 00 - 01 and C=1 gives 99 and N=1 V=0 Z=0 C=0
+  m_pProcessor->m_SR = CONSTANT | DECIMAL | CARRY;
+  m_pProcessor->m_AC = 0x00;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x99, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 0a - 00 and C=1 gives 0a and N=0 V=0 Z=0 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL | CARRY;
+  m_pProcessor->m_AC = 0x0A;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x0A, m_pProcessor->m_AC);
+  ASSERT_EQ(CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 0b - 00 and C=0 gives 0a and N=0 V=0 Z=0 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x0B;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x0A, m_pProcessor->m_AC);
+  ASSERT_EQ(CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 9a - 00 and C=1 gives 9a and N=1 V=0 Z=0 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL | CARRY;
+  m_pProcessor->m_AC = 0x9A;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x9A, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE | CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 9b - 00 and C=0 gives 9a and N=1 V=0 Z=0 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x9B;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x9A, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE | CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+}
+
 
 /* 0xEA */
 TEST_F(MOS6502Test, OpcodeNOP) {
