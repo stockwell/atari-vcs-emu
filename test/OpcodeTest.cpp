@@ -636,13 +636,23 @@ TEST_F(MOS6502Test, OPcodePLA) {
 
 /* 0x69 */
 TEST_F(MOS6502Test, OPcodeADC) {
-  uint8_t instr[] = {0x69, 0x01,  /* ADC #$1*/
-                     0x69, 0x09,  /* ADC #$9*/
-                     0x69, 0x03}; /* ADC #$3*/
+  uint8_t instr[] = {0x69, 0x01,  /* ADC #$01*/
+                     0x69, 0x09,  /* ADC #$09*/
+                     0x69, 0x00,  /* ADC #$00 */
+                     0x69, 0x00,  /* ADC #$00 */
+                     0x69, 0x56,  /* ADC #$56 */
+                     0x69, 0x82,  /* ADC #$82 */
+                     0x69, 0x76,  /* ADC #$76 */
+                     0x69, 0x76,  /* ADC #$76 */
+                     0x69, 0xF0,  /* ADC #$F0 */
+                     0x69, 0xFA,  /* ADC #$FA */
+                     0x69, 0x4F,  /* ADC #$4F */
+                     0x69, 0x00}; /* ADC #$00 */
+
   m_pMemory->Load(0xF000, instr, sizeof instr);
 
   m_pProcessor->m_AC = 0x09;
-  m_pProcessor->m_SR = DECIMAL;
+  m_pProcessor->m_SR = DECIMAL | CONSTANT;
 
   // 0x09 + 1 (BCD) = (0x10)
   m_pProcessor->Tick();
@@ -655,12 +665,86 @@ TEST_F(MOS6502Test, OPcodeADC) {
 
   ASSERT_EQ(0x20, m_pProcessor->m_AC);
 
-  // 0x99 + 0x03 (BCD) = 0x02
-  m_pProcessor->m_AC = 0x99;
+  // 00 + 00 and C=0 gives 00 and N=0 V=0 Z=1 C=0
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x00;
   m_pProcessor->Tick();
 
-  ASSERT_EQ(0x02, m_pProcessor->m_AC);
-  ASSERT_EQ(0x00, m_pProcessor->m_SR & OVERFLOW);
+  ASSERT_EQ(0x00, m_pProcessor->m_AC);
+  ASSERT_EQ(ZERO | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 79 + 00 and C=1 gives 80 and N=1 V=1 Z=0 C=0
+  m_pProcessor->m_SR = CONSTANT | CARRY | DECIMAL;
+  m_pProcessor->m_AC = 0x79;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE | OVERFLOW | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 24 + 56 and C=0 gives 80 and N=1 V=1 Z=0 C=0
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x24;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x80, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE | OVERFLOW | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 93 + 82 and C=0 gives 75 and N=0 V=1 Z=0 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x93;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x75, m_pProcessor->m_AC);
+  ASSERT_EQ(OVERFLOW | CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 89 + 76 and C=0 gives 65 and N=0 V=0 Z=0 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x89;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x65, m_pProcessor->m_AC);
+  ASSERT_EQ(CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 89 + 76 and C=1 gives 66 and N=0 V=0 Z=1 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL | CARRY;
+  m_pProcessor->m_AC = 0x89;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x66, m_pProcessor->m_AC);
+  ASSERT_EQ(ZERO | CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 80 + f0 and C=0 gives d0 and N=0 V=1 Z=0 C=1 (
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x80;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xD0, m_pProcessor->m_AC);
+  ASSERT_EQ(OVERFLOW | CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 80 + fa and C=0 gives e0 and N=1 V=0 Z=0 C=1
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x80;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0xE0, m_pProcessor->m_AC);
+  ASSERT_EQ(NEGATIVE | CARRY | CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 2f + 4f and C=0 gives 74 and N=0 V=0 Z=0 C=0
+  m_pProcessor->m_SR = CONSTANT | DECIMAL;
+  m_pProcessor->m_AC = 0x2F;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x74, m_pProcessor->m_AC);
+  ASSERT_EQ(CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
+  // 6f + 00 and C=1 gives 76 and N=0 V=0 Z=0 C=0
+  m_pProcessor->m_SR = CONSTANT | DECIMAL | CARRY;
+  m_pProcessor->m_AC = 0x6F;
+  m_pProcessor->Tick();
+
+  ASSERT_EQ(0x76, m_pProcessor->m_AC);
+  ASSERT_EQ(CONSTANT | DECIMAL, m_pProcessor->m_SR);
+
 }
 
 /* 0x6C */
