@@ -607,8 +607,8 @@ void MOS6502Core::OPCode0x6E() {
 
 /* BVS */
 void MOS6502Core::OPCode0x70() {
-  m_SR & OVERFLOW ? m_PC += (int8_t)m_pMemory->Read(++m_PC) : ++m_PC;
-  ++m_PC;
+  BranchRelative(m_SR & OVERFLOW);
+  m_PC += 2;
 }
 
 /* ADC Indirect, Y-indexed */
