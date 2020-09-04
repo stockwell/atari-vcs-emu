@@ -17,8 +17,9 @@ set(vcs-emu-source
         ${PROJECT_ROOT}/src/MOS6502Core.cpp
         ${PROJECT_ROOT}/src/Memory.cpp
         ${PROJECT_ROOT}/src/Opcodes.cpp
-        ${PROJECT_ROOT}/src/RIOTCore.cpp
-        ${PROJECT_ROOT}/src/TIACore.cpp
+        ${PROJECT_ROOT}/src/VCS/RIOTCore.cpp
+        ${PROJECT_ROOT}/src/VCS/TIACore.cpp
+        ${PROJECT_ROOT}/src/VCS/VCSMemory.cpp
         ${PROJECT_ROOT}/src/Cart.cpp
         ${PROJECT_ROOT}/src/HexDump.cpp)
 

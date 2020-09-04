@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -8,7 +9,7 @@
 #include "emu.h"
 #include "display.h"
 #include "kernel.h"
-#include "AtariVCS.h"
+#include "VCS/AtariVCS.h"
 
 #define ATARI_2600_W 160
 #define ATARI_2600_H 192
@@ -16,8 +17,6 @@
 class Emulator
 {
 public:
-  Emulator() = default;
-  ~Emulator();
   void Init();
   void RunToVBlank();
   void LoadRom(std::vector<uint8_t> &buffer);
@@ -30,12 +29,12 @@ public:
 
 private:
   bool running = true;
-  AtariVCS *m_pAtariVCS = nullptr;
+  std::unique_ptr<AtariVCS> m_pAtariVCS;
   std::mutex m;
 };
 
 void emu() {
-  auto emulator = new Emulator();
+  auto emulator = std::make_unique<Emulator>();
   emulator->Init();
 
   std::vector<uint8_t> rom(kernel_01_bin, kernel_01_bin + sizeof kernel_01_bin / sizeof kernel_01_bin[0]);
@@ -49,18 +48,12 @@ void emu() {
     uint32_t time = (uint32_t)esp_timer_get_time();
     std::cout << (time - start) << std::endl;
   } while (emulator->Running());
-
-  SafeDelete(emulator)
 }
 
 extern "C" void emulator_main(void *arg) {
   printf("Starting Atari VCS Emu..\n");
   emu();
   printf("Emulator shutting down..\n");
-}
-
-Emulator::~Emulator() {
-  SafeDelete(m_pAtariVCS)
 }
 
 void Emulator::Init() {

@@ -3,26 +3,30 @@
 *****************************************************************************/
 #include "gtest/gtest.h"
 
-#include "Memory.h"
-#include "TIACore.h"
+#include "VCS/VCSMemory.hpp"
+#include "VCS/TIACore.h"
 
 /*****************************************************************************
 * Unit Tests
 *****************************************************************************/
 
-class MOS6502Test : public ::testing::Test {
+class MOS6502Test
+	: public ::testing::Test
+{
 protected:
-  void SetUp() override {
-    m_pMemory = new Memory();
-    m_pMemory->Reset();
+	void SetUp() override
+	{
+		m_pMemory = std::make_shared<VCSMemory>();
+		m_pMemory->Reset();
 
-    m_pMemory->SetTIA(m_pTIA);
-  }
+		m_pMemory->SetTIA(m_pTIA);
+	}
 
-  void TearDown() override {
-    delete(m_pMemory);
-  }
+	void TearDown() override
+	{
 
-  TIACore *m_pTIA;
-  Memory *m_pMemory;
+	}
+
+	std::shared_ptr<TIACore> m_pTIA = nullptr;
+	std::shared_ptr<VCSMemory> m_pMemory = nullptr;
 };

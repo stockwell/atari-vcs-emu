@@ -1,6 +1,3 @@
-#ifndef HEXDUMP_H
-#define HEXDUMP_H
+#pragma once
 
-void hexDump(char *desc, void *addr, int len);
-
-#endif //HEXDUMP_H
+void hexDump(const char *desc, void *addr, int len);

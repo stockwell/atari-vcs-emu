@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(atari-vcs-emu)
 
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+set(CMAKE_CXX_STANDARD 20)
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 
 set(PROJECT_ROOT ${PROJECT_SOURCE_DIR})
 
@@ -13,13 +13,15 @@ add_subdirectory( vendor/SDL-mirror )
 add_executable(atari-vcs-emu
         platform/Linux-x86_64/main.cpp
         src/Cart.cpp
-        src/AtariVCS.cpp
         src/MOS6502Core.cpp
-        src/TIACore.cpp
         src/HexDump.cpp
         src/Memory.cpp
-        src/RIOTCore.cpp
-        src/Opcodes.cpp)
+        src/Opcodes.cpp
+        src/VCS/AtariVCS.cpp
+        src/VCS/RIOTCore.cpp
+        src/VCS/TIACore.cpp
+        src/VCS/VCSMemory.cpp
+        )
 
 target_include_directories(atari-vcs-emu PUBLIC src)
 target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1)

@@ -1,32 +1,30 @@
-#ifndef ATARI_VCS_EMU_MEMORY_H
-#define ATARI_VCS_EMU_MEMORY_H
+#pragma once
+
+#include <array>
+#include <memory>
 
 #include "Common.h"
 
 class MOS6502Core;
-class TIACore;
-class RIOTCore;
 
-class Memory {
+static constexpr int kMemorySize = 0xFFFF;
+
+class Memory
+{
 public:
-  Memory();
-  ~Memory();
-  void Reset();
-  void SetProcessor(MOS6502Core* pProcessor);
-  void SetTIA(TIACore *pTIA);
-  void SetRIOT(RIOTCore *pRIOT);
-  uint8_t Read(uint16_t address);
-  void Write(uint16_t address, uint8_t value);
-  void Load(uint16_t address, uint8_t value);
-  void Load(uint16_t address, uint8_t *bytes, size_t numBytes);
-  void LoadROM(const uint8_t* pROM, uint16_t offset);
-  void DumpRAM();
+	void Reset();
+	void SetProcessor(std::shared_ptr<MOS6502Core> pProcessor);
 
-private:
-  MOS6502Core *m_pProcessor;
-  TIACore *m_pTIA;
-  RIOTCore *m_pRIOT;
-  uint8_t *m_pMap;
+	virtual uint8_t Read(uint16_t address) = 0;
+	virtual void Write(uint16_t address, uint8_t value) = 0;
+
+	void Load(uint16_t address, uint8_t value);
+	void Load(uint16_t address, uint8_t *bytes, size_t numBytes);
+	virtual void LoadROM(const uint8_t *pROM, uint16_t offset) = 0;
+
+	void DumpRAM();
+
+protected:
+	std::shared_ptr<MOS6502Core> m_pProcessor = nullptr;
+	std::array<uint8_t, kMemorySize> m_map;
 };
-
-#endif //ATARI_VCS_EMU_MEMORY_H
