@@ -4,7 +4,7 @@
 #include "Cart.h"
 #include "VCSMemory.hpp"
 #include "MOS6502Core.h"
-#include "TIACore.h"
+#include "TIACore.hpp"
 #include "RIOTCore.h"
 
 AtariVCS::AtariVCS()
@@ -59,7 +59,7 @@ void AtariVCS::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBu
 			break;
 		}
 
-		break;
+		//break;
 	}
 }
 

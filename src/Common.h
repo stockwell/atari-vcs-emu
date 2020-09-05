@@ -2,10 +2,11 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 
 #include "HexDump.h"
 
-#ifdef DEBUG
+#ifndef DEBUG
 	#define Log(M, ...) printf(M "\n", ##__VA_ARGS__)
 	#define LogHexDump(...) hexDump(__VA_ARGS__)
 #else

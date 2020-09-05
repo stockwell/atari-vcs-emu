@@ -1,6 +1,6 @@
 #include "VCSMemory.hpp"
 
-#include "VCS/TIACore.h"
+#include "VCS/TIACore.hpp"
 #include "VCS/RIOTCore.h"
 
 void VCSMemory::SetTIA(std::shared_ptr<TIACore> pTIA)

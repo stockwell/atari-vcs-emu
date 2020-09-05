@@ -1,68 +1,28 @@
-#include <cstring>
+#include "TIACore.hpp"
 
-#include "TIACore.h"
 #include "MOS6502Core.h"
 
 TIACore::TIACore(std::shared_ptr<MOS6502Core> Processor)
 : m_Mem(0xFF)
+, m_pProcessor(std::move(Processor))
 {
-	m_pProcessor = Processor;
+	m_Background = std::make_unique<TIABase>();
+	m_Player0 = std::make_shared<TIAPlayer>();
+	m_Player1 = std::make_shared<TIAPlayer>();
+	m_Missile0 = std::make_unique<TIAMissile>();
+	m_Missile1 = std::make_unique<TIAMissile>();
+	m_Ball = std::make_unique<TIABall>();
+	m_Playfield = std::make_unique<TIAPlayfield>(m_Player0, m_Player1);
 
-	m_Background = std::make_unique<Background>();
-	m_Player0 = std::make_unique<Player>();
-	m_Player1 = std::make_unique<Player>();
-	m_Missile0 = std::make_unique<Missile>();
-	m_Missile1 = std::make_unique<Missile>();
-	m_Ball = std::make_unique<Ball>();
-	m_Playfield = std::make_unique<Playfield>(m_Player0, m_Player1);
+	m_TIAObjects.emplace_back(m_Background.get());
+	m_TIAObjects.emplace_back(m_Player0.get());
+	m_TIAObjects.emplace_back(m_Player1.get());
+	m_TIAObjects.emplace_back(m_Missile0.get());
+	m_TIAObjects.emplace_back(m_Missile1.get());
+	m_TIAObjects.emplace_back(m_Ball.get());
+	m_TIAObjects.emplace_back(m_Playfield.get());
 
-	m_WriteRegisters[0x00] = &TIACore::TIAWrite0x00;
-	m_WriteRegisters[0x01] = &TIACore::TIAWrite0x01;
-	m_WriteRegisters[0x02] = &TIACore::TIAWrite0x02;
-	m_WriteRegisters[0x03] = &TIACore::TIAWrite0x03;
-	m_WriteRegisters[0x04] = &TIACore::TIAWrite0x04;
-	m_WriteRegisters[0x05] = &TIACore::TIAWrite0x05;
-	m_WriteRegisters[0x06] = &TIACore::TIAWrite0x06;
-	m_WriteRegisters[0x07] = &TIACore::TIAWrite0x07;
-	m_WriteRegisters[0x08] = &TIACore::TIAWrite0x08;
-	m_WriteRegisters[0x09] = &TIACore::TIAWrite0x09;
-	m_WriteRegisters[0x0A] = &TIACore::TIAWrite0x0A;
-	m_WriteRegisters[0x0B] = &TIACore::TIAWrite0x0B;
-	m_WriteRegisters[0x0C] = &TIACore::TIAWrite0x0C;
-	m_WriteRegisters[0x0D] = &TIACore::TIAWrite0x0D;
-	m_WriteRegisters[0x0E] = &TIACore::TIAWrite0x0E;
-	m_WriteRegisters[0x0F] = &TIACore::TIAWrite0x0F;
-
-	m_WriteRegisters[0x10] = &TIACore::TIAWrite0x10;
-	m_WriteRegisters[0x11] = &TIACore::TIAWrite0x11;
-	m_WriteRegisters[0x12] = &TIACore::TIAWrite0x12;
-	m_WriteRegisters[0x13] = &TIACore::TIAWrite0x13;
-	m_WriteRegisters[0x14] = &TIACore::TIAWrite0x14;
-	m_WriteRegisters[0x15] = &TIACore::TIAWrite0x15;
-	m_WriteRegisters[0x16] = &TIACore::TIAWrite0x16;
-	m_WriteRegisters[0x17] = &TIACore::TIAWrite0x17;
-	m_WriteRegisters[0x18] = &TIACore::TIAWrite0x18;
-	m_WriteRegisters[0x19] = &TIACore::TIAWrite0x19;
-	m_WriteRegisters[0x1A] = &TIACore::TIAWrite0x1A;
-	m_WriteRegisters[0x1B] = &TIACore::TIAWrite0x1B;
-	m_WriteRegisters[0x1C] = &TIACore::TIAWrite0x1C;
-	m_WriteRegisters[0x1D] = &TIACore::TIAWrite0x1D;
-	m_WriteRegisters[0x1E] = &TIACore::TIAWrite0x1E;
-	m_WriteRegisters[0x1F] = &TIACore::TIAWrite0x1F;
-
-	m_WriteRegisters[0x20] = &TIACore::TIAWrite0x20;
-	m_WriteRegisters[0x21] = &TIACore::TIAWrite0x21;
-	m_WriteRegisters[0x22] = &TIACore::TIAWrite0x22;
-	m_WriteRegisters[0x23] = &TIACore::TIAWrite0x23;
-	m_WriteRegisters[0x24] = &TIACore::TIAWrite0x24;
-	m_WriteRegisters[0x25] = &TIACore::TIAWrite0x25;
-	m_WriteRegisters[0x26] = &TIACore::TIAWrite0x26;
-	m_WriteRegisters[0x27] = &TIACore::TIAWrite0x27;
-	m_WriteRegisters[0x28] = &TIACore::TIAWrite0x28;
-	m_WriteRegisters[0x29] = &TIACore::TIAWrite0x29;
-	m_WriteRegisters[0x2A] = &TIACore::TIAWrite0x2A;
-	m_WriteRegisters[0x2B] = &TIACore::TIAWrite0x2B;
-	m_WriteRegisters[0x2C] = &TIACore::TIAWrite0x2C;
+	TIACore::PopulateJumpTable();
 }
 
 bool TIACore::Tick(std::vector<uint8_t>& framebuffer)
@@ -88,7 +48,10 @@ bool TIACore::Tick(std::vector<uint8_t>& framebuffer)
 	TIAClearCollisions();
 
 	/* Game Draw Space */
-	if ((currentLine >= 40) && (currentLine < 232) && (currentPos >= 68)) {
+	if ((currentLine >= 40) && (currentLine < 232))
+	{
+		for (const auto& obj : m_TIAObjects)
+			obj->Tick();
 
 		framebuffer[m_PixelIndex] = m_Background->GetColour();
 
@@ -104,12 +67,13 @@ bool TIACore::Tick(std::vector<uint8_t>& framebuffer)
 
 		m_Player0->UpdatePixel(currentPos, &framebuffer[m_PixelIndex]);
 
-		++m_PixelIndex;
+		if (currentPos >= 68)
+		  ++m_PixelIndex;
 	}
 
 
 	/* New scanline, resume processor if it was suspended by WSYNC */
-	if (currentPos == 0x00)
+	if (currentPos == 0)
 	{
 		m_pProcessor->Resume();
 		m_Player0->SetVdelay(0x00);
@@ -450,4 +414,55 @@ void TIACore::TIAWrite0x2B(uint8_t value)
 void TIACore::TIAWrite0x2C(uint8_t value)
 {
 	TIAClearCollisions();
+}
+
+void TIACore::PopulateJumpTable()
+{
+	m_WriteRegisters[0x00] = &TIACore::TIAWrite0x00;
+	m_WriteRegisters[0x01] = &TIACore::TIAWrite0x01;
+	m_WriteRegisters[0x02] = &TIACore::TIAWrite0x02;
+	m_WriteRegisters[0x03] = &TIACore::TIAWrite0x03;
+	m_WriteRegisters[0x04] = &TIACore::TIAWrite0x04;
+	m_WriteRegisters[0x05] = &TIACore::TIAWrite0x05;
+	m_WriteRegisters[0x06] = &TIACore::TIAWrite0x06;
+	m_WriteRegisters[0x07] = &TIACore::TIAWrite0x07;
+	m_WriteRegisters[0x08] = &TIACore::TIAWrite0x08;
+	m_WriteRegisters[0x09] = &TIACore::TIAWrite0x09;
+	m_WriteRegisters[0x0A] = &TIACore::TIAWrite0x0A;
+	m_WriteRegisters[0x0B] = &TIACore::TIAWrite0x0B;
+	m_WriteRegisters[0x0C] = &TIACore::TIAWrite0x0C;
+	m_WriteRegisters[0x0D] = &TIACore::TIAWrite0x0D;
+	m_WriteRegisters[0x0E] = &TIACore::TIAWrite0x0E;
+	m_WriteRegisters[0x0F] = &TIACore::TIAWrite0x0F;
+
+	m_WriteRegisters[0x10] = &TIACore::TIAWrite0x10;
+	m_WriteRegisters[0x11] = &TIACore::TIAWrite0x11;
+	m_WriteRegisters[0x12] = &TIACore::TIAWrite0x12;
+	m_WriteRegisters[0x13] = &TIACore::TIAWrite0x13;
+	m_WriteRegisters[0x14] = &TIACore::TIAWrite0x14;
+	m_WriteRegisters[0x15] = &TIACore::TIAWrite0x15;
+	m_WriteRegisters[0x16] = &TIACore::TIAWrite0x16;
+	m_WriteRegisters[0x17] = &TIACore::TIAWrite0x17;
+	m_WriteRegisters[0x18] = &TIACore::TIAWrite0x18;
+	m_WriteRegisters[0x19] = &TIACore::TIAWrite0x19;
+	m_WriteRegisters[0x1A] = &TIACore::TIAWrite0x1A;
+	m_WriteRegisters[0x1B] = &TIACore::TIAWrite0x1B;
+	m_WriteRegisters[0x1C] = &TIACore::TIAWrite0x1C;
+	m_WriteRegisters[0x1D] = &TIACore::TIAWrite0x1D;
+	m_WriteRegisters[0x1E] = &TIACore::TIAWrite0x1E;
+	m_WriteRegisters[0x1F] = &TIACore::TIAWrite0x1F;
+
+	m_WriteRegisters[0x20] = &TIACore::TIAWrite0x20;
+	m_WriteRegisters[0x21] = &TIACore::TIAWrite0x21;
+	m_WriteRegisters[0x22] = &TIACore::TIAWrite0x22;
+	m_WriteRegisters[0x23] = &TIACore::TIAWrite0x23;
+	m_WriteRegisters[0x24] = &TIACore::TIAWrite0x24;
+	m_WriteRegisters[0x25] = &TIACore::TIAWrite0x25;
+	m_WriteRegisters[0x26] = &TIACore::TIAWrite0x26;
+	m_WriteRegisters[0x27] = &TIACore::TIAWrite0x27;
+	m_WriteRegisters[0x28] = &TIACore::TIAWrite0x28;
+	m_WriteRegisters[0x29] = &TIACore::TIAWrite0x29;
+	m_WriteRegisters[0x2A] = &TIACore::TIAWrite0x2A;
+	m_WriteRegisters[0x2B] = &TIACore::TIAWrite0x2B;
+	m_WriteRegisters[0x2C] = &TIACore::TIAWrite0x2C;
 }

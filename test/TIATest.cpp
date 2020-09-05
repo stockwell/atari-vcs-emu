@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "VCS/VCSMemory.hpp"
-#include "VCS/TIACore.h"
+#include "VCS/TIACore.hpp"
 
 /*****************************************************************************
 * Unit Tests
