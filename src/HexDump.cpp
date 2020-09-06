@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "HexDump.h"
+#include "HexDump.hpp"
 
 void hexDump(const char *desc, void *addr, int len)
 {

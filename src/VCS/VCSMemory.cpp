@@ -1,7 +1,7 @@
 #include "VCSMemory.hpp"
 
 #include "VCS/TIACore.hpp"
-#include "VCS/RIOTCore.h"
+#include "VCS/RIOTCore.hpp"
 
 void VCSMemory::SetTIA(std::shared_ptr<TIACore> pTIA)
 {

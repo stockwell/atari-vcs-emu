@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "Common.h"
+#include "Common.hpp"
 
-#include "Cart.h"
+#include "Cart.hpp"
 
 class MOS6502Core;
 class VCSMemory;

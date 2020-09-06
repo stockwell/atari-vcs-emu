@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "Common.h"
-#include "Memory.h"
+#include "Common.hpp"
+#include "Memory.hpp"
 
 /* Bits in the status register */
 #define NEGATIVE  0x80u

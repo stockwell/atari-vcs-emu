@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "Memory.h"
+#include "Memory.hpp"
 
 void Memory::SetProcessor(std::shared_ptr<MOS6502Core>pProcessor)
 {
@@ -28,5 +28,5 @@ void Memory::Load(uint16_t address, uint8_t byte)
 
 void Memory::DumpRAM()
 {
-	hexDump("Mem", &m_map[0x80], 0x80);
+	LogHexDump("Mem", &m_map[0x80], 0x80);
 }

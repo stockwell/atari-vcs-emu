@@ -1,33 +1,53 @@
 #pragma once
 
-#include "Common.h"
+#include "Common.hpp"
 
 #include "TIABase.hpp"
 
 class TIAPlayer : public TIABase
 {
 public:
-	void ResetPos(uint8_t value) { m_Position = 0; };
-	uint16_t GetPos() { return m_Position; }
-	void SetHMove(int8_t value)	{ m_HMove = value >> 4; }
-	void ApplyHMove() { m_Position -= m_HMove; }
-	void SetVdelay(uint8_t value) { m_Vdelay = value; }
+	TIAPlayer();
 
-	void SetSize(uint8_t value);
+	uint16_t GetPos() const { return 0; }
+
+	void ResetPos(uint8_t value);
+
+	void SetSize(uint8_t value, bool hblank);
 	void SetGraphics(uint8_t value);
 	void SetReflected(bool value);
+	void SetVdelay(uint8_t value);
 
-	void UpdatePixel(uint16_t currentPos, uint8_t *pixel);
+	void SetDivider(uint8_t divider);
+
+	// TIABase
+	void Tick(uint32_t x = 0, uint32_t hcount = 0) override;
+	void MovementTick(uint8_t clock, uint8_t hclock, bool hblank) override;
+	void SetEnable(bool enabled) override;
+	void NextLine() override;
 
 private:
-	void CalcBuffer();
+	void UpdatePattern();
 
 private:
+	static constexpr int kRenderCounterOffset = -5;
+
 	bool m_Reflected = false;
-	bool m_Vdelay = false;
+	bool m_isSuppressed = false;
+	bool m_isDelaying = false;
+
 	int8_t m_HMove = 0;
-	uint8_t m_Sprite = 0;
-	uint8_t m_Position = 0;
-	uint8_t m_Size = 0;
-	uint8_t m_SpriteBuffer[10] = {};
+	uint8_t m_DecodesOffset = 0;
+
+	uint8_t m_Pattern = 0;
+	uint8_t m_PatternOld = 0;
+	uint8_t m_PatternNew = 0;
+
+	uint8_t m_SampleCounter = 0;
+	uint8_t m_Divider = 0;
+	uint8_t m_DividerPending = 0;
+	int8_t m_DividerChangeCounter = -1;
+	int8_t m_RenderCounterTripPoint = 0;
+
+	const uint8_t* m_Decodes = nullptr;
 };

@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "Common.h"
+#include "Common.hpp"
 
 #include "TIAMissile.hpp"
 #include "TIAPlayer.hpp"
@@ -27,29 +27,65 @@ public:
 	void SetTrigger(uint8_t port, bool state);
 
 private:
+	void PopulateJumpTable();
+	void TIAClearCollisions();
+
+	void RenderPixel(uint32_t x, uint32_t y, std::vector<uint8_t>& framebuffer);
+
+	void NextLine();
+	void TickMovement();
+	void TickHblank();
+	void TickHframe(std::vector<uint8_t>& framebuffer);
+	void ApplyRsync() { };
+
+private:
+	enum class HState
+	{
+		blank,
+		frame,
+	};
+
+	enum class Priority
+	{
+		pfp,
+		score,
+		normal,
+	};
+
 	void (TIACore::*m_WriteRegisters[0x2E])(uint8_t value);
 	std::vector<uint8_t> m_Mem;
 	std::shared_ptr<MOS6502Core> m_pProcessor = nullptr;
 
-	bool m_Vsync = false;
-	bool m_Vblank = false;
-	uint16_t m_Clock = 0x00;
-	uint16_t m_PixelIndex = 0x00;
+	bool m_Vsync 	= false;
+	bool m_Vblank 	= false;
+	bool m_Hblank 	= false;
+	bool m_ExtendedHblank = false;
 
-	std::unique_ptr<TIABase>		m_Background = nullptr;
-	std::shared_ptr<TIAPlayer>		m_Player0 = nullptr;
-	std::shared_ptr<TIAPlayer>		m_Player1 = nullptr;
-	std::unique_ptr<TIAMissile>		m_Missile0 = nullptr;
-	std::unique_ptr<TIAMissile> 	m_Missile1 = nullptr;
-	std::unique_ptr<TIABall>		m_Ball = nullptr;
-	std::unique_ptr<TIAPlayfield>	m_Playfield = nullptr;
+	bool m_MovementInProgress = false;
+
+	uint8_t m_Hctr = 0;
+	int32_t m_HctrDelta = 0;
+
+	uint16_t m_Vctr = 0;
+	uint16_t m_Clock = 0;
+	uint16_t m_PixelIndex = 0;
+
+	uint32_t m_MovementClock = 0;
+
+	HState m_HState = HState::blank;
+	Priority m_Priority = Priority::normal;
+
+	std::unique_ptr<TIABase> m_Background 		= nullptr;
+	std::shared_ptr<TIAPlayer> m_Player0 		= nullptr;
+	std::shared_ptr<TIAPlayer> m_Player1 		= nullptr;
+	std::unique_ptr<TIAMissile> m_Missile0 		= nullptr;
+	std::unique_ptr<TIAMissile> m_Missile1 		= nullptr;
+	std::unique_ptr<TIABall> m_Ball 			= nullptr;
+	std::unique_ptr<TIAPlayfield> m_Playfield 	= nullptr;
 
 	std::vector<TIABase*> m_TIAObjects;
 
 private:
-	void PopulateJumpTable();
-	void TIAClearCollisions();
-
 	void TIAWrite0x00(uint8_t value);
 	void TIAWrite0x01(uint8_t value);
 	void TIAWrite0x02(uint8_t value);
@@ -98,6 +134,23 @@ private:
 	void TIAWrite0x2B(uint8_t value);
 	void TIAWrite0x2C(uint8_t value);
 };
+
+namespace TIAConstants
+{
+	static constexpr uint32_t frameBufferWidth = 160;
+	static constexpr uint32_t frameBufferHeight = 320;
+	static constexpr int32_t  minVcenter = -20; // limit to reasonable values
+	static constexpr int32_t  maxVcenter = 20; // limit to reasonable values
+	static constexpr uint32_t viewableWidth = 320;
+	static constexpr uint32_t viewableHeight = 240;
+	static constexpr uint32_t initialGarbageFrames = 10;
+
+	static constexpr uint16_t H_PIXEL = 160;
+	static constexpr uint16_t H_CYCLES = 76;
+	static constexpr uint16_t CYCLE_CLOCKS = 3;
+	static constexpr uint16_t H_CLOCKS = H_CYCLES * CYCLE_CLOCKS;   // = 228
+	static constexpr uint16_t H_BLANK_CLOCKS = H_CLOCKS - H_PIXEL;  // = 68
+}
 
 static const char *kTIAReadRegisterNames[0x0E] = {
 	"Cxm0p",    /* Read Collision M0-P1   M0-P0 */

@@ -4,9 +4,8 @@
 #include <cstdio>
 #include <cstring>
 
-#include "HexDump.h"
-
 #ifndef DEBUG
+	#include "HexDump.hpp"
 	#define Log(M, ...) printf(M "\n", ##__VA_ARGS__)
 	#define LogHexDump(...) hexDump(__VA_ARGS__)
 #else

@@ -3,7 +3,7 @@
 #include <array>
 #include <memory>
 
-#include "Common.h"
+#include "Common.hpp"
 
 class MOS6502Core;
 

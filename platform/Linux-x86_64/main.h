@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VCS/AtariVCS.h"
+#include "VCS/AtariVCS.hpp"
 
 #include <memory>
 

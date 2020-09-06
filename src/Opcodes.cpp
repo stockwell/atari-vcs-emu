@@ -1,8 +1,8 @@
 #include <iostream>
 
-#include "Common.h"
-#include "MOS6502Core.h"
-#include "Opcodes.h"
+#include "Common.hpp"
+#include "MOS6502Core.hpp"
+#include "Opcodes.hpp"
 
 void MOS6502Core::InitOpcodeTable()
 {

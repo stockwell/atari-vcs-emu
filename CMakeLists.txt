@@ -18,6 +18,7 @@ add_executable(atari-vcs-emu
         src/Memory.cpp
         src/Opcodes.cpp
         src/VCS/AtariVCS.cpp
+        src/VCS/DrawCounterDecodes.cpp
         src/VCS/RIOTCore.cpp
         src/VCS/TIACore.cpp
         src/VCS/VCSMemory.cpp

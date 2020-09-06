@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "MOS6502Core.h"
-#include "Opcodes.h"
+#include "MOS6502Core.hpp"
+#include "Opcodes.hpp"
 
 MOS6502Core::MOS6502Core(std::shared_ptr<Memory> pMemory)
 : m_pMemory(pMemory)

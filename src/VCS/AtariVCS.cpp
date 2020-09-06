@@ -1,11 +1,11 @@
-#include "Common.h"
+#include "Common.hpp"
 
-#include "AtariVCS.h"
-#include "Cart.h"
+#include "AtariVCS.hpp"
+#include "Cart.hpp"
 #include "VCSMemory.hpp"
-#include "MOS6502Core.h"
+#include "MOS6502Core.hpp"
 #include "TIACore.hpp"
-#include "RIOTCore.h"
+#include "RIOTCore.hpp"
 
 AtariVCS::AtariVCS()
 {
@@ -55,10 +55,9 @@ void AtariVCS::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBu
 
 		if (m_pTIA->Tick(framebuffer))
 		{
-			framebuffer.clear();
+			//memset(framebuffer.data(), 0x00, framebuffer.size());
 			break;
 		}
-
 		//break;
 	}
 }

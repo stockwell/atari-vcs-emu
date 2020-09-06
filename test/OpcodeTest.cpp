@@ -5,7 +5,7 @@
 
 #include <memory>
 
-#include "MOS6502Core.h"
+#include "MOS6502Core.hpp"
 #include "VCS/VCSMemory.hpp"
 
 /*****************************************************************************

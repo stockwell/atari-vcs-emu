@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Common.h"
+#include "Common.hpp"
 
 #include "TIABase.hpp"
 #include "TIAPlayer.hpp"

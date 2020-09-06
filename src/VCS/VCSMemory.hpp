@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Memory.h"
+#include "Memory.hpp"
 
 class TIACore;
 class RIOTCore;

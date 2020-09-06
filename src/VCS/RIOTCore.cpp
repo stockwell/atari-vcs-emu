@@ -1,4 +1,4 @@
-#include "RIOTCore.h"
+#include "RIOTCore.hpp"
 
 RIOTCore::RIOTCore()
 {

@@ -164,7 +164,7 @@ bool Emulator::Draw(std::vector<uint8_t>& framebuffer)
 }
 int main()
 {
-	setbuf(stdout, 0);
+	setbuf(stdout, nullptr);
 
 	auto emulator = std::make_unique<Emulator>();
 

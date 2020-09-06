@@ -5,8 +5,8 @@
 #include <cstdio>
 #include <vector>
 
-#include "Cart.h"
-#include "Common.h"
+#include "Cart.hpp"
+#include "Common.hpp"
 
 bool Cartridge::LoadFromFile(const char *path)
 {
