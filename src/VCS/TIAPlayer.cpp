@@ -48,7 +48,7 @@ uint8_t TIAPlayer::GetPos()
 
 void TIAPlayer::ResetPos(uint8_t value)
 {
-	m_Counter = value;
+	m_Counter = value & 0x02u;
 
 	// This tries to account for the effects of RESP during draw counter decode as
 	// described in Andrew Towers' notes. Still room for tuning.'

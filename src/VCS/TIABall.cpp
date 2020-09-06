@@ -37,7 +37,7 @@ void TIABall::SetEnable(bool enabled)
 
 void TIABall::ResetPos(uint8_t value)
 {
-	m_Counter = value;
+	m_Counter = value & 0x02u;
 
 	m_isRendering = true;
 	m_RenderCounter = kRenderCounterOffset + (value - 157);

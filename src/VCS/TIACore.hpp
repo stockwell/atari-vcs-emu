@@ -31,7 +31,6 @@ public:
 
 private:
 	void PopulateJumpTable();
-	void TIAClearCollisions();
 
 	void RenderPixel(uint32_t x, uint32_t y, std::vector<uint8_t>& framebuffer);
 
@@ -40,7 +39,7 @@ private:
 	void TickMovement();
 	void TickHblank();
 	void TickHframe(std::vector<uint8_t>& framebuffer);
-	void ApplyRsync() { };
+	void ApplyRsync();
 	void DelayedWrite(uint8_t address, uint8_t value);
 
 	uint8_t resxCounter();
@@ -60,12 +59,13 @@ private:
 	};
 
 	void (TIACore::*m_WriteRegisters[0x2E])(uint8_t value);
+	uint8_t (TIACore::*m_ReadRegisters[0x08])();
+
 	std::vector<uint8_t> m_Mem;
 	std::shared_ptr<MOS6502Core> m_pProcessor = nullptr;
 
 	bool m_Vsync 	= false;
 	bool m_Vblank 	= false;
-	bool m_Hblank 	= false;
 	bool m_ExtendedHblank = false;
 
 	bool m_MovementInProgress = false;
@@ -99,6 +99,16 @@ private:
 	std::vector<TIABase*> m_TIAObjects;
 
 private:
+
+	uint8_t TIARead0x00();
+	uint8_t TIARead0x01();
+	uint8_t TIARead0x02();
+	uint8_t TIARead0x03();
+	uint8_t TIARead0x04();
+	uint8_t TIARead0x05();
+	uint8_t TIARead0x06();
+	uint8_t TIARead0x07();
+
 	void TIAWrite0x00(uint8_t value);
 	void TIAWrite0x01(uint8_t value);
 	void TIAWrite0x02(uint8_t value);
@@ -190,6 +200,15 @@ enum ResxCounter: uint8_t
 	hblank = 159,
 	lateHblank = 158,
 	frame = 157
+};
+
+enum CollisionMask: uint32_t {
+	player0   = 0b0111110000000000,
+	player1   = 0b0100001111000000,
+	missile0  = 0b0010001000111000,
+	missile1  = 0b0001000100100110,
+	ball      = 0b0000100010010101,
+	playfield = 0b0000010001001011
 };
 
 static const char *kTIAReadRegisterNames[0x0E] = {

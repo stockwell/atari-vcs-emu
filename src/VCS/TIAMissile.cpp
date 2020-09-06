@@ -41,7 +41,7 @@ void TIAMissile::SetSize(uint8_t value)
 
 void TIAMissile::ResetPos(uint8_t value, bool hblank)
 {
-	m_Counter = value;
+	m_Counter = value & 0x02u;
 
 	if (m_isRendering)
 	{
@@ -180,4 +180,5 @@ void TIAMissile::UpdateEnabled()
 	m_Enabled = m_Enam && ! m_Resmp;
 
 	m_Collision = (m_isVisible && m_Enabled) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+	m_TIA->ScheduleCollisionUpdate();
 }
