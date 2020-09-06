@@ -1,14 +1,49 @@
+//============================================================================
+//
+//   SSSS    tt          lll  lll
+//  SS  SS   tt           ll   ll
+//  SS     tttttt  eeee   ll   ll   aaaa
+//   SSSS    tt   ee  ee  ll   ll      aa
+//      SS   tt   eeeeee  ll   ll   aaaaa  --  "An Atari 2600 VCS Emulator"
+//  SS  SS   tt   ee      ll   ll  aa  aa
+//   SSSS     ttt  eeeee llll llll  aaaaa
+//
+// Copyright (c) 1995-2020 by Bradford W. Mott, Stephen Anthony
+// and the Stella Team
+//
+// See the file "License.txt" for information on usage and redistribution of
+// this file, and for a DISCLAIMER OF ALL WARRANTIES.
+//============================================================================
+
+
 #include "TIAPlayer.hpp"
 #include "TIACore.hpp"
 
 #include "DrawCounterDecodes.hpp"
 
-TIAPlayer::TIAPlayer()
+TIAPlayer::TIAPlayer(TIACore* pTIA)
 : m_Decodes(DrawCounterDecodes::get().playerDecodes()[m_DecodesOffset])
+, m_TIA(pTIA)
 {
 	SetDivider(1);
+}
 
-	m_Enabled = true;
+uint8_t TIAPlayer::GetPos()
+{
+	switch (m_Divider)
+	{
+		case 1:
+			return (m_Counter + TIAConstants::H_PIXEL - 5) % TIAConstants::H_PIXEL;
+
+		case 2:
+			return (m_Counter + TIAConstants::H_PIXEL - 9) % TIAConstants::H_PIXEL;
+
+		case 4:
+			return (m_Counter + TIAConstants::H_PIXEL - 12) % TIAConstants::H_PIXEL;
+
+		default:
+			throw std::runtime_error("invalid width");
+	}
 }
 
 void TIAPlayer::ResetPos(uint8_t value)
@@ -148,7 +183,7 @@ void TIAPlayer::UpdatePattern()
 
 	if (m_isRendering && m_RenderCounter >= m_RenderCounterTripPoint) {
 		m_Collision = (m_Pattern & (1 << m_SampleCounter)) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
-		//myTIA->scheduleCollisionUpdate();
+		m_TIA->ScheduleCollisionUpdate();
 	}
 }
 
@@ -187,16 +222,6 @@ void TIAPlayer::SetVdelay(uint8_t value)
 	m_isDelaying = (value & 0x01) > 0;
 
 	if (oldIsDelaying != m_isDelaying)
-		UpdatePattern();
-}
-
-void TIAPlayer::SetEnable(bool enabled)
-{
-	const bool oldIsSuppressed = m_isSuppressed;
-
-	m_isSuppressed = ! enabled;
-
-	if (oldIsSuppressed != m_isSuppressed)
 		UpdatePattern();
 }
 
@@ -255,7 +280,7 @@ void TIAPlayer::MovementTick(uint8_t clock, uint8_t hclock, bool hblank)
 	if (m_isMoving)
 	{
 		if (hblank)
-			Tick();
+			Tick(clock, hclock);
 	}
 }
 
@@ -263,4 +288,15 @@ void TIAPlayer::SetDivider(uint8_t divider)
 {
 	m_Divider = divider;
 	m_RenderCounterTripPoint = divider == 1 ? 0 : 1;
+}
+
+void TIAPlayer::ShufflePatterns()
+{
+	const uint8_t oldPatternOld = m_PatternOld;
+
+	m_PatternOld = m_PatternNew;
+
+	if (m_isDelaying && m_PatternOld != oldPatternOld) {
+		UpdatePattern();
+	}
 }

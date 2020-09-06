@@ -2,28 +2,40 @@
 
 #include "TIABase.hpp"
 
+class TIACore;
+
 class TIAMissile : public TIABase
 {
 public:
-	void SetSize(uint8_t value) { m_Size = 1 << (value >> 4); }
-	void SetHMove(int8_t value) { m_HMove = value >> 4; }
-	void ApplyHMove() { m_Position -= m_HMove; }
-	void ResetPos(uint8_t value) { m_Position = 0; };
-	void SetPos(uint16_t pos) { m_Position = pos; }
-	void UpdatePixel(uint16_t currentPos, uint8_t *pixel)
-	{
-		if (m_Position == 0)
-			m_Position = currentPos;
-		if (currentPos < m_Position || currentPos >= (m_Position + m_Size))
-			return;
-		if (m_Enabled)
-			*pixel = m_Colour;
-	}
+	explicit TIAMissile(TIACore* pTIA);
+
+	void SetSize(uint8_t value);
+	void ResetPos(uint8_t value, bool hblank);
+	void ResetPosPlayer(uint8_t value, uint8_t pos);
+	void Tick(uint8_t hcount, bool isReceivingMclock = true);
+
+	// TIABase
+	void Tick(uint32_t x, uint32_t hcount) override { TIAMissile::Tick(hcount); }
+	void MovementTick(uint8_t clock, uint8_t hclock, bool hblank) override;
+	void NextLine() override;
+	void SetEnable(bool enabled) override;
 
 private:
-	bool m_Enabled = false;
-	int8_t m_HMove = 0;
-	uint8_t m_Size = 1;
-	uint8_t m_Colour;
-	uint16_t m_Position;
+	void UpdateEnabled();
+
+private:
+	static constexpr int kRenderCounterOffset = -4;
+
+	bool m_isVisible = false;
+	bool m_Enam = false;
+
+	uint8_t m_EffectiveWidth = 1;
+	uint8_t m_Width = 1;
+
+	uint8_t m_Resmp = 0;
+
+	uint8_t m_DecodesOffset = 0;
+	const uint8_t* m_Decodes = nullptr;
+
+	TIACore* m_TIA = nullptr;
 };

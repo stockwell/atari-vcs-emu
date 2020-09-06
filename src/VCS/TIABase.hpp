@@ -5,17 +5,6 @@
 class TIABase
 {
 public:
-	void SetColor(uint8_t colour)
-	{
-		if (colour != m_Colour)
-			m_Colour = colour;
-	}
-
-	uint8_t GetColour()
-	{
-		return m_Colour;
-	}
-
 	bool IsMoving()
 	{
 		return m_isMoving;
@@ -36,8 +25,23 @@ public:
 		m_isMoving = true;
 	}
 
-	virtual void SetEnable(bool enabled) { m_Enabled = enabled; }
-	virtual void Tick(uint32_t x = 0, uint32_t hcount = 0) {};
+	virtual void SetColor(uint8_t colour)
+	{
+		if (colour != m_Colour)
+			m_Colour = colour;
+	}
+
+	virtual uint8_t GetColour()
+	{
+		return m_Colour;
+	}
+
+	virtual void SetEnable(bool enabled)
+	{
+		m_Enabled = enabled;
+	}
+
+	virtual void Tick(uint32_t x, uint32_t hcount) {};
 	virtual void MovementTick(uint8_t clock, uint8_t hclock, bool hblank) {};
 	virtual void NextLine() {};
 
@@ -56,4 +60,5 @@ protected:
 	bool m_Enabled = false;
 	bool m_isRendering = false;
 	bool m_isMoving = false;
+	bool m_InvertedPhaseClock = false;
 };

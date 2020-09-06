@@ -9,12 +9,12 @@ TIACore::TIACore(std::shared_ptr<MOS6502Core> Processor)
 , m_pProcessor(std::move(Processor))
 {
 	m_Background = std::make_unique<TIABase>();
-	m_Player0 = std::make_shared<TIAPlayer>();
-	m_Player1 = std::make_shared<TIAPlayer>();
-	m_Missile0 = std::make_unique<TIAMissile>();
-	m_Missile1 = std::make_unique<TIAMissile>();
-	m_Ball = std::make_unique<TIABall>();
-	m_Playfield = std::make_unique<TIAPlayfield>(m_Player0, m_Player1);
+	m_Player0 = std::make_unique<TIAPlayer>(this);
+	m_Player1 = std::make_unique<TIAPlayer>(this);
+	m_Missile0 = std::make_unique<TIAMissile>(this);
+	m_Missile1 = std::make_unique<TIAMissile>(this);
+	m_Ball = std::make_unique<TIABall>(this);
+	m_Playfield = std::make_unique<TIAPlayfield>();
 
 	m_TIAObjects.emplace_back(m_Background.get());
 	m_TIAObjects.emplace_back(m_Player0.get());
@@ -42,81 +42,41 @@ bool TIACore::Tick(std::vector<uint8_t>& framebuffer)
 	//  192   | Game Draw Space
 	//   30   | Overscan
 	// -------------------------
-	//      282 scanlines
-
-	int currentLine = m_Clock / 228;
-	int currentPos = m_Clock % 228;
+	//      262 scanlines
 
 	TIAClearCollisions();
 
-	/* Game Draw Space */
-	if ((currentLine >= 40) && (currentLine < 232))
-	{
-		for (const auto& obj : m_TIAObjects)
-			obj->Tick();
-
-//		framebuffer[m_PixelIndex] = m_Background->GetColour();
-//
-//		m_Playfield->UpdatePixel(currentPos, &framebuffer[m_PixelIndex]);
-//
-//		m_Ball->UpdatePixel(currentPos, &framebuffer[m_PixelIndex]);
-//
-//		m_Missile1->UpdatePixel(currentPos, &framebuffer[m_PixelIndex]);
-//
-//		m_Missile0->UpdatePixel(currentPos, &framebuffer[m_PixelIndex]);
-
-		if (currentPos >= 68)
+	m_DelayQueue.execute(
+		[this] (uint8_t address, uint8_t value)
 		{
-			++m_PixelIndex;
+			DelayedWrite(address, value);
 		}
+	);
 
-	}
+	m_CollisionUpdateRequired = m_CollisionUpdateScheduled;
+	m_CollisionUpdateScheduled = false;
 
-	size_t colourClocks = 1;
-	for (size_t i = 0; i < colourClocks; ++i)
+	TickMovement();
+
+	if (m_HState == HState::blank)
+		TickHblank();
+	else
+		TickHframe(framebuffer);
+
+	if (m_CollisionUpdateRequired && ! m_Vblank)
+		UpdateCollision();
+
+	if (++m_Hctr >= TIAConstants::H_CLOCKS)
+		NextLine();
+
+
+	if (m_Vsync || (m_Vctr == 262))
 	{
-//		myDelayQueue.execute(
-//			[this] (uint8_t address, uint8_t value) {
-//				delayedWrite(address, value);
-//			}
-//		);
-
-//		myCollisionUpdateRequired = myCollisionUpdateScheduled;
-//		myCollisionUpdateScheduled = false;
-
-
-		TickMovement();
-
-		if (m_HState == HState::blank)
-			TickHblank();
-		else
-			TickHframe(framebuffer);
-
-//		if (myCollisionUpdateRequired && ! m_Vblank)
-//			updateCollision();
-
-		if (++m_Hctr >= TIAConstants::H_CLOCKS)
-			NextLine();
-	}
-
-
-	/* New scanline, resume processor if it was suspended by WSYNC */
-	if (currentPos == 0)
-	{
-		m_pProcessor->Resume();
-		m_Ball->SetVdelay(0x00);
-	}
-
-	if (m_Vsync || (currentLine == 282))
-	{
-		m_PixelIndex = 0x00;
-		m_Clock = 0x00;
 		m_Vctr = 0;
 		m_Hctr = 0;
+		m_Vsync = false;
 		return true;
 	}
-
-	++m_Clock;
 
 	return false;
 }
@@ -204,8 +164,7 @@ void TIACore::RenderPixel(uint32_t x, uint32_t y, std::vector<uint8_t>& framebuf
 		case Priority::normal:  // CTRLPF D2=0, D1=0
 			// Priority from highest to lowest:
 			//   P0/M0 => P1/M1 => BL/PF => BK
-			if (m_Player0->IsEnabled())
-				colour = m_Player0->GetColour();
+			if (m_Player0->IsEnabled())			colour = m_Player0->GetColour();
 			else if (m_Missile0->IsEnabled())	colour = m_Missile0->GetColour();
 			else if (m_Player1->IsEnabled())	colour = m_Player1->GetColour();
 			else if (m_Missile1->IsEnabled())	colour = m_Missile1->GetColour();
@@ -236,7 +195,24 @@ void TIACore::NextLine()
 
 	++m_Vctr;
 
-	//m_pProcessor->Resume();
+	m_pProcessor->Resume();
+}
+
+void TIACore::ScheduleCollisionUpdate()
+{
+	m_CollisionUpdateScheduled = true;
+}
+
+void TIACore::UpdateCollision()
+{
+	m_CollisionMask |= (
+		m_Player0->m_Collision &
+		m_Player1->m_Collision &
+		m_Missile0->m_Collision &
+		m_Missile1->m_Collision &
+		m_Ball->m_Collision &
+		m_Playfield->m_Collision
+	);
 }
 
 void TIACore::TickMovement()
@@ -257,7 +233,7 @@ void TIACore::TickMovement()
 				return obj->IsMoving();
 			});
 
-		//myCollisionUpdateRequired = myCollisionUpdateRequired || myMovementInProgress;
+		m_CollisionUpdateRequired = m_CollisionUpdateRequired || m_MovementInProgress;
 
 		++m_MovementClock;
 	}
@@ -291,12 +267,135 @@ void TIACore::TickHframe(std::vector<uint8_t>& framebuffer)
 	const uint32_t y = m_Vctr;
 	const uint32_t x = m_Hctr - TIAConstants::H_BLANK_CLOCKS - m_HctrDelta;
 
-	//myCollisionUpdateRequired = true;
+	if (m_Vctr < TIAConstants::V_BLANK_CLOCKS)
+		return;
+
+	m_CollisionUpdateRequired = true;
 
 	for (const auto& obj : m_TIAObjects)
 		obj->Tick(x, m_Hctr);
 
-	RenderPixel(x, y, framebuffer);
+	RenderPixel(x, y - TIAConstants::V_BLANK_CLOCKS, framebuffer);
+}
+
+void TIACore::DelayedWrite(uint8_t address, uint8_t value)
+{
+
+	switch (address)
+	{
+		case 0x00:
+			m_Vblank = value & 0x02u;
+			break;
+
+		case 0x2A:
+			m_MovementClock = 0;
+			m_MovementInProgress = true;
+
+			if (! m_ExtendedHblank) {
+				//clearHmoveComb();
+				m_ExtendedHblank = true;
+			}
+
+			for (const auto& obj : m_TIAObjects)
+				obj->SetHmove();
+
+			break;
+
+		case 0x0D:
+			m_Playfield->SetPF0(value);
+			break;
+
+		case 0x0E:
+			m_Playfield->SetPF1(value);
+			break;
+
+		case 0x0F:
+			m_Playfield->SetPF2(value);
+			break;
+
+		case 0x09:
+			m_Background->SetColor(value);
+			break;
+
+		case 0x08:
+			m_Playfield->SetColor(value);
+			m_Ball->SetColor(value);
+			break;
+
+		case 0x22:
+			m_Missile0->SetHMx(value);
+			break;
+
+		case 0x23:
+			m_Missile1->SetHMx(value);
+			break;
+
+		case 0x2B:
+			for (const auto& obj : m_TIAObjects)
+				obj->SetHMx(0x00);
+			break;
+
+		case 0x1B:
+			m_Player0->SetGraphics(value);
+			break;
+
+		case 0x1C:
+			m_Player1->SetGraphics(value);
+			break;
+
+		case 0xF1:
+			m_Player0->ShufflePatterns();
+			break;
+
+		case 0xF2:
+			m_Player1->ShufflePatterns();
+			break;
+
+		case 0xF3:
+			m_Ball->ShuffleStatus();
+			break;
+
+		case 0x20:
+			m_Player0->SetHMx(value);
+			break;
+
+		case 0x21:
+			m_Player1->SetHMx(value);
+			break;
+
+		case 0x24:
+			m_Ball->SetHMx(value);
+			break;
+
+		case 0x0B:
+			m_Player0->SetReflected(value & 0x08);
+			break;
+
+		case 0x0C:
+			m_Player1->SetReflected(value & 0x08);
+			break;
+
+		case 0x1F:
+			m_Ball->SetEnable(value & 0x02u);
+			break;
+
+		case 0x1D:
+			m_Missile0->SetEnable(value & 0x02u);
+			break;
+
+		case 0x1E:
+			m_Missile1->SetEnable(value & 0x02u);
+			break;
+
+		default:
+			break;
+	}
+}
+
+uint8_t TIACore::resxCounter()
+{
+	return m_HState == HState::blank ?
+		   (m_Hctr >= resxLateHblankThreshold ? ResxCounter::lateHblank : ResxCounter::hblank) : ResxCounter::frame;
 }
 
 /* Vertical Sync Set-Clear              */
@@ -308,7 +407,7 @@ void TIACore::TIAWrite0x00(uint8_t value)
 /* Vertical Blank Set-Clear             */
 void TIACore::TIAWrite0x01(uint8_t value)
 {
-	m_Vblank = value & 0x02u;
+	m_DelayQueue.push(0x01, value, Delay::vblank);
 }
 
 /* Wait for Horizontal blank */
@@ -326,14 +425,14 @@ void TIACore::TIAWrite0x03(uint8_t value)
 /* Nusiz0 */
 void TIACore::TIAWrite0x04(uint8_t value)
 {
-	m_Player0->SetSize(value & 0x07, m_Hblank);
+	m_Player0->SetSize(value & 0x07, m_HState == HState::blank);
 	m_Missile0->SetSize(value & 0x30);
 }
 
 /* Nusiz1 */
 void TIACore::TIAWrite0x05(uint8_t value)
 {
-	m_Player1->SetSize(value & 0x07, m_Hblank);
+	m_Player1->SetSize(value & 0x07, m_HState == HState::blank);
 	m_Missile1->SetSize(value & 0x30);
 }
 
@@ -341,6 +440,7 @@ void TIACore::TIAWrite0x05(uint8_t value)
 void TIACore::TIAWrite0x06(uint8_t value)
 {
 	m_Player0->SetColor(value);
+	m_Playfield->SetColourP0(value);
 	m_Missile0->SetColor(value);
 }
 
@@ -348,6 +448,7 @@ void TIACore::TIAWrite0x06(uint8_t value)
 void TIACore::TIAWrite0x07(uint8_t value)
 {
 	m_Player1->SetColor(value);
+	m_Playfield->SetColourP1(value);
 	m_Missile1->SetColor(value);
 }
 
@@ -371,61 +472,61 @@ void TIACore::TIAWrite0x0A(uint8_t value)
 				 (value & 0x02) ? Priority::score : Priority::normal;
 
 	m_Playfield->SetCTRL(value & 0x07);
-	m_Ball->SetSize(value & 0x60);
+	m_Ball->SetSize(value & 0x30);
 }
 
 /* Refp0 */
 void TIACore::TIAWrite0x0B(uint8_t value)
 {
-	m_Player0->SetReflected(value & 0x08);
+	m_DelayQueue.push(0x0B, value, Delay::refp);
 }
 
 /* Refp1 */
 void TIACore::TIAWrite0x0C(uint8_t value)
 {
-	m_Player1->SetReflected(value & 0x08);
+	m_DelayQueue.push(0x0C, value, Delay::refp);
 }
 
 /* PF0 */
 void TIACore::TIAWrite0x0D(uint8_t value)
 {
-	m_Playfield->SetPF0(value);
+	m_DelayQueue.push(0x0D, value, Delay::pf);
 }
 
 /* PF1 */
 void TIACore::TIAWrite0x0E(uint8_t value)
 {
-	m_Playfield->SetPF1(value);
+	m_DelayQueue.push(0x0E, value, Delay::pf);
 }
 
 /* PF2 */
 void TIACore::TIAWrite0x0F(uint8_t value)
 {
-	m_Playfield->SetPF2(value);
+	m_DelayQueue.push(0x0F, value, Delay::pf);
 }
 
 /* Resp0 */
 void TIACore::TIAWrite0x10(uint8_t value)
 {
-	m_Player0->ResetPos(value);
+	m_Player0->ResetPos(resxCounter());
 }
 
 /* Resp1 */
 void TIACore::TIAWrite0x11(uint8_t value)
 {
-	m_Player1->ResetPos(value);
+	m_Player1->ResetPos(resxCounter());
 }
 
 /* Resm0 */
 void TIACore::TIAWrite0x12(uint8_t value)
 {
-	m_Missile0->ResetPos(value & 0x02u);
+	m_Missile0->ResetPos(value & 0x02u, m_Hblank);
 }
 
 /* Resm1 */
 void TIACore::TIAWrite0x13(uint8_t value)
 {
-	m_Missile1->ResetPos(value & 0x02u);
+	m_Missile1->ResetPos(value & 0x02u, m_Hblank);
 }
 
 /* Resbl */
@@ -473,61 +574,64 @@ void TIACore::TIAWrite0x1A(uint8_t value)
 /* Grp0 */
 void TIACore::TIAWrite0x1B(uint8_t value)
 {
-	m_Player0->SetGraphics(value);
+	m_DelayQueue.push(0x1B, value, Delay::grp);
+	m_DelayQueue.push(0xF1, 0, Delay::shufflePlayer);
 }
 
 /* Grp1 */
 void TIACore::TIAWrite0x1C(uint8_t value)
 {
-	m_Player1->SetGraphics(value);
+	m_DelayQueue.push(0x1C, value, Delay::grp);
+	m_DelayQueue.push(0xF0, 0, Delay::shufflePlayer);
+	m_DelayQueue.push(0xF2, 0, Delay::shuffleBall);
 }
 
 /* Enam0 */
 void TIACore::TIAWrite0x1D(uint8_t value)
 {
-	m_Missile0->SetEnable(value & 0x02u);
+	m_DelayQueue.push(0x1D, value & 0x02u, Delay::enam);
 }
 
 /* Enam1 */
 void TIACore::TIAWrite0x1E(uint8_t value)
 {
-	m_Missile1->SetEnable(value & 0x02u);
+	m_DelayQueue.push(0x1E, value & 0x02u, Delay::enam);
 }
 
 /* Enabl */
 void TIACore::TIAWrite0x1F(uint8_t value)
 {
-	m_Ball->SetEnable(value & 0x02u);
+	m_DelayQueue.push(0x1F, value, Delay::enabl);
 }
 
 /* Hmp0 */
 void TIACore::TIAWrite0x20(uint8_t value)
 {
-	m_Player0->SetHMx(value);
+	m_DelayQueue.push(0x20, value, Delay::hmp);
 }
 
 /* Hmp1 */
 void TIACore::TIAWrite0x21(uint8_t value)
 {
-	m_Player1->SetHMx(value);
+	m_DelayQueue.push(0x21, value, Delay::hmp);
 }
 
 /* Hmm0 */
 void TIACore::TIAWrite0x22(uint8_t value)
 {
-	m_Missile0->SetHMove(value);
+	m_DelayQueue.push(0x22, value, Delay::hmm);
 }
 
 /* Hmm1 */
 void TIACore::TIAWrite0x23(uint8_t value)
 {
-	m_Missile1->SetHMove(value);
+	m_DelayQueue.push(0x23, value, Delay::hmm);
 }
 
 /* Hmbl */
 void TIACore::TIAWrite0x24(uint8_t value)
 {
-	m_Ball->SetHMove(value);
+	m_DelayQueue.push(0x24, value, Delay::hmbl);
 }
 
 /* Vdelp0 */
@@ -551,33 +655,25 @@ void TIACore::TIAWrite0x27(uint8_t value)
 /* Resmp0 */
 void TIACore::TIAWrite0x28(uint8_t value)
 {
-	m_Missile0->SetPos(m_Player0->GetPos());
+	m_Missile0->ResetPosPlayer(value, m_Player0->GetPos());
 }
 
 /* Resmp1 */
 void TIACore::TIAWrite0x29(uint8_t value)
 {
-	m_Missile1->SetPos(m_Player1->GetPos());
+	m_Missile0->ResetPosPlayer(value, m_Player0->GetPos());
 }
 
 /* Hmove */
 void TIACore::TIAWrite0x2A(uint8_t value)
 {
-	m_Missile0->ApplyHMove();
-	m_Missile1->ApplyHMove();
-	m_Player0->SetHmove();
-	m_Player1->SetHmove();
-	m_Ball->ApplyHMove();
+	m_DelayQueue.push(0x2A, value, Delay::hmove);
 }
 
 /* Hmclr */
 void TIACore::TIAWrite0x2B(uint8_t value)
 {
-	m_Missile0->SetHMove(0x00);
-	m_Missile1->SetHMove(0x00);
-	m_Player0->SetHMx(0x00);
-	m_Player1->SetHMx(0x00);
-	m_Ball->SetHMove(0x00);
+	m_DelayQueue.push(0x2B, value, Delay::hmclr);
 }
 
 /* Cxclr */

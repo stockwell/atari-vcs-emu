@@ -7,6 +7,7 @@
 
 #include "Common.hpp"
 
+#include "DelayQueue.hpp"
 #include "TIAMissile.hpp"
 #include "TIAPlayer.hpp"
 #include "TIABall.hpp"
@@ -26,6 +27,8 @@ public:
 
 	void SetTrigger(uint8_t port, bool state);
 
+	void ScheduleCollisionUpdate();
+
 private:
 	void PopulateJumpTable();
 	void TIAClearCollisions();
@@ -33,10 +36,14 @@ private:
 	void RenderPixel(uint32_t x, uint32_t y, std::vector<uint8_t>& framebuffer);
 
 	void NextLine();
+	void UpdateCollision();
 	void TickMovement();
 	void TickHblank();
 	void TickHframe(std::vector<uint8_t>& framebuffer);
 	void ApplyRsync() { };
+	void DelayedWrite(uint8_t address, uint8_t value);
+
+	uint8_t resxCounter();
 
 private:
 	enum class HState
@@ -62,22 +69,28 @@ private:
 	bool m_ExtendedHblank = false;
 
 	bool m_MovementInProgress = false;
+	bool m_CollisionUpdateRequired = false;
+	bool m_CollisionUpdateScheduled = false;
 
 	uint8_t m_Hctr = 0;
 	int32_t m_HctrDelta = 0;
 
 	uint16_t m_Vctr = 0;
-	uint16_t m_Clock = 0;
-	uint16_t m_PixelIndex = 0;
 
 	uint32_t m_MovementClock = 0;
+
+	uint32_t m_CollisionMask = 0;
 
 	HState m_HState = HState::blank;
 	Priority m_Priority = Priority::normal;
 
+	static constexpr unsigned delayQueueLength = 16;
+	static constexpr unsigned delayQueueSize = 16;
+	DelayQueue<delayQueueLength, delayQueueSize> m_DelayQueue;
+
 	std::unique_ptr<TIABase> m_Background 		= nullptr;
-	std::shared_ptr<TIAPlayer> m_Player0 		= nullptr;
-	std::shared_ptr<TIAPlayer> m_Player1 		= nullptr;
+	std::unique_ptr<TIAPlayer> m_Player0 		= nullptr;
+	std::unique_ptr<TIAPlayer> m_Player1 		= nullptr;
 	std::unique_ptr<TIAMissile> m_Missile0 		= nullptr;
 	std::unique_ptr<TIAMissile> m_Missile1 		= nullptr;
 	std::unique_ptr<TIABall> m_Ball 			= nullptr;
@@ -150,7 +163,34 @@ namespace TIAConstants
 	static constexpr uint16_t CYCLE_CLOCKS = 3;
 	static constexpr uint16_t H_CLOCKS = H_CYCLES * CYCLE_CLOCKS;   // = 228
 	static constexpr uint16_t H_BLANK_CLOCKS = H_CLOCKS - H_PIXEL;  // = 68
+	static constexpr uint16_t V_BLANK_CLOCKS = 40;
 }
+
+static constexpr uint8_t resxLateHblankThreshold = TIAConstants::H_CYCLES - 3;
+
+enum Delay: uint8_t
+{
+	hmove = 6,
+	pf = 2,
+	grp = 1,
+	shufflePlayer = 1,
+	shuffleBall = 1,
+	hmp = 2,
+	hmm = 2,
+	hmbl = 2,
+	hmclr = 2,
+	refp = 1,
+	enabl = 1,
+	enam = 1,
+	vblank = 1,
+};
+
+enum ResxCounter: uint8_t
+{
+	hblank = 159,
+	lateHblank = 158,
+	frame = 157
+};
 
 static const char *kTIAReadRegisterNames[0x0E] = {
 	"Cxm0p",    /* Read Collision M0-P1   M0-P0 */

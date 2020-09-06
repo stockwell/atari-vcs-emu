@@ -4,26 +4,26 @@
 
 #include "TIABase.hpp"
 
+class TIACore;
+
 class TIAPlayer : public TIABase
 {
 public:
-	TIAPlayer();
+	explicit TIAPlayer(TIACore* pTIA);
 
-	uint16_t GetPos() const { return 0; }
-
+	uint8_t GetPos();
 	void ResetPos(uint8_t value);
 
 	void SetSize(uint8_t value, bool hblank);
 	void SetGraphics(uint8_t value);
 	void SetReflected(bool value);
 	void SetVdelay(uint8_t value);
-
 	void SetDivider(uint8_t divider);
+	void ShufflePatterns();
 
 	// TIABase
-	void Tick(uint32_t x = 0, uint32_t hcount = 0) override;
+	void Tick(uint32_t x, uint32_t hcount) override;
 	void MovementTick(uint8_t clock, uint8_t hclock, bool hblank) override;
-	void SetEnable(bool enabled) override;
 	void NextLine() override;
 
 private:
@@ -36,7 +36,6 @@ private:
 	bool m_isSuppressed = false;
 	bool m_isDelaying = false;
 
-	int8_t m_HMove = 0;
 	uint8_t m_DecodesOffset = 0;
 
 	uint8_t m_Pattern = 0;
@@ -50,4 +49,6 @@ private:
 	int8_t m_RenderCounterTripPoint = 0;
 
 	const uint8_t* m_Decodes = nullptr;
+
+	TIACore* m_TIA = nullptr;
 };

@@ -2,31 +2,37 @@
 
 #include "TIABase.hpp"
 
+class TIACore;
+
 class TIABall : public TIABase
 {
 public:
-	void SetVdelay(uint8_t value) { m_Vdelay = value; }
-	void SetSize(uint8_t value) { m_Size = 1 << (value >> 4); }
-	void SetHMove(int8_t value) { m_HMove = value >> 4; }
-	void ApplyHMove() { m_Position -= m_HMove; }
-	void ResetPos(uint8_t value) { m_Position = 0; };
-	void UpdatePixel(uint16_t currentPos, uint8_t *pixel)
-	{
-		if (m_Position == 0)
-			m_Position = currentPos + 12;
-		if (currentPos < m_Position || currentPos >= (m_Position + m_Size))
-			return;
-		if (m_Vdelay)
-			return;
-		if (m_Enabled)
-			*pixel = m_Colour;
-	}
+	explicit TIABall(TIACore* pTIA);
+
+	void ShuffleStatus();
+	void SetVdelay(uint8_t value);
+	void SetSize(uint8_t value);
+	void ResetPos(uint8_t value);
+	void UpdateEnabled();
+
+	// TIABase
+	void Tick(uint32_t x, uint32_t hcount) override;
+	void MovementTick(uint8_t clock, uint8_t hclock, bool hblank) override;
+	void NextLine() override;
+	void SetEnable(bool enabled) override;
 
 private:
-	bool m_Enabled = false;
-	bool m_Vdelay = false;
-	int8_t m_HMove;
-	uint8_t m_Size;
-	uint8_t m_Colour;
-	uint16_t m_Position;
+	static constexpr int kRenderCounterOffset = -4;
+
+	bool m_isEnabledOld = false;
+	bool m_isEnabledNew = false;
+	bool m_isDelaying = false;
+	bool m_SignalActive = false;
+	bool m_isReceivingRegularClock = false;
+
+	uint8_t m_EffectiveWidth = 1;
+	uint8_t m_Width = 1;
+	uint8_t m_LastMovementTick = 0;
+
+	TIACore* m_TIA = nullptr;
 };
