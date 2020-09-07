@@ -18,9 +18,11 @@
 #include "TIABall.hpp"
 #include "TIACore.hpp"
 
-TIABall::TIABall(TIACore* pTIA)
+TIABall::TIABall(TIACore* pTIA, uint32_t collisionMask)
 : m_TIA(pTIA)
 {
+	m_CollisionMaskDisabled = collisionMask;
+	m_Collision = collisionMask;
 }
 
 void TIABall::SetEnable(bool enabled)
@@ -30,14 +32,12 @@ void TIABall::SetEnable(bool enabled)
 	m_isEnabledNew = enabled;
 
 	if (m_isEnabledNew != enabledNewOldValue && ! m_isDelaying)
-	{
 		UpdateEnabled();
-	}
 }
 
 void TIABall::ResetPos(uint8_t value)
 {
-	m_Counter = value & 0x02u;
+	m_Counter = value;
 
 	m_isRendering = true;
 	m_RenderCounter = kRenderCounterOffset + (value - 157);
@@ -58,7 +58,7 @@ void TIABall::UpdateEnabled()
 {
 	m_Enabled = m_isDelaying ? m_isEnabledOld : m_isEnabledNew;
 
-	m_Collision = (m_SignalActive && m_Enabled) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+	m_Collision = (m_SignalActive && m_Enabled) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 	m_TIA->ScheduleCollisionUpdate();
 }
 
@@ -66,7 +66,7 @@ void TIABall::SetSize(uint8_t value)
 {
 	static constexpr std::array<uint8_t, 4> ourWidths = { 1, 2, 4, 8 };
 
-	const uint8_t newWidth = ourWidths[value >> 4u];
+	const uint8_t newWidth = ourWidths[(value & 0x30) >> 4];
 
 	if (newWidth != m_Width)
 		m_Width = newWidth;
@@ -80,7 +80,6 @@ void TIABall::SetVdelay(uint8_t value)
 
 	if (oldIsDelaying != m_isDelaying)
 		UpdateEnabled();
-
 }
 
 void TIABall::NextLine()
@@ -89,10 +88,10 @@ void TIABall::NextLine()
 	// hblank. Usually, this will be taken care off in the next tick, but there is no
 	// next tick before hblank ends.
 	m_SignalActive = m_isRendering && m_RenderCounter >= 0;
-	m_Collision = (m_SignalActive && m_Enabled) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+	m_Collision = (m_SignalActive && m_Enabled) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 }
 
-void TIABall::MovementTick(uint8_t clock, uint8_t hclock, bool hblank)
+void TIABall::MovementTick(uint32_t clock, uint8_t hclock, bool hblank)
 {
 	m_LastMovementTick = m_Counter;
 
@@ -106,24 +105,32 @@ void TIABall::MovementTick(uint8_t clock, uint8_t hclock, bool hblank)
 		// by an ordinary tick or merges two consecutive ticks into a single tick (inverted
 		// movement clock phase mode).
 		if (hblank)
-			Tick(clock, hclock);
+			Tick(false);
 
 		// Track a tick outside hblank for later processing
 		m_InvertedPhaseClock = ! hblank;
 	}
 }
 
-void TIABall::Tick(uint32_t x, uint32_t hcount)
+void TIABall::Tick(bool isReceivingRegularClock)
 {
+	// If we are in inverted movement clock phase mode and a movement tick occurred, it
+	// will supress the tick.
+	if(m_UseInvertedPhaseClock && m_InvertedPhaseClock)
+	{
+		m_InvertedPhaseClock = false;
+		return;
+	}
+
 	// Turn on the signal if the render counter reaches the threshold
 	m_SignalActive = m_isRendering && m_RenderCounter >= 0;
 
 	// Consider enabled status and the signal to determine visibility (as represented
 	// by the collision mask)
-	m_Collision = (m_SignalActive && m_Enabled) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+	m_Collision = (m_SignalActive && m_Enabled) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 
 	// Regular clock pulse during movement -> starfield mode
-	bool starfieldEffect = m_isMoving && m_isReceivingRegularClock;
+	bool starfieldEffect = m_isMoving && isReceivingRegularClock;
 
 	// Decode value that triggers rendering
 	if (m_Counter == 156)
@@ -133,20 +140,21 @@ void TIABall::Tick(uint32_t x, uint32_t hcount)
 
 		// What follows is an effective description of ball width in starfield mode.
 		uint8_t starfieldDelta = (m_Counter + TIAConstants::H_PIXEL - m_LastMovementTick) % 4;
-		if (starfieldEffect && starfieldDelta == 3 && m_Width < 4) ++m_RenderCounter;
+		if (starfieldEffect && starfieldDelta == 3 && m_Width < 4)
+			++m_RenderCounter;
 
 		switch (starfieldDelta) {
-		case 3:
-			m_EffectiveWidth = m_Width == 1 ? 2 : m_Width;
-			break;
+			case 3:
+				m_EffectiveWidth = m_Width == 1 ? 2 : m_Width;
+				break;
 
-		case 2:
-			m_EffectiveWidth = 0;
-			break;
+			case 2:
+				m_EffectiveWidth = 0;
+				break;
 
-		default:
-			m_EffectiveWidth = m_Width;
-			break;
+			default:
+				m_EffectiveWidth = m_Width;
+				break;
 		}
 
 	} else if (m_isRendering && ++m_RenderCounter >= (starfieldEffect ? m_EffectiveWidth : m_Width))

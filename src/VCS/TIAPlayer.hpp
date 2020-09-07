@@ -9,7 +9,7 @@ class TIACore;
 class TIAPlayer : public TIABase
 {
 public:
-	explicit TIAPlayer(TIACore* pTIA);
+	explicit TIAPlayer(TIACore* pTIA, uint32_t collisionMask);
 
 	uint8_t GetPos();
 	void ResetPos(uint8_t value);
@@ -23,14 +23,14 @@ public:
 
 	// TIABase
 	void Tick(uint32_t x, uint32_t hcount) override;
-	void MovementTick(uint8_t clock, uint8_t hclock, bool hblank) override;
+	void MovementTick(uint32_t clock, uint8_t hclock, bool hblank) override;
 	void NextLine() override;
 
 private:
 	void UpdatePattern();
 
 private:
-	static constexpr int kRenderCounterOffset = -5;
+	static constexpr int8_t kRenderCounterOffset = -5;
 
 	bool m_Reflected = false;
 	bool m_isSuppressed = false;

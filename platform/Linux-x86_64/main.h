@@ -59,7 +59,7 @@ private:
 };
 
 #define ATARI_2600_FB_W 160
-#define ATARI_2600_FB_H 192
+#define ATARI_2600_FB_H 200
 
 #define EMU_WINDOW_W  900
 #define EMU_WINDOW_H  600

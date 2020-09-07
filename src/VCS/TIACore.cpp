@@ -9,12 +9,12 @@ TIACore::TIACore(std::shared_ptr<MOS6502Core> Processor)
 , m_pProcessor(std::move(Processor))
 {
 	m_Background = std::make_unique<TIABase>();
-	m_Player0 = std::make_unique<TIAPlayer>(this);
-	m_Player1 = std::make_unique<TIAPlayer>(this);
-	m_Missile0 = std::make_unique<TIAMissile>(this);
-	m_Missile1 = std::make_unique<TIAMissile>(this);
-	m_Ball = std::make_unique<TIABall>(this);
-	m_Playfield = std::make_unique<TIAPlayfield>();
+	m_Player0 = std::make_unique<TIAPlayer>(this, ~CollisionMask::player0 & 0x7FFF);
+	m_Player1 = std::make_unique<TIAPlayer>(this, ~CollisionMask::player1 & 0x7FFF);
+	m_Missile0 = std::make_unique<TIAMissile>(this, ~CollisionMask::missile0 & 0x7FFF);
+	m_Missile1 = std::make_unique<TIAMissile>(this, ~CollisionMask::missile1 & 0x7FFF);
+	m_Ball = std::make_unique<TIABall>(this, ~CollisionMask::ball & 0x7FFF);
+	m_Playfield = std::make_unique<TIAPlayfield>(~CollisionMask::playfield & 0x7FFF);
 
 	m_TIAObjects.emplace_back(m_Background.get());
 	m_TIAObjects.emplace_back(m_Player0.get());
@@ -221,10 +221,12 @@ void TIACore::TickMovement()
 		for (const auto& obj : m_TIAObjects)
 			obj->MovementTick(movementCounter, m_Hctr, hblank);
 
-		m_MovementInProgress = std::any_of(m_TIAObjects.begin(), m_TIAObjects.end(),
-			[] (TIABase* obj) {
-				return obj->IsMoving();
-			});
+		m_MovementInProgress =
+			m_Missile0->IsMoving() ||
+			m_Missile1->IsMoving() ||
+			m_Player0->IsMoving()  ||
+			m_Player1->IsMoving()  ||
+			m_Ball->IsMoving();
 
 		m_CollisionUpdateRequired = m_CollisionUpdateRequired || m_MovementInProgress;
 
@@ -260,9 +262,6 @@ void TIACore::TickHframe(std::vector<uint8_t>& framebuffer)
 	const uint32_t y = m_Vctr;
 	const uint32_t x = m_Hctr - TIAConstants::H_BLANK_CLOCKS - m_HctrDelta;
 
-	if (m_Vctr < TIAConstants::V_BLANK_CLOCKS)
-		return;
-
 	m_CollisionUpdateRequired = true;
 
 	for (const auto& obj : m_TIAObjects)
@@ -284,10 +283,8 @@ void TIACore::DelayedWrite(uint8_t address, uint8_t value)
 			m_MovementClock = 0;
 			m_MovementInProgress = true;
 
-			if (! m_ExtendedHblank) {
-				//clearHmoveComb();
+			if (! m_ExtendedHblank)
 				m_ExtendedHblank = true;
-			}
 
 			for (const auto& obj : m_TIAObjects)
 				obj->SetHmove();
@@ -387,7 +384,6 @@ void TIACore::DelayedWrite(uint8_t address, uint8_t value)
 
 void TIACore::ApplyRsync()
 {
-
 	m_HctrDelta = TIAConstants::H_CLOCKS - 3 - m_Hctr;
 	m_Hctr = TIAConstants::H_CLOCKS - 3;
 }
@@ -398,65 +394,75 @@ uint8_t TIACore::resxCounter()
 		   (m_Hctr >= resxLateHblankThreshold ? ResxCounter::lateHblank : ResxCounter::hblank) : ResxCounter::frame;
 }
 
+/* Cxm0p */
 uint8_t TIACore::TIARead0x00()
 {
 	return (
 		((m_CollisionMask & CollisionMask::missile0 & CollisionMask::player0) ? 0x40 : 0) |
 		((m_CollisionMask & CollisionMask::missile0 & CollisionMask::player1) ? 0x80 : 0)
-	);
+	) & 0b11000000;
 }
 
+/* Cxm1p */
 uint8_t TIACore::TIARead0x01()
 {
 	return (
 		((m_CollisionMask & CollisionMask::missile1 & CollisionMask::player1) ? 0x40 : 0) |
 		((m_CollisionMask & CollisionMask::missile1 & CollisionMask::player0) ? 0x80 : 0)
-	);
+	) & 0b11000000;
 }
 
+/* Cxp0fb */
 uint8_t TIACore::TIARead0x02()
 {
 	return (
 		((m_CollisionMask & CollisionMask::player0 & CollisionMask::ball) ? 0x40 : 0) |
 		((m_CollisionMask & CollisionMask::player0 & CollisionMask::playfield) ? 0x80 : 0)
-	);
+	) & 0b11000000;
 }
 
+/* Cxp1fb */
 uint8_t TIACore::TIARead0x03()
 {
 	return (
 		((m_CollisionMask & CollisionMask::player1 & CollisionMask::ball) ? 0x40 : 0) |
 		((m_CollisionMask & CollisionMask::player1 & CollisionMask::playfield) ? 0x80 : 0)
-	);
+	) & 0b11000000;
 }
 
+/* Cxm0fb */
 uint8_t TIACore::TIARead0x04()
 {
 	return (
 		((m_CollisionMask & CollisionMask::missile0 & CollisionMask::ball) ? 0x40 : 0) |
 		((m_CollisionMask & CollisionMask::missile0 & CollisionMask::playfield) ? 0x80 : 0)
-	);
+	) & 0b11000000;
 }
 
+/* Cxm1fb */
 uint8_t TIACore::TIARead0x05()
 {
 	return (
 		((m_CollisionMask & CollisionMask::missile1 & CollisionMask::ball) ? 0x40 : 0) |
 		((m_CollisionMask & CollisionMask::missile1 & CollisionMask::playfield) ? 0x80 : 0)
-	);
+	) & 0b11000000;
 }
 
+/* Cxblpf */
 uint8_t TIACore::TIARead0x06()
+{
+	return (
+		(m_CollisionMask & CollisionMask::ball & CollisionMask::playfield) ? 0x80 : 0
+	) & 0b10000000;
+}
+
+/* Cxppmm */
+uint8_t TIACore::TIARead0x07()
 {
 	return (
 		((m_CollisionMask & CollisionMask::missile0 & CollisionMask::missile1) ? 0x40 : 0) |
 		((m_CollisionMask & CollisionMask::player0 & CollisionMask::player1) ? 0x80 : 0)
-	);
-}
-
-uint8_t TIACore::TIARead0x07()
-{
-	return (m_CollisionMask & CollisionMask::ball & CollisionMask::playfield) ? 0x80 : 0;
+	) & 0b11000000;
 }
 
 /* Vertical Sync Set-Clear              */
@@ -536,7 +542,7 @@ void TIACore::TIAWrite0x0A(uint8_t value)
 				 (value & 0x02) ? Priority::score : Priority::normal;
 
 	m_Playfield->SetCTRL(value & 0x07);
-	m_Ball->SetSize(value & 0x30);
+	m_Ball->SetSize(value);
 }
 
 /* Refp0 */

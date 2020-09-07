@@ -42,15 +42,15 @@ public:
 	}
 
 	virtual void Tick(uint32_t x, uint32_t hcount) {};
-	virtual void MovementTick(uint8_t clock, uint8_t hclock, bool hblank) {};
+	virtual void MovementTick(uint32_t clock, uint8_t hclock, bool hblank) {};
 	virtual void NextLine() {};
 
 public:
 	uint32_t m_Collision = 0;
 
 protected:
-	static constexpr uint32_t kCollisionMaskDisabled = 0;
 	static constexpr uint32_t kCollisionMaskEnabled = 0xFFFF;
+	uint32_t m_CollisionMaskDisabled = 0;
 
 	uint8_t m_Colour = 0;
 	uint8_t m_Counter = 0;
@@ -61,4 +61,5 @@ protected:
 	bool m_isRendering = false;
 	bool m_isMoving = false;
 	bool m_InvertedPhaseClock = false;
+	bool m_UseInvertedPhaseClock = false;
 };

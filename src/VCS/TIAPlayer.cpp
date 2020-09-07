@@ -21,11 +21,14 @@
 
 #include "DrawCounterDecodes.hpp"
 
-TIAPlayer::TIAPlayer(TIACore* pTIA)
+TIAPlayer::TIAPlayer(TIACore* pTIA, uint32_t collisionMask)
 : m_Decodes(DrawCounterDecodes::get().playerDecodes()[m_DecodesOffset])
 , m_TIA(pTIA)
 {
 	SetDivider(1);
+
+	m_CollisionMaskDisabled = collisionMask;
+	m_Collision = collisionMask;
 }
 
 uint8_t TIAPlayer::GetPos()
@@ -48,7 +51,7 @@ uint8_t TIAPlayer::GetPos()
 
 void TIAPlayer::ResetPos(uint8_t value)
 {
-	m_Counter = value & 0x02u;
+	m_Counter = value;
 
 	// This tries to account for the effects of RESP during draw counter decode as
 	// described in Andrew Towers' notes. Still room for tuning.'
@@ -171,18 +174,18 @@ void TIAPlayer::UpdatePattern()
 	{
 		m_Pattern = (
 			((m_Pattern & 0x01) << 7) |
-				((m_Pattern & 0x02) << 5) |
-				((m_Pattern & 0x04) << 3) |
-				((m_Pattern & 0x08) << 1) |
-				((m_Pattern & 0x10) >> 1) |
-				((m_Pattern & 0x20) >> 3) |
-				((m_Pattern & 0x40) >> 5) |
-				((m_Pattern & 0x80) >> 7)
+			((m_Pattern & 0x02) << 5) |
+			((m_Pattern & 0x04) << 3) |
+			((m_Pattern & 0x08) << 1) |
+			((m_Pattern & 0x10) >> 1) |
+			((m_Pattern & 0x20) >> 3) |
+			((m_Pattern & 0x40) >> 5) |
+			((m_Pattern & 0x80) >> 7)
 		);
 	}
 
 	if (m_isRendering && m_RenderCounter >= m_RenderCounterTripPoint) {
-		m_Collision = (m_Pattern & (1 << m_SampleCounter)) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+		m_Collision = (m_Pattern & (1 << m_SampleCounter)) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 		m_TIA->ScheduleCollisionUpdate();
 	}
 }
@@ -190,9 +193,9 @@ void TIAPlayer::UpdatePattern()
 void TIAPlayer::NextLine()
 {
 	if (! m_isRendering || m_RenderCounter < m_RenderCounterTripPoint)
-		m_Collision = kCollisionMaskDisabled;
+		m_Collision = m_CollisionMaskDisabled;
 	else
-		m_Collision = (m_Pattern & (1 << m_SampleCounter)) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+		m_Collision = (m_Pattern & (1 << m_SampleCounter)) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 }
 
 void TIAPlayer::SetGraphics(uint8_t value)
@@ -227,11 +230,16 @@ void TIAPlayer::SetVdelay(uint8_t value)
 
 void TIAPlayer::Tick(uint32_t x, uint32_t hcount)
 {
+	if(m_UseInvertedPhaseClock && m_InvertedPhaseClock)
+	{
+		m_InvertedPhaseClock = false;
+		return;
+	}
 
 	if (! m_isRendering || m_RenderCounter < m_RenderCounterTripPoint)
-		m_Collision = kCollisionMaskDisabled;
+		m_Collision = m_CollisionMaskDisabled;
 	else
-		m_Collision = (m_Pattern & (1 << m_SampleCounter)) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+		m_Collision = (m_Pattern & (1 << m_SampleCounter)) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 
 	if (m_Decodes[m_Counter])
 	{
@@ -272,7 +280,7 @@ void TIAPlayer::Tick(uint32_t x, uint32_t hcount)
 		m_Counter = 0;
 }
 
-void TIAPlayer::MovementTick(uint8_t clock, uint8_t hclock, bool hblank)
+void TIAPlayer::MovementTick(uint32_t clock, uint8_t hclock, bool hblank)
 {
 	if (clock == m_HmxClocks)
 		m_isMoving = false;

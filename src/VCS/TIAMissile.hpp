@@ -7,7 +7,7 @@ class TIACore;
 class TIAMissile : public TIABase
 {
 public:
-	explicit TIAMissile(TIACore* pTIA);
+	explicit TIAMissile(TIACore* pTIA, uint32_t collisionMask);
 
 	void SetSize(uint8_t value);
 	void ResetPos(uint8_t value, bool hblank);
@@ -16,7 +16,7 @@ public:
 
 	// TIABase
 	void Tick(uint32_t x, uint32_t hcount) override { TIAMissile::Tick(hcount); }
-	void MovementTick(uint8_t clock, uint8_t hclock, bool hblank) override;
+	void MovementTick(uint32_t clock, uint8_t hclock, bool hblank) override;
 	void NextLine() override;
 	void SetEnable(bool enabled) override;
 

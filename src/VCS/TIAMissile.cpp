@@ -21,10 +21,12 @@
 
 #include "DrawCounterDecodes.hpp"
 
-TIAMissile::TIAMissile(TIACore* pTIA)
+TIAMissile::TIAMissile(TIACore* pTIA, uint32_t collisionMask)
 : m_Decodes(DrawCounterDecodes::get().missileDecodes()[m_DecodesOffset])
 , m_TIA(pTIA)
 {
+	m_CollisionMaskDisabled = collisionMask;
+	m_Collision = collisionMask;
 }
 
 void TIAMissile::SetSize(uint8_t value)
@@ -41,7 +43,7 @@ void TIAMissile::SetSize(uint8_t value)
 
 void TIAMissile::ResetPos(uint8_t value, bool hblank)
 {
-	m_Counter = value & 0x02u;
+	m_Counter = value;
 
 	if (m_isRendering)
 	{
@@ -81,7 +83,7 @@ void TIAMissile::ResetPos(uint8_t value, bool hblank)
 
 void TIAMissile::ResetPosPlayer(uint8_t value, uint8_t pos)
 {
-	const uint8_t resmp = value & 0x02u;
+	const uint8_t resmp = value;
 
 	if (resmp == m_Resmp)
 		return;
@@ -94,7 +96,7 @@ void TIAMissile::ResetPosPlayer(uint8_t value, uint8_t pos)
 	UpdateEnabled();
 }
 
-void TIAMissile::MovementTick(uint8_t clock, uint8_t hclock, bool hblank)
+void TIAMissile::MovementTick(uint32_t clock, uint8_t hclock, bool hblank)
 {
 	if(clock == m_HmxClocks)
 		m_isMoving = false;
@@ -114,7 +116,7 @@ void TIAMissile::Tick(uint8_t hcount, bool isReceivingMclock)
 		m_isRendering &&
 			(m_RenderCounter >= 0 || (m_isMoving && isReceivingMclock && m_RenderCounter == -1 && m_Width < 4 && ((hcount + 1) % 4 == 3)));
 
-	m_Collision = (m_isVisible && m_Enabled) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+	m_Collision = (m_isVisible && m_Enabled) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 
 	if (m_Decodes[m_Counter] && ! m_Resmp)
 	{
@@ -162,7 +164,7 @@ void TIAMissile::Tick(uint8_t hcount, bool isReceivingMclock)
 void TIAMissile::NextLine()
 {
 	m_isVisible = m_isRendering && (m_RenderCounter >= 0);
-	m_Collision = (m_isVisible && m_Enabled) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+	m_Collision = (m_isVisible && m_Enabled) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 }
 
 void TIAMissile::SetEnable(bool enabled)
@@ -179,6 +181,6 @@ void TIAMissile::UpdateEnabled()
 {
 	m_Enabled = m_Enam && ! m_Resmp;
 
-	m_Collision = (m_isVisible && m_Enabled) ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+	m_Collision = (m_isVisible && m_Enabled) ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 	m_TIA->ScheduleCollisionUpdate();
 }

@@ -202,7 +202,8 @@ enum ResxCounter: uint8_t
 	frame = 157
 };
 
-enum CollisionMask: uint32_t {
+enum CollisionMask: uint32_t
+{
 	player0   = 0b0111110000000000,
 	player1   = 0b0100001111000000,
 	missile0  = 0b0010001000111000,
@@ -213,7 +214,7 @@ enum CollisionMask: uint32_t {
 
 static const char *kTIAReadRegisterNames[0x0E] = {
 	"Cxm0p",    /* Read Collision M0-P1   M0-P0 */
-	"Cxm0p",    /*                M1-P0   M1-P1 */
+	"Cxm1p",    /*                M1-P0   M1-P1 */
 	"Cxp0fb",   /*                P0-PF   P0-BL */
 	"Cxp1fb",   /*                P1-PF   P1-BL */
 	"Cxm0fb",   /*                M0-PF   M0-BL */

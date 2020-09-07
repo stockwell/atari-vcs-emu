@@ -5,6 +5,8 @@
 class TIAPlayfield : public TIABase
 {
 public:
+	TIAPlayfield(uint32_t collisionMask);
+
 	void SetPF0(uint8_t val);
 	void SetPF1(uint8_t val);
 	void SetPF2(uint8_t val);
@@ -28,11 +30,11 @@ private:
 		score,
 	};
 
+	ColourMode m_ColourMode = ColourMode::normal;
+
 	uint8_t m_PF0 = 0;
 	uint8_t m_PF1 = 0;
 	uint8_t m_PF2 = 0;
-
-	ColourMode m_ColourMode = ColourMode::normal;
 
 	uint8_t m_ColourP0 = 0;
 	uint8_t m_ColourP1 = 0;

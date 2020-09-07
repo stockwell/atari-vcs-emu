@@ -19,6 +19,12 @@
 #include "TIAPlayfield.hpp"
 #include "TIACore.hpp"
 
+TIAPlayfield::TIAPlayfield(uint32_t collisionMask)
+{
+	m_CollisionMaskDisabled = collisionMask;
+	m_Collision = collisionMask;
+}
+
 void TIAPlayfield::Tick(uint32_t x, uint32_t hcount)
 {
 	m_Xpos = x;
@@ -42,7 +48,7 @@ void TIAPlayfield::Tick(uint32_t x, uint32_t hcount)
 		currentPixel = m_EffectivePattern & (1 << ((x >> 2) - 20));
 	}
 
-	m_Collision = currentPixel ? kCollisionMaskEnabled : kCollisionMaskDisabled;
+	m_Collision = currentPixel ? kCollisionMaskEnabled : m_CollisionMaskDisabled;
 }
 
 void TIAPlayfield::SetPF0(uint8_t val)
