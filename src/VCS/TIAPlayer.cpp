@@ -62,7 +62,7 @@ void TIAPlayer::ResetPos(uint8_t value)
 
 void TIAPlayer::SetSize(uint8_t value, bool hblank)
 {
-	m_DecodesOffset = value;
+	m_DecodesOffset = value & 0x07;
 
 	switch (m_DecodesOffset)
 	{

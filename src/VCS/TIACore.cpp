@@ -493,15 +493,15 @@ void TIACore::TIAWrite0x03(uint8_t value)
 /* Nusiz0 */
 void TIACore::TIAWrite0x04(uint8_t value)
 {
-	m_Player0->SetSize(value & 0x07, m_HState == HState::blank);
-	m_Missile0->SetSize(value & 0x30);
+	m_Player0->SetSize(value, m_HState == HState::blank);
+	m_Missile0->SetSize(value);
 }
 
 /* Nusiz1 */
 void TIACore::TIAWrite0x05(uint8_t value)
 {
-	m_Player1->SetSize(value & 0x07, m_HState == HState::blank);
-	m_Missile1->SetSize(value & 0x30);
+	m_Player1->SetSize(value, m_HState == HState::blank);
+	m_Missile1->SetSize(value);
 }
 
 /* Colup0 */
