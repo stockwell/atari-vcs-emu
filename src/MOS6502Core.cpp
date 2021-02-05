@@ -12,11 +12,11 @@ MOS6502Core::MOS6502Core(std::shared_ptr<Memory> pMemory)
 void MOS6502Core::Reset()
 {
 	/* Load reset vector */
-	m_PC = (unsigned) m_pMemory->Read(RESET_VECTOR + 1) << 8u | m_pMemory->Read(RESET_VECTOR);
+	m_PC = (unsigned) m_pMemory->Read(vectorAddresses::reset + 1) << 8u | m_pMemory->Read(vectorAddresses::reset);
 	m_AC = 0x00;
 	m_XR = 0x00;
 	m_YR = 0x00;
-	m_SR = CONSTANT;
+	m_SR = statusRegs::constant;
 	m_SP = 0xFD;
 
 	m_Delay = 1;
@@ -35,13 +35,13 @@ uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode)
 	Log("Opcode: %s(0x%02X), PC 0x%04X", kOPCodeNames[opcode], opcode, m_PC);
 	Log("SR: 0x%02X  |  AC: 0x%02X  |  XR: 0x%02X | YR: 0x%02X | SP: 0x%02X [ %s%s%s%s%s%s%s]",
 		m_SR, m_AC, m_XR, m_YR, m_SP,
-		m_SR & CARRY ? "C " : "",
-		m_SR & ZERO ? "Z " : "",
-		m_SR & INTERRUPT ? "I " : "",
-		m_SR & DECIMAL ? "D " : "",
-		m_SR & BREAK ? "B " : "",
-		m_SR & OVERFLOW ? "O " : "",
-		m_SR & NEGATIVE ? "N " : "");
+		m_SR & statusRegs::constant ? "C " : "",
+		m_SR & statusRegs::zero ? "Z " : "",
+		m_SR & statusRegs::interrupt ? "I " : "",
+		m_SR & statusRegs::decimal ? "D " : "",
+		m_SR & statusRegs::brk ? "B " : "",
+		m_SR & statusRegs::overflow ? "O " : "",
+		m_SR & statusRegs::negative ? "N " : "");
 	(this->*m_OPCodes[opcode])();
 
 	return cycletime[opcode] + (m_CycleTime * 3);

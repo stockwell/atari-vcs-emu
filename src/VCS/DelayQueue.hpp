@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <array>
+
 #include "smartmod.hpp"
 #include "DelayQueueMember.hpp"
 

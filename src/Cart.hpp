@@ -1,5 +1,4 @@
-#ifndef ATARI_VCS_EMU_CART_H
-#define ATARI_VCS_EMU_CART_H
+#pragma once
 
 #include <list>
 #include <cstdint>
@@ -21,5 +20,3 @@ private:
   char m_szFilePath[512];
   char m_szFileName[512];
 };
-
-#endif //ATARI_VCS_EMU_CART_H

@@ -5,25 +5,6 @@
 #include "Common.hpp"
 #include "Memory.hpp"
 
-/* Bits in the status register */
-#define NEGATIVE  0x80u
-#define OVERFLOW  0x40u
-#define CONSTANT  0x20u
-#define BREAK     0x10u
-#define DECIMAL   0x08u
-#define INTERRUPT 0x04u
-#define ZERO      0x02u
-#define CARRY     0x01u
-
-/* Base memory address of the stack */
-#define STACK_BASE 0x100u
-
-/* Vectors */
-#define NMI_VECTOR    0xFFFA
-#define RESET_VECTOR  0xFFFC
-#define IRQ_VECTOR    0xFFFE
-#define BRK_VECTOR    0xFFFE
-
 class MOS6502Core
 {
 public:
@@ -45,12 +26,36 @@ public:
 	uint8_t m_SR;
 	uint8_t m_SP;
 
+public:
+	/* Base memory address of the stack */
+	static constexpr auto kStackBase = 0x100u;
+
+	/* Bits in the status register */
+	enum statusRegs : uint8_t
+	{
+		negative 	= 0x80u,
+		overflow 	= 0x40u,
+		constant 	= 0x20u,
+		brk 		= 0x10u,
+		decimal 	= 0x08u,
+		interrupt 	= 0x04u,
+		zero 		= 0x02u,
+		carry 		= 0x01u,
+	};
+
+	/* Vectors */
+	enum vectorAddresses : uint16_t
+	{
+		nmi = 0xFFFA,
+		reset = 0xFFFC,
+		irq_brq = 0xFFFE,
+	};
+
 private:
 	void (MOS6502Core::*m_OPCodes[0x100])();
 	bool m_Running = false;
 	std::shared_ptr<Memory> m_pMemory = nullptr;
 
-private:
 	uint8_t FetchOPCode();
 	uint8_t ExecuteOPCode(uint8_t opcode);
 	void OPCodeInvalid();
