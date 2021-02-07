@@ -50,14 +50,14 @@ void AtariVCS::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBu
 {
 	while (true)
 	{
-		m_pProcessor->Tick();
-		m_pRIOT->Tick();
 
 		if (m_pTIA->Tick(framebuffer))
 		{
 			//memset(framebuffer.data(), 0x00, framebuffer.size());
 			break;
 		}
+        m_pProcessor->Tick();
+        m_pRIOT->Tick();
 		//break;
 	}
 }

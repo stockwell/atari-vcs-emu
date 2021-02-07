@@ -13,7 +13,7 @@ public:
 	void Reset();
 	void InitOpcodeTable();
 	void Tick();
-	void Halt();
+	void Halt(uint16_t cycles);
 	void Resume();
 
 public:
@@ -54,6 +54,7 @@ public:
 private:
 	void (MOS6502Core::*m_OPCodes[0x100])();
 	bool m_Running = false;
+	uint16_t m_HBlankCycles = 0;
 	std::shared_ptr<Memory> m_pMemory = nullptr;
 
 	uint8_t FetchOPCode();

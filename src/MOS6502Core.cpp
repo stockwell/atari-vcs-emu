@@ -49,11 +49,9 @@ uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode)
 
 void MOS6502Core::Tick()
 {
-	if (!m_Running)
+	if (m_HBlankCycles)
 	{
-		if (m_Delay > 1)
-			--m_Delay;
-
+        --m_HBlankCycles;
 		return;
 	}
 
@@ -66,12 +64,11 @@ void MOS6502Core::Tick()
 	m_Delay = (ExecuteOPCode(FetchOPCode()));
 }
 
-void MOS6502Core::Halt()
+void MOS6502Core::Halt(uint16_t cycles)
 {
-	m_Running = false;
+    m_HBlankCycles = cycles;
 }
 
 void MOS6502Core::Resume()
 {
-	m_Running = true;
 }

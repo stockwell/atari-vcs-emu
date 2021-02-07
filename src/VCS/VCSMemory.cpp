@@ -29,8 +29,7 @@ uint8_t VCSMemory::Read(uint16_t address)
 	/* TIA */
 	if ((actualAddress & 0x1080u) == 0x00)
 	{
-		actualAddress &= 0x7Fu;
-		return m_pTIA->Read(actualAddress);
+		return m_pTIA->Read(actualAddress & 0x7Fu);
 	}
 	/* RAM */
 	else if ((actualAddress & 0x1280u) == 0x80)
@@ -41,7 +40,7 @@ uint8_t VCSMemory::Read(uint16_t address)
 	else if ((actualAddress & 0x1280u) == 0x280)
 	{
 		actualAddress &= 0x2FFu;
-		return m_map[actualAddress & 0x2FFu] = m_pRIOT->Read(actualAddress);
+		return m_map[actualAddress] = m_pRIOT->Read(actualAddress);
 	}
 	/* ROM Cart */
 	else
@@ -65,8 +64,7 @@ void VCSMemory::Write(uint16_t address, uint8_t value)
 	/* TIA */
 	if ((actualAddress & 0x1080u) == 0x00)
 	{
-		actualAddress &= 0x7Fu;
-		m_pTIA->Write(actualAddress, value);
+		m_pTIA->Write(actualAddress & 0x7Fu, value);
 	}
 	/* RAM */
 	else if ((actualAddress & 0x1280u) == 0x80)

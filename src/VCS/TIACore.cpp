@@ -44,7 +44,8 @@ bool TIACore::Tick(std::vector<uint8_t>& framebuffer)
 	// -------------------------
 	//      262 scanlines
 
-	m_DelayQueue.execute(
+	m_DelayQueue.execute
+	(
 		[this] (uint8_t address, uint8_t value)
 		{
 			DelayedWrite(address, value);
@@ -259,7 +260,7 @@ void TIACore::TickHblank()
 
 void TIACore::TickHframe(std::vector<uint8_t>& framebuffer)
 {
-	const uint32_t y = m_Vctr;
+	const uint32_t y = m_Vctr - TIAConstants::V_BLANK_CLOCKS;
 	const uint32_t x = m_Hctr - TIAConstants::H_BLANK_CLOCKS - m_HctrDelta;
 
 	m_CollisionUpdateRequired = true;
@@ -267,7 +268,7 @@ void TIACore::TickHframe(std::vector<uint8_t>& framebuffer)
 	for (const auto& obj : m_TIAObjects)
 		obj->Tick(x, m_Hctr);
 
-	RenderPixel(x, y - TIAConstants::V_BLANK_CLOCKS, framebuffer);
+	RenderPixel(x, y, framebuffer);
 }
 
 void TIACore::DelayedWrite(uint8_t address, uint8_t value)
@@ -480,7 +481,7 @@ void TIACore::TIAWrite0x01(uint8_t value)
 /* Wait for Horizontal blank */
 void TIACore::TIAWrite0x02(uint8_t value)
 {
-	m_pProcessor->Halt();
+	m_pProcessor->Halt(TIAConstants::H_CLOCKS - m_Hctr);
 }
 
 /* Rsync */
