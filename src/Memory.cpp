@@ -5,7 +5,7 @@
 
 void Memory::SetProcessor(std::shared_ptr<MOS6502Core>pProcessor)
 {
-	m_pProcessor = pProcessor;
+	m_pProcessor = std::move(pProcessor);
 }
 
 void Memory::Reset()

@@ -4,26 +4,15 @@
 #include <vector>
 
 #include "Common.hpp"
-
 #include "Cart.hpp"
+#include "EmulatorCore.hpp"
 
 class MOS6502Core;
 class VCSMemory;
 class TIACore;
 class RIOTCore;
 
-typedef enum
-{
-	KEYPRESS_UP,
-	KEYPRESS_DOWN,
-	KEYPRESS_LEFT,
-	KEYPRESS_RIGHT,
-	KEYPRESS_SPACE,
-	KEYPRESS_RESET,
-	KEYPRESS_SELECT
-} keypress_event_t;
-
-class AtariVCS
+class AtariVCS : public EmulatorCore
 {
 public:
 	AtariVCS();

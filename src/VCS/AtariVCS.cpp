@@ -95,7 +95,8 @@ void AtariVCS::KeypressEvent(keypress_event_t evt, bool pressed)
 
 			break;
 
-		case KEYPRESS_SPACE:m_pTIA->SetTrigger(0, pressed);
+		case KEYPRESS_SPACE:
+		    m_pTIA->SetTrigger(0, pressed);
 			break;
 
 		case KEYPRESS_SELECT:

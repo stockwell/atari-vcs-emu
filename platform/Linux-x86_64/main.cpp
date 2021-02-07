@@ -1,4 +1,6 @@
 #include "main.hpp"
+#include "VCS/AtariVCS.hpp"
+#include "NES/NES.hpp"
 
 namespace
 {
@@ -79,7 +81,7 @@ void SDL_Init(SDL_Renderer** renderer, SDL_Texture** texture)
 	}
 
 	/* Create the window and renderer */
-	window = SDL_CreateWindow("Atari 2600 Emu",
+	window = SDL_CreateWindow("Emulator",
 							  SDL_WINDOWPOS_UNDEFINED,
 							  SDL_WINDOWPOS_UNDEFINED,
 							  kWindowWidth, kWindowHeight,
@@ -102,20 +104,24 @@ void SDL_Init(SDL_Renderer** renderer, SDL_Texture** texture)
 
 Emulator::Emulator()
 {
-	m_pAtariVCS = std::make_unique<AtariVCS>();
+#ifdef NES_EMULATOR
+    m_emulatorCore = std::make_unique<NES>();
+#elif VCS_EMULATOR
+    m_emulatorCore = std::make_unique<AtariVCS>();
+#endif
 }
 
 void Emulator::RunToVBlank(std::vector<uint8_t>& framebuffer)
 {
-	m_pAtariVCS->RunToVBlank(framebuffer, nullptr, nullptr);
+	m_emulatorCore->RunToVBlank(framebuffer, nullptr, nullptr);
 }
 
 bool Emulator::LoadRom(const char *szFilePath)
 {
-	if (! m_pAtariVCS->LoadROM(szFilePath))
+	if (! m_emulatorCore->LoadROM(szFilePath))
 		return false;
 
-	m_pAtariVCS->Reset();
+    m_emulatorCore->Reset();
 	return true;
 }
 
@@ -131,7 +137,7 @@ void Emulator::Stop()
 
 void Emulator::KeypressEvent(keypress_event_t evt, bool pressed)
 {
-	m_pAtariVCS->KeypressEvent(evt, pressed);
+    m_emulatorCore->KeypressEvent(evt, pressed);
 }
 
 bool Emulator::Draw(std::vector<uint8_t>& framebuffer, SDL_Renderer* renderer, SDL_Texture* texture)

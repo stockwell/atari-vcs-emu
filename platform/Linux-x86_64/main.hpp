@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VCS/AtariVCS.hpp"
+#include "EmulatorCore.hpp"
 #include "SDL.h"
 
 #include <memory>
@@ -19,5 +19,5 @@ public:
 
 private:
 	bool m_running = true;
-	std::unique_ptr<AtariVCS> m_pAtariVCS;
+	std::unique_ptr<EmulatorCore> m_emulatorCore;
 };
