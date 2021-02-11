@@ -16,10 +16,19 @@ typedef enum
 class EmulatorCore
 {
 public:
-    virtual ~EmulatorCore() = default;
+	struct framebufferInfo
+	{
+		uint16_t width;
+		uint16_t height;
+	};
 
-    virtual bool LoadROM(const char *szFilePath) = 0;
-    virtual void RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBuffer, int *pSampleCount) = 0;
-    virtual void Reset() = 0;
-    virtual void KeypressEvent(keypress_event_t evt, bool pressed) = 0;
+	virtual ~EmulatorCore() = default;
+
+	virtual bool LoadROM(const char *szFilePath) = 0;
+	virtual void RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBuffer, int *pSampleCount) = 0;
+	virtual void Reset() = 0;
+	virtual void KeypressEvent(keypress_event_t evt, bool pressed) = 0;
+
+	virtual const framebufferInfo GetFramebufferInfo() = 0;
+	virtual const uint32_t* GetColourLut(size_t& lutSize) = 0;
 };

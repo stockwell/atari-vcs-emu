@@ -73,3 +73,25 @@ void NES::KeypressEvent(keypress_event_t evt, bool pressed)
             break;
     }
 }
+
+const EmulatorCore::framebufferInfo NES::GetFramebufferInfo()
+{
+	static constexpr EmulatorCore::framebufferInfo info =
+	{
+		.width 	= 0,
+		.height = 0,
+	};
+
+	return info;
+}
+
+const uint32_t* NES::GetColourLut(size_t& lutSize)
+{
+	static constexpr uint32_t kColourLUT[] =
+	{
+		0
+	};
+
+	lutSize = std::size(kColourLUT);
+	return static_cast<const uint32_t*>(kColourLUT);
+}

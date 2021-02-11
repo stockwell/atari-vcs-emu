@@ -17,14 +17,15 @@ class AtariVCS : public EmulatorCore
 public:
 	AtariVCS();
 
-	bool LoadROM(const char *szFilePath);
 	bool LoadROM(const std::vector<uint8_t>& romBuffer);
+	bool LoadROM(const char *szFilePath) override;
 
-	void RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBuffer, int *pSampleCount);
+	void RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBuffer, int *pSampleCount) override;
+	void Reset() override;
+	void KeypressEvent(keypress_event_t evt, bool pressed) override;
 
-	void Reset();
-
-	void KeypressEvent(keypress_event_t evt, bool pressed);
+	const framebufferInfo GetFramebufferInfo() override;
+	const uint32_t* GetColourLut(size_t& lutSize) override;
 
 private:
 	std::unique_ptr<Cartridge>		m_pCartridge = nullptr;
