@@ -47,7 +47,7 @@ public:
 	uint8_t Read(uint16_t address) override;
 	void Write(uint16_t address, uint8_t value) override;
 
-	void LoadROM(const uint8_t *pROM, uint16_t offset) override;
+	bool LoadROM(const uint8_t *pROM, uint16_t offset) override;
 
 private:
 	std::shared_ptr<TIACore>	m_pTIA 	= nullptr;

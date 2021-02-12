@@ -84,9 +84,11 @@ void VCSMemory::Write(uint16_t address, uint8_t value)
 	}
 }
 
-void VCSMemory::LoadROM(const uint8_t *pROM, uint16_t romSize)
+bool VCSMemory::LoadROM(const uint8_t *pROM, uint16_t romSize)
 {
 	/* For a 2K ROM cart A11 isn't connected - effectively 0x1000 - 0x17FF is mirrored from 0x1800 - 0x1FFF */
 	for (size_t i = ROMMemory::kStartAddr, j = 0; i < ROMMemory::kEndAddr; i++, j++)
 		m_map[i] = pROM[j % romSize];
+
+	return true;
 }

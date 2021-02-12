@@ -4,6 +4,7 @@
 #include "SDL.h"
 
 #include <memory>
+#include <cstdint>
 
 class Emulator
 {

@@ -177,7 +177,7 @@ int main()
 
 	auto emulator = std::make_unique<Emulator>();
 
-	if (! emulator->LoadRom("pitfall.bin"))
+	if (! emulator->LoadRom("rom.bin"))
 		exit(1);
 
 #ifndef DISABLE_RENDERER
