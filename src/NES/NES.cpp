@@ -41,9 +41,10 @@ void NES::Reset()
 
 void NES::RunToVBlank(std::vector<uint8_t> &framebuffer, int16_t *pSampleBuffer, int *pSampleCount)
 {
-	while (true)
+	//while (true)
 	{
-		m_pProcessor->Tick();
+		for (uint8_t i = 0; i < 60; i++)
+			m_pProcessor->Tick();
 	}
 }
 

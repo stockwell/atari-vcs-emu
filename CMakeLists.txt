@@ -25,7 +25,8 @@ add_executable(atari-vcs-emu
         src/VCS/TIAPlayer.cpp
         src/VCS/TIAMissile.cpp
         src/VCS/TIABall.cpp
-        src/VCS/TIAPlayfield.cpp src/EmulatorCore.hpp)
+        src/VCS/TIAPlayfield.cpp
+        src/EmulatorCore.hpp)
 
 target_include_directories(atari-vcs-emu PUBLIC src)
 target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1 VCS_EMULATOR=1)
@@ -40,9 +41,13 @@ add_executable(nes-emu
         src/Opcodes.cpp
         src/NES/NES.cpp
         src/NES/NESMemory.cpp
-        src/EmulatorCore.hpp)
+        src/EmulatorCore.hpp
+        src/NES/Mapper.cpp
+        src/NES/Mapper.hpp
+        src/NES/Mappers/NROM.cpp
+        src/NES/Mappers/NROM.hpp)
 
-target_include_directories(nes-emu PUBLIC src)
+target_include_directories(nes-emu PUBLIC src src/NES)
 target_compile_definitions(nes-emu PUBLIC DEBUG=1 NES_EMULATOR=1)
 target_link_libraries(nes-emu SDL2main SDL2-static)
 

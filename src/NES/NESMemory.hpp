@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Memory.hpp"
+#include "Mapper.hpp"
 
 class NESMemory : public Memory
 {
@@ -12,11 +13,14 @@ public:
 
 	bool LoadROM(const uint8_t *pROM, uint16_t offset) override;
 
-private:
-	uint8_t m_mapperNumber = 0;
-	bool m_extendedRAM = false;
-	bool m_nameTableMirroring = false;
+	uint8_t GetMapper() const;
+	bool GetNameTableMirroring() const;
+	bool HasExtendedRAM() const;
 
-	std::vector<uint8_t> m_PRG_ROM;
-	std::vector<uint8_t> m_CHR_ROM;
+private:
+	bool m_extendedRAM = false;
+	uint8_t m_mapperNumber = 0;
+	uint8_t m_nameTableMirroring = 0;
+
+	std::unique_ptr<Mapper> m_mapper;
 };

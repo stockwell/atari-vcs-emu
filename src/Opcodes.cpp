@@ -181,7 +181,7 @@ void MOS6502Core::InitOpcodeTable()
 
 void MOS6502Core::OPCodeInvalid()
 {
-	std::cout << "INVALID OPCODE!!" << std::endl;
+	throw std::runtime_error("INVALID OPCODE!!");
 }
 
 /* BRK */

@@ -51,7 +51,7 @@ void MOS6502Core::Tick()
 {
 	if (m_HBlankCycles)
 	{
-        --m_HBlankCycles;
+		--m_HBlankCycles;
 		return;
 	}
 
