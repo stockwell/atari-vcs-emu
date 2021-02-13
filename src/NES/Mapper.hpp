@@ -1,8 +1,12 @@
 #pragma once
 
+#include "NESMemory.hpp"
+
 #include <cstdint>
 #include <memory>
 #include <vector>
+
+class NESMemory;
 
 class Mapper
 {
@@ -18,9 +22,5 @@ public:
 
 	virtual const uint8_t* GetPagePtr(uint16_t addr) = 0;
 
-	static std::unique_ptr<Mapper> Create(uint8_t mapperNum, std::vector<uint8_t>&& PRG_ROM, std::vector<uint8_t>&& CHR_ROM);
-
-protected:
-	std::vector<uint8_t> m_CHR_ROM;
-	std::vector<uint8_t> m_PRG_ROM;
+	static std::shared_ptr<Mapper> Create(std::shared_ptr<NESMemory> pMemory);
 };

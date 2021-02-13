@@ -7,7 +7,7 @@
 class NROM : public Mapper
 {
 public:
-	NROM(std::vector<uint8_t>&& PRG_ROM, std::vector<uint8_t>&& CHR_ROM);
+	NROM(std::vector<uint8_t>* pPRG_ROM, std::vector<uint8_t>* pCHR_ROM);
 	~NROM() override = default;
 
 	void 	WritePRG(uint16_t address, uint8_t value) override;
@@ -19,9 +19,9 @@ public:
 	const uint8_t* GetPagePtr(uint16_t addr) override;
 
 private:
-	std::vector<uint8_t> m_PRG_ROM;
-	std::vector<uint8_t> m_CHR_ROM;
-	std::vector<uint8_t> m_CHR_RAM;
+	std::vector<uint8_t>*	m_pPRG_ROM;
+	std::vector<uint8_t>*	m_pCHR_ROM;
+	std::vector<uint8_t>	m_CHR_RAM;
 
 	uint16_t m_addressMask = 0xFFFF;
 	bool m_usesCharacterRAM = false;

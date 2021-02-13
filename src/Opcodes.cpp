@@ -184,11 +184,21 @@ void MOS6502Core::OPCodeInvalid()
 	throw std::runtime_error("INVALID OPCODE!!");
 }
 
+void MOS6502Core::NMI_IRQ()
+{
+	StackPush(m_PC);
+	StackPush(m_SR);
+	m_SR |= statusRegs::interrupt;
+	m_PC = m_pMemory->Read(vectorAddresses::nmi) | (m_pMemory->Read(vectorAddresses::nmi + 1) << 8);
+}
+
 /* BRK */
 void MOS6502Core::OPCode0x00()
 {
 	StackPush(++m_PC);
 	StackPush((uint8_t) (m_SR | statusRegs::brk));
+
+	m_SR |= statusRegs::interrupt;
 	m_PC = m_pMemory->Read(vectorAddresses::irq_brq) | (m_pMemory->Read(vectorAddresses::irq_brq + 1) << 8);
 }
 

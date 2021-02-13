@@ -15,6 +15,7 @@ public:
 	void Tick();
 	void Halt(uint16_t cycles);
 	void Resume();
+	void NMI_IRQ();
 
 public:
 	uint8_t m_Delay;

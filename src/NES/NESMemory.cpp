@@ -12,11 +12,15 @@ uint8_t NESMemory::Read(uint16_t address)
 	{
 		if (address < 0x4000) //PPU registers, mirrored
 		{
-
+			auto it = m_readCallbacks.find(static_cast<IORegisters>(address & 0x2007));
+			if (it != m_readCallbacks.end())
+				return (it -> second)();
 		}
 		else if (address < 0x4018 && address >= 0x4014) //Only *some* IO registers
 		{
-
+			auto it = m_readCallbacks.find(static_cast<IORegisters>(address));
+			if (it != m_readCallbacks.end())
+				return (it -> second)();
 		}
 		else
 		{
@@ -29,11 +33,12 @@ uint8_t NESMemory::Read(uint16_t address)
 	}
 	else if (address < 0x8000) // Extended RAM
 	{
-
+		if (! m_extendedRAM.empty())
+			return m_extendedRAM[address - 0x6000];
 	}
 	else //PRG
 	{
-		return m_mapper->ReadPRG(address);
+		return m_pMapper->ReadPRG(address);
 	}
 
 	return 0;
@@ -49,27 +54,31 @@ void NESMemory::Write(uint16_t address, uint8_t value)
 	{
 		if (address < 0x4000) //PPU registers, mirrored
 		{
-
+			auto it = m_writeCallbacks.find(static_cast<IORegisters>(address & 0x2007));
+			if (it != m_writeCallbacks.end())
+				(it->second)(value);
 		}
 		else if (address < 0x4017 && address >= 0x4014) //only some registers
 		{
-
+			auto it = m_writeCallbacks.find(static_cast<IORegisters>(address));
+			if (it != m_writeCallbacks.end())
+				(it->second)(value);
 		}
 		else
-			printf("Write access attmept at: %x\n", address);
+			printf("Write access attempt at: %x\n", address);
 	}
 	else if (address < 0x6000)
 	{
-		throw std::runtime_error("Expansion ROM access attempted. This is currently unsupported\n");
+		//throw std::runtime_error("Expansion ROM access attempted. This is currently unsupported\n");
 	}
 	else if (address < 0x8000)
 	{
-//		if (m_extendedRAM)
-//			m_extRAM[addr - 0x6000] = value;
+		if (! m_extendedRAM.empty())
+			m_extendedRAM[address - 0x6000] = value;
 	}
 	else
 	{
-		m_mapper->WritePRG(address, value);
+		m_pMapper->WritePRG(address, value);
 	}
 }
 
@@ -100,8 +109,10 @@ bool NESMemory::LoadROM(const uint8_t *pROM, uint16_t romSize)
 	m_mapperNumber = ((pROM[6] >> 4) & 0xf) | (pROM[7] & 0xf0);
 	printf("Mapper: #%d\n", m_mapperNumber);
 
-	m_extendedRAM = pROM[6] & 0x2;
-	printf("Extended (CPU) RAM: %s\n", m_extendedRAM ? "true" : "false");
+	if (pROM[6] & 0x2)
+		m_extendedRAM.resize(0x2000);
+
+	printf("Extended (CPU) RAM: %zu\n", m_extendedRAM.size());
 
 	if (pROM[6] & 0x4)
 	{
@@ -122,38 +133,60 @@ bool NESMemory::LoadROM(const uint8_t *pROM, uint16_t romSize)
 	//PRG-ROM 16KB banks
 	size_t bankSize = 0x4000 * banks;
 
-	std::vector<uint8_t> PRG_ROM(bankSize);
-	memcpy(PRG_ROM.data(), pROM, bankSize);
+	m_PRG_ROM.resize(bankSize);
+	memcpy(m_PRG_ROM.data(), pROM, bankSize);
 	pROM += bankSize;
-
-	std::vector<uint8_t> CHR_ROM;
 
 	//CHR-ROM 8KB banks
 	if (vbanks)
 	{
 		size_t vBankSize = 0x2000 * vbanks;
-		CHR_ROM.resize(vBankSize);
-		memcpy(CHR_ROM.data(), pROM, vBankSize);
+		m_CHR_ROM.resize(vBankSize);
+		memcpy(m_CHR_ROM.data(), pROM, vBankSize);
 	}
 	else
 		printf("Cartridge with CHR-RAM.\n");
 
-	m_mapper = Mapper::Create(m_mapperNumber, std::move(PRG_ROM), std::move(CHR_ROM));
-
 	return true;
 }
 
-uint8_t NESMemory::GetMapper() const
+void NESMemory::SetMapper(std::shared_ptr<Mapper> pMapper)
+{
+	m_pMapper = std::move(pMapper);
+}
+
+uint8_t NESMemory::GetMapperType() const
 {
 	return m_mapperNumber;
 }
 
-bool NESMemory::GetNameTableMirroring() const
+uint8_t NESMemory::GetNameTableMirroring() const
 {
 	return m_nameTableMirroring;
 }
 
-bool NESMemory::HasExtendedRAM() const
+std::vector<uint8_t>* NESMemory::GetPRG()
 {
-	return m_extendedRAM;
+	return &m_PRG_ROM;
+}
+
+std::vector<uint8_t>* NESMemory::GetCHR()
+{
+	return &m_CHR_ROM;
+}
+
+bool NESMemory::SetWriteCallback(IORegisters reg, std::function<void(uint8_t)> callback)
+{
+	if (! callback)
+		return false;
+
+	return m_writeCallbacks.emplace(reg, callback).second;
+}
+
+bool NESMemory::SetReadCallback(IORegisters reg, std::function<uint8_t(void)> callback)
+{
+	if (! callback)
+		return false;
+
+	return m_readCallbacks.emplace(reg, callback).second;
 }

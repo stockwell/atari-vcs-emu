@@ -48,18 +48,14 @@ void AtariVCS::Reset()
 
 void AtariVCS::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBuffer, int *pSampleCount)
 {
-	while (true)
-	{
+	bool frameFinished;
 
-		if (m_pTIA->Tick(framebuffer))
-		{
-			//memset(framebuffer.data(), 0x00, framebuffer.size());
-			break;
-		}
-        m_pProcessor->Tick();
-        m_pRIOT->Tick();
-		//break;
-	}
+	do
+	{
+		frameFinished = m_pTIA->Tick(framebuffer);
+		m_pRIOT->Tick();
+		m_pProcessor->Tick();
+	} while (! frameFinished);
 }
 
 void AtariVCS::KeypressEvent(keypress_event_t evt, bool pressed)

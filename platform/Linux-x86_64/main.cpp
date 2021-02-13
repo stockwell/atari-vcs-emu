@@ -177,8 +177,13 @@ int main()
 
 	auto emulator = std::make_unique<Emulator>();
 
+#ifdef NES_EMULATOR
 	if (! emulator->LoadRom("mario.nes"))
 		exit(1);
+#elif VCS_EMULATOR
+	if (! emulator->LoadRom("pitfall.bin"))
+		exit(1);
+#endif
 
 #ifndef DISABLE_RENDERER
 	emulator->InitSDL(&renderer, &texture);

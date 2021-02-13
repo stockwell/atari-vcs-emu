@@ -83,7 +83,7 @@ bool TIACore::Tick(std::vector<uint8_t>& framebuffer)
 uint8_t TIACore::Read(uint16_t address)
 {
 	if (address < (sizeof kTIAReadRegisterNames / sizeof kTIAReadRegisterNames[0]))
-		Log("TIA Read: Addr %u (%s) - %u\n", address, kTIAReadRegisterNames[address]), m_Mem[address];
+		Log("TIA Read: Addr %u (%s) - %u\n", address, kTIAReadRegisterNames[address], m_Mem[address]);
 
 	if (address <= 0x07)
 		return (this->*m_ReadRegisters[address])();
