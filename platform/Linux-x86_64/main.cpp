@@ -1,3 +1,5 @@
+#include <chrono>
+#include <unistd.h>
 #include "main.hpp"
 #include "VCS/AtariVCS.hpp"
 #include "NES/NES.hpp"
@@ -204,12 +206,20 @@ int main()
 	/* Loop, waiting for QUIT or the escape key */
 	do
 	{
+		auto start = std::chrono::steady_clock::now();
 		emulator->RunToVBlank();
 
 #ifndef DISABLE_RENDERER
 		if (! emulator->Draw(renderer, texture))
 			emulator->Stop();
 #endif
+
+		std::chrono::duration<double> elapsed_seconds = std::chrono::steady_clock::now() - start;
+
+		auto delay = static_cast<int32_t>(((1.0f/30.0f) - elapsed_seconds.count()) * 100);
+
+		if (delay > 0)
+			SDL_Delay(delay);
 
 	} while (emulator->Running());
 
