@@ -29,7 +29,7 @@ add_executable(atari-vcs-emu
         src/EmulatorCore.hpp)
 
 target_include_directories(atari-vcs-emu PUBLIC src)
-target_compile_definitions(atari-vcs-emu PUBLIC DEBUG=1 VCS_EMULATOR=1)
+target_compile_definitions(atari-vcs-emu PUBLIC VCS_EMULATOR=1)
 target_link_libraries(atari-vcs-emu SDL2main SDL2-static)
 
 add_executable(nes-emu
@@ -44,7 +44,8 @@ add_executable(nes-emu
         src/NES/PictureBus.cpp
         src/NES/PPU.cpp
         src/NES/Mapper.cpp
-        src/NES/Mappers/NROM.cpp)
+        src/NES/Mappers/NROM.cpp
+        src/NES/Controller.cpp)
 
 target_include_directories(nes-emu PUBLIC src src/NES)
 target_compile_definitions(nes-emu PUBLIC NES_EMULATOR=1)

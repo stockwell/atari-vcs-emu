@@ -65,7 +65,16 @@ void NESMemory::Write(uint16_t address, uint8_t value)
 				(it->second)(value);
 		}
 		else
-			printf("Write access attempt at: %x\n", address);
+		{
+			static bool once = false;
+			if (! once)
+			{
+				printf("Write access attempt at: %x\n", address);
+				once = true;
+			}
+
+		}
+
 	}
 	else if (address < 0x6000)
 	{
@@ -173,6 +182,30 @@ std::vector<uint8_t>* NESMemory::GetPRG()
 std::vector<uint8_t>* NESMemory::GetCHR()
 {
 	return &m_CHR_ROM;
+}
+
+const uint8_t* NESMemory::GetPagePtr(uint8_t page)
+{
+	uint16_t addr = page << 8;
+	if (addr < 0x2000)
+		return &m_map[addr & 0x7ff];
+	else if (addr < 0x4020)
+	{
+		printf("Register address memory pointer access attempt\n");
+	}
+	else if (addr < 0x6000)
+	{
+		printf("Expansion ROM access attempted, which is unsupported\n");
+	}
+	else if (addr < 0x8000)
+	{
+		if (! m_extendedRAM.empty())
+		{
+			return &m_extendedRAM[addr - 0x6000];
+		}
+	}
+
+	return nullptr;
 }
 
 bool NESMemory::SetWriteCallback(IORegisters reg, std::function<void(uint8_t)> callback)

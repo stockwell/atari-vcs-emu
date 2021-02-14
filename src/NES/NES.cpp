@@ -10,36 +10,10 @@ NES::NES()
 	m_pCartridge = std::make_unique<Cartridge>();
 	m_pMemory = std::make_shared<NESMemory>();
 	m_pProcessor = std::make_shared<MOS6502Core>(m_pMemory);
-	m_pMapper = Mapper::Create(m_pMemory);
 	m_pPictureBus = std::make_shared<PictureBus>();
 	m_pPPU = std::make_unique<PPU>(m_pPictureBus);
-
-	m_pPictureBus->SetMapper(m_pMapper, m_pMemory->GetNameTableMirroring());
-
-	m_pPPU->reset();
-
-	m_pMemory->SetMapper(m_pMapper);
-	m_pMemory->SetProcessor(m_pProcessor);
-	m_pMemory->Reset();
-
-	m_pMemory->SetReadCallback(NESMemory::PPUSTATUS, [&]() { return m_pPPU->getStatus(); });
-	m_pMemory->SetReadCallback(NESMemory::PPUDATA,	[&]() { return m_pPPU->getData(); });
-	//m_pMemory->SetReadCallback(NESMemory::JOY1, 	[&]() { return m_controller1.read(); });
-	//m_pMemory->SetReadCallback(NESMemory::JOY2, 	[&]() { return m_controller2.read(); });
-	m_pMemory->SetReadCallback(NESMemory::OAMDATA,	[&]() { return m_pPPU->getOAMData(); });
-
-
-	m_pMemory->SetWriteCallback(NESMemory::PPUCTRL,	[&](uint8_t b) { m_pPPU->control(b);});
-	m_pMemory->SetWriteCallback(NESMemory::PPUMASK,	[&](uint8_t b) { m_pPPU->setMask(b);});
-	m_pMemory->SetWriteCallback(NESMemory::OAMADDR,	[&](uint8_t b) { m_pPPU->setOAMAddress(b);});
-	m_pMemory->SetWriteCallback(NESMemory::PPUADDR,	[&](uint8_t b) { m_pPPU->setDataAddress(b);});
-	m_pMemory->SetWriteCallback(NESMemory::PPUSCROL,	[&](uint8_t b) { m_pPPU->setScroll(b);});
-	m_pMemory->SetWriteCallback(NESMemory::PPUDATA,	[&](uint8_t b) { m_pPPU->setData(b);});
-	m_pMemory->SetWriteCallback(NESMemory::OAMDMA,		[&](uint8_t b) { DMA(b);});
-	//m_pMemory->SetWriteCallback(NESMemory::JOY1,		[&](uint8_t b) { m_controller1.strobe(b); m_controller2.strobe(b);});
-	m_pMemory->SetWriteCallback(NESMemory::OAMDATA,	[&](uint8_t b) { m_pPPU->setOAMData(b);});
-
-	m_pPPU->SetInterruptCallback([&](){ m_pProcessor->NMI_IRQ(); });
+	m_pController1 = std::make_unique<Controller>();
+	m_pController2 = std::make_unique<Controller>();
 }
 
 bool NES::LoadROM(const char *szFilePath)
@@ -63,6 +37,35 @@ bool NES::LoadROM(const std::vector<uint8_t> &romBuffer)
 
 void NES::Reset()
 {
+	m_pMapper = Mapper::Create(m_pMemory);
+
+	m_pPictureBus->SetMapper(m_pMapper, m_pMemory->GetNameTableMirroring());
+
+	m_pPPU->reset();
+
+	m_pMemory->SetMapper(m_pMapper);
+	m_pMemory->SetProcessor(m_pProcessor);
+	m_pMemory->Reset();
+
+	m_pMemory->SetReadCallback(NESMemory::PPUSTATUS,	[&]() { return m_pPPU->getStatus(); });
+	m_pMemory->SetReadCallback(NESMemory::PPUDATA,		[&]() { return m_pPPU->getData(); });
+	m_pMemory->SetReadCallback(NESMemory::JOY1, 		[&]() { return m_pController1->Read(); });
+	m_pMemory->SetReadCallback(NESMemory::JOY2, 		[&]() { return m_pController2->Read(); });
+	m_pMemory->SetReadCallback(NESMemory::OAMDATA,		[&]() { return m_pPPU->getOAMData(); });
+
+
+	m_pMemory->SetWriteCallback(NESMemory::PPUCTRL,	[&](uint8_t b) { m_pPPU->control(b);});
+	m_pMemory->SetWriteCallback(NESMemory::PPUMASK,	[&](uint8_t b) { m_pPPU->setMask(b);});
+	m_pMemory->SetWriteCallback(NESMemory::OAMADDR,	[&](uint8_t b) { m_pPPU->setOAMAddress(b);});
+	m_pMemory->SetWriteCallback(NESMemory::PPUADDR,	[&](uint8_t b) { m_pPPU->setDataAddress(b);});
+	m_pMemory->SetWriteCallback(NESMemory::PPUSCROL,	[&](uint8_t b) { m_pPPU->setScroll(b);});
+	m_pMemory->SetWriteCallback(NESMemory::PPUDATA,	[&](uint8_t b) { m_pPPU->setData(b);});
+	m_pMemory->SetWriteCallback(NESMemory::OAMDMA,		[&](uint8_t b) { DMA(b);});
+	m_pMemory->SetWriteCallback(NESMemory::JOY1,		[&](uint8_t b) { m_pController1->Strobe(b); m_pController2->Strobe(b);});
+	m_pMemory->SetWriteCallback(NESMemory::OAMDATA,	[&](uint8_t b) { m_pPPU->setOAMData(b);});
+
+	m_pPPU->SetInterruptCallback([&](){ m_pProcessor->NMI_IRQ(); });
+
 	m_pProcessor->Reset();
 }
 
@@ -79,29 +82,7 @@ void NES::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t* pSampleBuffer,
 
 void NES::KeypressEvent(keypress_event_t evt, bool pressed)
 {
-	switch (evt)
-	{
-		case KEYPRESS_UP:
-			break;
-
-		case KEYPRESS_DOWN:
-			break;
-
-		case KEYPRESS_LEFT:
-			break;
-
-		case KEYPRESS_RIGHT:
-			break;
-
-		case KEYPRESS_SPACE:
-			break;
-
-		case KEYPRESS_SELECT:
-			break;
-
-		case KEYPRESS_RESET:
-			break;
-	}
+	m_pController1->HandleKeypress(evt, pressed);
 }
 
 const EmulatorCore::framebufferInfo NES::GetFramebufferInfo()
@@ -135,7 +116,7 @@ const uint32_t *NES::GetColourLut(size_t &lutSize) {
 
 void NES::DMA(uint8_t page)
 {
-	//m_pProcessor->skipDMACycles();
-	auto page_ptr = m_pMapper->GetPagePtr(page);
+	m_pProcessor->Halt(513);
+	auto page_ptr = m_pMemory->GetPagePtr(page);
 	m_pPPU->doDMA(page_ptr);
 }

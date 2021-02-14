@@ -8,7 +8,7 @@ NROM::NROM(std::vector<uint8_t>* pPRG_ROM, std::vector<uint8_t>* pCHR_ROM)
 	if (m_pPRG_ROM->size() == 0x4000)
 		m_addressMask = 0x3FFF;
 
-	if (! m_pCHR_ROM->empty())
+	if (m_pCHR_ROM->empty())
 		m_usesCharacterRAM = true;
 }
 

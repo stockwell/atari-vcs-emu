@@ -5,6 +5,7 @@
 
 #include "Common.hpp"
 #include "Cart.hpp"
+#include "Controller.hpp"
 #include "EmulatorCore.hpp"
 #include "PictureBus.hpp"
 #include "PPU.hpp"
@@ -37,4 +38,6 @@ private:
 	std::unique_ptr<PPU>			m_pPPU;
 	std::shared_ptr<PictureBus>		m_pPictureBus;
 	std::shared_ptr<Mapper>			m_pMapper;
+	std::unique_ptr<Controller>		m_pController1;
+	std::unique_ptr<Controller>		m_pController2;
 };

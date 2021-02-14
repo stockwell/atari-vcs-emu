@@ -88,7 +88,7 @@ bool Emulator::LoadRom(const char *szFilePath)
 	if (! m_emulatorCore->LoadROM(szFilePath))
 		return false;
 
-    m_emulatorCore->Reset();
+	m_emulatorCore->Reset();
 	return true;
 }
 
@@ -143,12 +143,24 @@ bool Emulator::Draw(SDL_Renderer* renderer, SDL_Texture* texture)
 						KeypressEvent(KEYPRESS_SPACE, event.type == SDL_KEYDOWN);
 						break;
 
+					case SDLK_F10:
+						KeypressEvent(KEYPRESS_START, event.type == SDL_KEYDOWN);
+						break;
+
 					case SDLK_F11:
 						KeypressEvent(KEYPRESS_SELECT, event.type == SDL_KEYDOWN);
 						break;
 
 					case SDLK_F12:
 						KeypressEvent(KEYPRESS_RESET, event.type == SDL_KEYDOWN);
+						break;
+
+					case SDLK_z:
+						KeypressEvent(KEYPRESS_A, event.type == SDL_KEYDOWN);
+						break;
+
+					case SDLK_x:
+						KeypressEvent(KEYPRESS_B, event.type == SDL_KEYDOWN);
 						break;
 
 					default:break;

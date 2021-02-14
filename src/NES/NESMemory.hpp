@@ -39,6 +39,8 @@ public:
 	std::vector<uint8_t>* GetPRG();
 	std::vector<uint8_t>* GetCHR();
 
+	const uint8_t* GetPagePtr(uint8_t page);
+
 	bool	SetWriteCallback(IORegisters reg, std::function<void(uint8_t)> callback);
 	bool	SetReadCallback(IORegisters reg, std::function<uint8_t(void)> callback);
 
