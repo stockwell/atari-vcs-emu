@@ -216,10 +216,10 @@ int main()
 
 		std::chrono::duration<double> elapsed_seconds = std::chrono::steady_clock::now() - start;
 
-		auto delay = static_cast<int32_t>(((1.0f/30.0f) - elapsed_seconds.count()) * 100);
+		auto delay = static_cast<int32_t>(((1.0f/60.0f) - elapsed_seconds.count()) * 1000000);
 
 		if (delay > 0)
-			SDL_Delay(delay);
+			usleep(delay);
 
 	} while (emulator->Running());
 
