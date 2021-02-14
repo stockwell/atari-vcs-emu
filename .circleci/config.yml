@@ -17,6 +17,6 @@ jobs:
       - run: git submodule update --init
       - run: ./build.sh
       - codecov/upload:
-          file: cmake-build-docker/atari-2600-tests/coverage.xml
+          file: cmake-build-docker/emulator-tests/coverage.xml
       - store_test_results:
-          path: cmake-build-docker/atari-2600-tests
+          path: cmake-build-docker/emulator-tests

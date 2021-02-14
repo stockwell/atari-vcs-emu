@@ -61,7 +61,7 @@ make all
 printf "\n+++ Check Test Coverage\n"
 
 #Annoying grep to get coverage summary from index.html
-cov=($(grep -oP -m 2 '("headerTableEntry" )[^ ]*' atari-2600-tests/coverage/index.html | cut -d '>' -f2))
+cov=($(grep -oP -m 2 '("headerTableEntry" )[^ ]*' emulator-tests/coverage/index.html | cut -d '>' -f2))
 
 printf "\n${GREEN}#############################${NC}\n"
 printf "Line Coverage: %.2f%%\n" ${cov[0]}

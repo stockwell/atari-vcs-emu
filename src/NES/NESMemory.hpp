@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <functional>
 
 #include "Memory.hpp"
 #include "Mapper.hpp"
