@@ -25,7 +25,7 @@ void Emulator::UpdateTexture(SDL_Texture* texture)
 	{
 		dst = (uint32_t*) ((uint8_t*) pixels + row * pitch);
 		for (col = 0; col < m_framebufferInfo.width; ++col)
-			*dst++ = (0xFF000000 | (m_ColourLUT[m_framebuffer[src++] & 0xFEu]));
+			*dst++ = (0xFF000000 | (m_ColourLUT[m_framebuffer[src++]]));
 	}
 	SDL_UnlockTexture(texture);
 }
@@ -33,7 +33,6 @@ void Emulator::UpdateTexture(SDL_Texture* texture)
 void Emulator::InitSDL(SDL_Renderer** renderer, SDL_Texture** texture)
 {
 	SDL_Window* window;
-	SDL_RWops* handle;
 
 	/* Enable standard application logging */
 	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
@@ -48,12 +47,13 @@ void Emulator::InitSDL(SDL_Renderer** renderer, SDL_Texture** texture)
 	window = SDL_CreateWindow("Emulator",
 							  SDL_WINDOWPOS_UNDEFINED,
 							  SDL_WINDOWPOS_UNDEFINED,
-							  kWindowWidth, kWindowHeight,
-							  SDL_WINDOW_RESIZABLE);
+							  m_framebufferInfo.width * 3,
+							  m_framebufferInfo.height * 3,
+							  SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
 	if (! window)
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create window: %s\n", SDL_GetError());
 
-	*renderer = SDL_CreateRenderer(window, -1, 0);
+	*renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (! *renderer)
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create renderer: %s\n", SDL_GetError());
 
@@ -175,8 +175,7 @@ bool Emulator::Draw(SDL_Renderer* renderer, SDL_Texture* texture)
 	}
 
 	UpdateTexture(texture);
-
-	SDL_RenderClear(renderer);
+	
 	SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 	SDL_RenderPresent(renderer);
 
@@ -192,7 +191,7 @@ int main()
 	auto emulator = std::make_unique<Emulator>();
 
 #ifdef NES_EMULATOR
-	if (! emulator->LoadRom("mario.nes"))
+	if (! emulator->LoadRom("toads.nes"))
 		exit(1);
 #elif VCS_EMULATOR
 	if (! emulator->LoadRom("pitfall.bin"))
