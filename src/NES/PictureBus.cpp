@@ -64,9 +64,9 @@ void PictureBus::Write(uint16_t addr, uint8_t value)
 	}
 }
 
-void PictureBus::UpdateMirroring(uint8_t mirroringMode)
+void PictureBus::UpdateMirroring(NameTableMirroring mirroringMode)
 {
-	switch (static_cast<NameTableMirroring>(mirroringMode))
+	switch (mirroringMode)
 	{
 		case NameTableMirroring::Horizontal:
 			NameTable0 = NameTable1 = 0;
@@ -101,7 +101,7 @@ bool PictureBus::SetMapper(std::shared_ptr<Mapper> mapper, uint8_t mirroringMode
 	}
 
 	m_mapper = std::move(mapper);
-	UpdateMirroring(mirroringMode);
+	UpdateMirroring(static_cast<NameTableMirroring>(mirroringMode));
 	return true;
 }
 

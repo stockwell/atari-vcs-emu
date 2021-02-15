@@ -5,6 +5,7 @@
 class PictureBus
 {
 	public:
+
 		PictureBus();
 
 		uint8_t Read(uint16_t addr) const;
@@ -13,18 +14,9 @@ class PictureBus
 
 		bool 	SetMapper(std::shared_ptr<Mapper> mapper, uint8_t mirroringMode);
 
-		void 	UpdateMirroring(uint8_t mirroringMode);
+		void 	UpdateMirroring(NameTableMirroring mirroringMode);
 
 	private:
-		enum class NameTableMirroring : uint16_t
-		{
-			Horizontal		= 0,
-			Vertical		= 1,
-			FourScreen		= 8,
-			OneScreenLower,
-			OneScreenHigher,
-		};
-
 		size_t NameTable0, NameTable1, NameTable2, NameTable3; //indices where they start in RAM vector
 
 		std::vector<uint8_t> m_RAM;

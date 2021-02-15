@@ -37,7 +37,7 @@ bool NES::LoadROM(const std::vector<uint8_t> &romBuffer)
 
 void NES::Reset()
 {
-	m_pMapper = Mapper::Create(m_pMemory);
+	m_pMapper = Mapper::Create(m_pMemory, [&](NameTableMirroring& m) { return m_pPictureBus->UpdateMirroring(m); });
 
 	m_pPictureBus->SetMapper(m_pMapper, m_pMemory->GetNameTableMirroring());
 

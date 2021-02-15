@@ -43,10 +43,11 @@ add_executable(nes-emu
         src/NES/NESMemory.cpp
         src/NES/PictureBus.cpp
         src/NES/PPU.cpp
+        src/NES/Controller.cpp
         src/NES/Mapper.cpp
         src/NES/Mappers/NROM.cpp
-        src/NES/Controller.cpp
-        src/NES/Mappers/AOROM.cpp)
+        src/NES/Mappers/AOROM.cpp
+        src/NES/Mappers/SxROM.cpp)
 
 target_include_directories(nes-emu PUBLIC src src/NES)
 target_compile_definitions(nes-emu PUBLIC NES_EMULATOR=1)

@@ -8,6 +8,15 @@
 
 class NESMemory;
 
+enum class NameTableMirroring : uint8_t
+{
+	Horizontal		= 0,
+	Vertical		= 1,
+	FourScreen		= 8,
+	OneScreenLower,
+	OneScreenHigher,
+};
+
 class Mapper
 {
 public:
@@ -22,5 +31,5 @@ public:
 
 	virtual const uint8_t* GetPagePtr(uint16_t addr) = 0;
 
-	static std::shared_ptr<Mapper> Create(std::shared_ptr<NESMemory> pMemory);
+	static std::shared_ptr<Mapper> Create(const std::shared_ptr<NESMemory>& pMemory, std::function<void(NameTableMirroring&)> mirroring_cb);
 };
