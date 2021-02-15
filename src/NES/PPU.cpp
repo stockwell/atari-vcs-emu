@@ -343,7 +343,6 @@ uint8_t PPU::getStatus()
 
 void PPU::setDataAddress(uint8_t address)
 {
-	//m_dataAddress = ((m_dataAddress << 8) & 0xff00) | addr;
 	if (m_firstWrite)
 	{
 		m_tempAddress &= ~0xff00; //Unset the upper byte

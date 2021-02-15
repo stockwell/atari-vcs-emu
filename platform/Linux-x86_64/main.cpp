@@ -18,7 +18,7 @@ void Emulator::UpdateTexture(SDL_Texture* texture)
 	void* pixels;
 	int pitch;
 
-	if (SDL_LockTexture(texture, NULL, &pixels, &pitch) < 0)
+	if (SDL_LockTexture(texture, nullptr, &pixels, &pitch) < 0)
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't lock texture: %s\n", SDL_GetError());
 
 	for (row = 0; row < m_framebufferInfo.height; ++row)
@@ -106,7 +106,7 @@ void Emulator::Stop()
 
 void Emulator::KeypressEvent(keypress_event_t evt, bool pressed)
 {
-    m_emulatorCore->KeypressEvent(evt, pressed);
+	m_emulatorCore->KeypressEvent(evt, pressed);
 }
 
 bool Emulator::Draw(SDL_Renderer* renderer, SDL_Texture* texture)
