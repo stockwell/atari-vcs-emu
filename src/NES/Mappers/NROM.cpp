@@ -9,7 +9,10 @@ NROM::NROM(std::vector<uint8_t>* pPRG_ROM, std::vector<uint8_t>* pCHR_ROM)
 		m_addressMask = 0x3FFF;
 
 	if (m_pCHR_ROM->empty())
+	{
 		m_usesCharacterRAM = true;
+		m_CHR_RAM.resize(0x2000);
+	}
 }
 
 void NROM::WritePRG(uint16_t address, uint8_t value)
