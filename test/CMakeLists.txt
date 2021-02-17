@@ -36,7 +36,7 @@ include_directories(${PROJECT_ROOT}/src)
 # Build & link tests
 add_executable(${PROJECT_TEST_TARGET} AllTests.cpp ${test-source} ${vcs-emu-source})
 target_link_libraries(${PROJECT_TEST_TARGET} gtest_main)
-target_compile_definitions(${PROJECT_TEST_TARGET} PUBLIC DISABLE_CPU_CYCLE_ACCURACY)
+target_compile_definitions(${PROJECT_TEST_TARGET} PUBLIC DISABLE_CPU_CYCLE_ACCURACY VCS_EMULATOR)
 
 # C Test
 add_test(NAME gtest-runner COMMAND ${PROJECT_TEST_TARGET})

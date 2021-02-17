@@ -17,7 +17,7 @@ void MOS6502Core::Reset()
 	m_AC = 0x00;
 	m_XR = 0x00;
 	m_YR = 0x00;
-	m_SR = statusRegs::constant;
+	m_SR = statusRegs::constant | statusRegs::interrupt;
 	m_SP = 0xFD;
 
 	m_Delay = 1;
@@ -43,6 +43,7 @@ uint8_t MOS6502Core::ExecuteOPCode(uint8_t opcode)
 		m_SR & statusRegs::brk ? "B " : "",
 		m_SR & statusRegs::overflow ? "O " : "",
 		m_SR & statusRegs::negative ? "N " : "");
+
 	(this->*m_OPCodes[opcode])();
 
 	return cycletime[opcode] + (m_CycleTime * 3);
@@ -67,7 +68,7 @@ void MOS6502Core::Tick()
 
 void MOS6502Core::Halt(uint16_t cycles)
 {
-    m_HBlankCycles = cycles;
+	m_HBlankCycles = cycles;
 }
 
 void MOS6502Core::Resume()

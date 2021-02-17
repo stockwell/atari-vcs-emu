@@ -195,10 +195,11 @@ void MOS6502Core::NMI_IRQ()
 /* BRK */
 void MOS6502Core::OPCode0x00()
 {
-	StackPush(++m_PC);
+	m_PC += 2;
+	StackPush(m_PC);
 	StackPush((uint8_t) (m_SR | statusRegs::brk));
 
-	m_SR |= statusRegs::interrupt;
+	m_SR |= statusRegs::interrupt | statusRegs::brk;
 	m_PC = m_pMemory->Read(vectorAddresses::irq_brq) | (m_pMemory->Read(vectorAddresses::irq_brq + 1) << 8);
 }
 
@@ -281,14 +282,14 @@ void MOS6502Core::OPCode0x11()
 /* ORA ZPG, X */
 void MOS6502Core::OPCode0x15()
 {
-	OPCodesORA(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesORA((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* ASL ZPG, X */
 void MOS6502Core::OPCode0x16()
 {
-	OPCodesASL(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesASL((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
@@ -375,15 +376,15 @@ void MOS6502Core::OPCode0x29()
 /* ROL A */
 void MOS6502Core::OPCode0x2A()
 {
-	uint16_t val = m_AC << 1u;
+	uint8_t keepCarry = m_SR & statusRegs::carry;
+	m_AC & 0x80 ? m_SR |= statusRegs::carry : m_SR &= ~statusRegs::carry;
 
-	if (m_SR & statusRegs::carry)
-		val |= 0x01;
-	val > 0xFF ? m_SR |= statusRegs::carry : m_SR &= ~statusRegs::carry;
-	val & 0x80 ? m_SR |= statusRegs::negative : m_SR &= ~statusRegs::negative;
-	val ? m_SR &= ~statusRegs::zero : m_SR |= statusRegs::zero;
+	m_AC <<= 1u;
+	m_AC |= keepCarry;
 
-	m_AC = val & 0xFF;
+	m_AC & 0x80 ? m_SR |= statusRegs::negative : m_SR &= ~statusRegs::negative;
+	m_AC ? m_SR &= ~statusRegs::zero : m_SR |= statusRegs::zero;
+
 	++m_PC;
 }
 
@@ -427,14 +428,14 @@ void MOS6502Core::OPCode0x31()
 /* AND zpg, X */
 void MOS6502Core::OPCode0x35()
 {
-	OPCodesAND(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesAND((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* ROL zpg, X */
 void MOS6502Core::OPCode0x36()
 {
-	OPCodesROL(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesROL((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
@@ -560,14 +561,14 @@ void MOS6502Core::OPCode0x51()
 /* EOR zpg, X*/
 void MOS6502Core::OPCode0x55()
 {
-	OPCodesEOR(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesEOR((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* LSR zpg, X */
 void MOS6502Core::OPCode0x56()
 {
-	OPCodesLSR(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesLSR((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
@@ -702,14 +703,14 @@ void MOS6502Core::OPCode0x71()
 /* ADC zpg, X */
 void MOS6502Core::OPCode0x75()
 {
-	OPCodesADC(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesADC((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* ROR zpg, X */
 void MOS6502Core::OPCode0x76()
 {
-	OPCodesROR(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesROR((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
@@ -829,21 +830,21 @@ void MOS6502Core::OPCode0x91()
 /* STY zpg, X */
 void MOS6502Core::OPCode0x94()
 {
-	OPCodesSTY(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesSTY((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* STA zpg, X */
 void MOS6502Core::OPCode0x95()
 {
-	OPCodesSTA(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesSTA((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* STX zpg, Y */
 void MOS6502Core::OPCode0x96()
 {
-	OPCodesSTX(m_pMemory->Read(++m_PC) + m_YR);
+	OPCodesSTX((m_pMemory->Read(++m_PC) + m_YR) & 0xFF);
 	++m_PC;
 }
 
@@ -988,21 +989,21 @@ void MOS6502Core::OPCode0xB1()
 /* LDY zpg, X */
 void MOS6502Core::OPCode0xB4()
 {
-	OPCodesLDY(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesLDY((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* LDA zpg, X */
 void MOS6502Core::OPCode0xB5()
 {
-	OPCodesLDA(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesLDA((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* LDX zpg, Y */
 void MOS6502Core::OPCode0xB6()
 {
-	OPCodesLDX(m_pMemory->Read(++m_PC) + m_YR);
+	OPCodesLDX((m_pMemory->Read(++m_PC) + m_YR) & 0xFF);
 	++m_PC;
 }
 
@@ -1171,14 +1172,14 @@ void MOS6502Core::OPCode0xD1()
 /* CMP zpg, X */
 void MOS6502Core::OPCode0xD5()
 {
-	OPCodesCMP(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesCMP((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* DEC zpg, X */
 void MOS6502Core::OPCode0xD6()
 {
-	OPCodesDEC(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesDEC((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
@@ -1308,14 +1309,14 @@ void MOS6502Core::OPCode0xF1()
 /* SBC zpg, X */
 void MOS6502Core::OPCode0xF5()
 {
-	OPCodesSBC(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesSBC((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
 /* INC zpg, X */
 void MOS6502Core::OPCode0xF6()
 {
-	OPCodesINC(m_pMemory->Read(++m_PC) + m_XR);
+	OPCodesINC((m_pMemory->Read(++m_PC) + m_XR) & 0xFF);
 	++m_PC;
 }
 
@@ -1350,15 +1351,22 @@ void MOS6502Core::OPCode0xFE()
 void MOS6502Core::OPCodesADC(uint16_t address)
 {
 	uint8_t operand = m_pMemory->Read(address);
-
-	if (m_SR & statusRegs::decimal) {
+	bool bcdMode = false;
+#if VCS_EMULATOR
+	bcdMode = m_SR & statusRegs::decimal;
+#endif
+	if (bcdMode)
+	{
 		int32_t lo = (m_AC & 0x0f) + (operand & 0x0f) + (m_SR & statusRegs::carry ? 1 : 0);
 		int32_t hi = (m_AC & 0xf0) + (operand & 0xf0);
 		(lo + hi) & 0xff ? m_SR &= ~statusRegs::zero : m_SR |= statusRegs::zero;
-		if (lo > 0x09) {
+
+		if (lo > 0x09)
+		{
 			hi += 0x10;
 			lo += 0x06;
 		}
+
 		hi & 0x80 ? m_SR |= statusRegs::negative : m_SR &= ~statusRegs::negative;
 
 		~(m_AC ^ operand) & (m_AC ^ hi) & 0x80 ? m_SR |= statusRegs::overflow : m_SR &= ~statusRegs::overflow;
@@ -1368,7 +1376,9 @@ void MOS6502Core::OPCodesADC(uint16_t address)
 		hi & 0xff00 ? m_SR |= statusRegs::carry : m_SR &= ~statusRegs::carry;
 
 		m_AC = (lo & 0x0f) + (hi & 0xf0);
-	} else {
+	}
+	else
+	{
 		int32_t sum = m_AC + operand + (m_SR & statusRegs::carry ? 1 : 0);
 		sum & 0x80 ? m_SR |= statusRegs::negative : m_SR &= ~statusRegs::negative;
 		~(m_AC ^ operand) & (m_AC ^ sum) & 0x80 ? m_SR |= statusRegs::overflow : m_SR &= ~statusRegs::overflow;
@@ -1387,10 +1397,16 @@ void MOS6502Core::OPCodesSBC(uint16_t address)
 	(m_AC ^ operand) & (m_AC ^ sum) & 0x80 ? m_SR |= statusRegs::overflow : m_SR &= ~statusRegs::overflow;
 	sum & 0xff ? m_SR &= ~statusRegs::zero : m_SR |= statusRegs::zero;
 
-	if (m_SR & statusRegs::decimal) {
+	bool bcdMode = false;
+#if VCS_EMULATOR
+	bcdMode = m_SR & statusRegs::decimal;
+#endif
+	if (bcdMode)
+	{
 		int32_t lo = (m_AC & 0x0f) - (operand & 0x0f) - (m_SR & statusRegs::carry ? 0 : 1);
 		int32_t hi = (m_AC & 0xf0) - (operand & 0xf0);
-		if (lo & 0x10) {
+		if (lo & 0x10)
+		{
 			lo -= 6;
 			hi--;
 		}
@@ -1553,24 +1569,27 @@ void MOS6502Core::OPCodesROR(uint16_t address)
 
 void MOS6502Core::OPCodesROL(uint16_t address)
 {
-	uint16_t val = m_pMemory->Read(address) << 1u;
+	const uint8_t keepCarry = m_SR & statusRegs::carry;
+	uint8_t val = m_pMemory->Read(address);
 
-	if (m_SR & statusRegs::carry)
-		val |= 0x01;
-	val > 0xFF ? m_SR |= statusRegs::carry : m_SR &= ~statusRegs::carry;
+	val & 0x80 ? m_SR |= statusRegs::carry : m_SR &= ~statusRegs::carry;
+
+	val = val << 1 | keepCarry;
+
 	val & 0x80 ? m_SR |= statusRegs::negative : m_SR &= ~statusRegs::negative;
 	val ? m_SR &= ~statusRegs::zero : m_SR |= statusRegs::zero;
 
-	m_pMemory->Write(address, val & 0xFF);
+	m_pMemory->Write(address, val);
 }
 
 void MOS6502Core::OPCodesBIT(uint16_t address)
 {
-	uint8_t val = m_pMemory->Read(address) & m_AC;
+	uint8_t val = m_pMemory->Read(address);
 	m_SR = (m_SR & 0x3Fu) | (val & 0xC0u);
 
+	val & 0x40u ? m_SR |= statusRegs::overflow : m_SR &= ~statusRegs::overflow;
 	val & 0x80u ? m_SR |= statusRegs::negative : m_SR &= ~statusRegs::negative;
-	val ? m_SR &= ~statusRegs::zero : m_SR |= statusRegs::zero;
+	val & m_AC ? m_SR &= ~statusRegs::zero : m_SR |= statusRegs::zero;
 }
 
 void MOS6502Core::BranchRelative(bool condition)
