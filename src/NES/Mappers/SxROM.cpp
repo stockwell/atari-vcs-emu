@@ -6,6 +6,9 @@ SxROM::SxROM(std::vector<uint8_t>* pPRG_ROM, std::vector<uint8_t>* pCHR_ROM, std
 	m_pPRG_ROM = pPRG_ROM;
 	m_pCHR_ROM = pCHR_ROM;
 
+	NameTableMirroring mode = NameTableMirroring::Horizontal;
+	m_mirroringCallback(mode);
+
 	if (m_pCHR_ROM->empty())
 	{
 		m_CHR_RAM.resize(0x2000);
