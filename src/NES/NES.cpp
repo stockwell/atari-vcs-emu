@@ -91,6 +91,9 @@ const EmulatorCore::framebufferInfo NES::GetFramebufferInfo()
 	{
 		.width	= 256,
 		.height	= 240,
+		.scaleX = 3,
+		.scaleY = 3,
+		.framerate = 60
 	};
 
 	return info;

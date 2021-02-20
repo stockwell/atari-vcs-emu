@@ -159,6 +159,9 @@ const EmulatorCore::framebufferInfo AtariVCS::GetFramebufferInfo()
 	{
 		.width 	= 160,
 		.height = 200,
+		.scaleX = 3,
+		.scaleY = 2,
+		.framerate = 120
 	};
 
 	return info;

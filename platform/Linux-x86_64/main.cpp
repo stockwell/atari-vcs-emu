@@ -4,12 +4,6 @@
 #include "VCS/AtariVCS.hpp"
 #include "NES/NES.hpp"
 
-namespace
-{
-	constexpr auto kWindowWidth 		= 900;
-	constexpr auto kWindowHeight 		= 600;
-}
-
 void Emulator::UpdateTexture(SDL_Texture* texture)
 {
 	uint32_t src = 0;
@@ -47,8 +41,8 @@ void Emulator::InitSDL(SDL_Renderer** renderer, SDL_Texture** texture)
 	window = SDL_CreateWindow("Emulator",
 							  SDL_WINDOWPOS_UNDEFINED,
 							  SDL_WINDOWPOS_UNDEFINED,
-							  m_framebufferInfo.width * 3,
-							  m_framebufferInfo.height * 3,
+							  m_framebufferInfo.width * m_framebufferInfo.scaleX,
+							  m_framebufferInfo.height * m_framebufferInfo.scaleY,
 							  SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
 	if (! window)
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create window: %s\n", SDL_GetError());
@@ -181,6 +175,7 @@ bool Emulator::Draw(SDL_Renderer* renderer, SDL_Texture* texture)
 
 	return true;
 }
+
 int main()
 {
 	SDL_Renderer*	renderer;
@@ -191,7 +186,7 @@ int main()
 	auto emulator = std::make_unique<Emulator>();
 
 #ifdef NES_EMULATOR
-	if (! emulator->LoadRom("toads.nes"))
+	if (! emulator->LoadRom("mario.nes"))
 		exit(1);
 #elif VCS_EMULATOR
 	if (! emulator->LoadRom("pitfall.bin"))
@@ -215,7 +210,7 @@ int main()
 
 		std::chrono::duration<double> elapsed_seconds = std::chrono::steady_clock::now() - start;
 
-		auto delay = static_cast<int32_t>(((1.0f/60.0f) - elapsed_seconds.count()) * 1000000);
+		auto delay = static_cast<int32_t>(((1.0f/static_cast<float>(emulator->GetFramerate())) - elapsed_seconds.count()) * 1000000);
 
 		if (delay > 0)
 			usleep(delay);

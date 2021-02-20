@@ -23,6 +23,8 @@ public:
 
 	void KeypressEvent(keypress_event_t evt, bool pressed);
 
+	uint8_t GetFramerate() const { return m_framebufferInfo.framerate; }
+
 private:
 	bool m_running = true;
 	std::unique_ptr<EmulatorCore> m_emulatorCore;
@@ -30,5 +32,5 @@ private:
 	size_t m_lutSize = 0;
 
 	std::vector<uint8_t> m_framebuffer;
-	EmulatorCore::framebufferInfo m_framebufferInfo;
+	EmulatorCore::framebufferInfo m_framebufferInfo{};
 };
