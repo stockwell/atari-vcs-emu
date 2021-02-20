@@ -18,6 +18,9 @@ uint8_t NESMemory::Read(uint16_t address)
 		}
 		else if (address < 0x4018 && address >= 0x4014) //Only *some* IO registers
 		{
+			if (address == 0x4015)
+				return m_APUReadCallback();
+
 			auto it = m_readCallbacks.find(static_cast<IORegisters>(address));
 			if (it != m_readCallbacks.end())
 				return (it -> second)();
@@ -58,11 +61,18 @@ void NESMemory::Write(uint16_t address, uint8_t value)
 			if (it != m_writeCallbacks.end())
 				(it->second)(value);
 		}
-		else if (address < 0x4017 && address >= 0x4014) //only some registers
+		else if (address <= 0x4017 && address >= 0x4000)
 		{
-			auto it = m_writeCallbacks.find(static_cast<IORegisters>(address));
-			if (it != m_writeCallbacks.end())
-				(it->second)(value);
+			if (address != OAMDMA && address != JOY1)
+			{
+				m_APUWriteCallback(address, value);
+			}
+			else
+			{
+				auto it = m_writeCallbacks.find(static_cast<IORegisters>(address));
+				if (it != m_writeCallbacks.end())
+					(it->second)(value);
+			}
 		}
 		else
 		{

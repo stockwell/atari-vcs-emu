@@ -57,6 +57,8 @@ void MOS6502Core::Tick()
 		return;
 	}
 
+	++m_Cycles;
+
 	/* MOS6507 clock is 1/3 the graphics clock */
 #ifndef DISABLE_CPU_CYCLE_ACCURACY
 	if (--m_Delay)

@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 project(atari-vcs-emu)
 
 set(CMAKE_CXX_STANDARD 20)
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
-
 set(PROJECT_ROOT ${PROJECT_SOURCE_DIR})
 
 set(SDL_STATIC ON CACHE BOOL "" FORCE)
@@ -34,16 +32,25 @@ target_link_libraries(atari-vcs-emu SDL2main SDL2-static)
 
 add_executable(nes-emu
         platform/Linux-x86_64/main.cpp
+        platform/Linux-x86_64/Sound_Queue.cpp
         src/Cart.cpp
-        src/MOS6502Core.cpp
         src/HexDump.cpp
         src/Memory.cpp
+        src/MOS6502Core.cpp
         src/Opcodes.cpp
+        src/NES/Controller.cpp
         src/NES/NES.cpp
         src/NES/NESMemory.cpp
         src/NES/PictureBus.cpp
         src/NES/PPU.cpp
-        src/NES/Controller.cpp
+        src/NES/APU/apu_snapshot.cpp
+        src/NES/APU/Blip_Buffer.cpp
+        src/NES/APU/Multi_Buffer.cpp
+        src/NES/APU/Nes_Apu.cpp
+        src/NES/APU/Nes_Namco.cpp
+        src/NES/APU/Nes_Oscs.cpp
+        src/NES/APU/Nes_Vrc6.cpp
+        src/NES/APU/Nonlinear_Buffer.cpp
         src/NES/Mapper.cpp
         src/NES/Mappers/NROM.cpp
         src/NES/Mappers/AOROM.cpp

@@ -16,6 +16,8 @@ public:
 	void Halt(uint16_t cycles);
 	void Resume();
 	void NMI_IRQ();
+	int GetCycleCount() { return m_Cycles / 3; }
+	void ClearCycleCount() { m_Cycles = 0; }
 
 public:
 	uint8_t m_Delay;
@@ -54,8 +56,11 @@ public:
 
 private:
 	void (MOS6502Core::*m_OPCodes[0x100])();
+
 	bool m_Running = false;
 	uint16_t m_HBlankCycles = 0;
+	uint32_t m_Cycles = 0;
+
 	std::shared_ptr<Memory> m_pMemory = nullptr;
 
 	uint8_t FetchOPCode();

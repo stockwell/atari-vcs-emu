@@ -9,6 +9,7 @@
 #include "EmulatorCore.hpp"
 #include "PictureBus.hpp"
 #include "PPU.hpp"
+#include "APU/Nes_Apu.h"
 
 class MOS6502Core;
 class NESMemory;
@@ -22,14 +23,12 @@ public:
 	bool LoadROM(const std::vector<uint8_t>& romBuffer);
 	bool LoadROM(const char *szFilePath) override;
 
-	void RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBuffer, int *pSampleCount) override;
+	void RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t* pSampleBuffer, int* pSampleCount) override;
 	void Reset() override;
 	void KeypressEvent(keypress_event_t evt, bool pressed) override;
 
 	const framebufferInfo GetFramebufferInfo() override;
 	const uint32_t* GetColourLut(size_t& lutSize) override;
-
-
 
 private:
 	std::unique_ptr<Cartridge>		m_pCartridge;
@@ -40,4 +39,6 @@ private:
 	std::shared_ptr<Mapper>			m_pMapper;
 	std::unique_ptr<Controller>		m_pController1;
 	std::unique_ptr<Controller>		m_pController2;
+	std::unique_ptr<Nes_Apu>		m_pAPU;
+	std::unique_ptr<Blip_Buffer>	m_pBlipBuffer;
 };

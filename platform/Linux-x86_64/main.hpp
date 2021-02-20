@@ -1,10 +1,13 @@
 #pragma once
+#include <memory>
+#include <cstdint>
 
 #include "EmulatorCore.hpp"
 #include "SDL.h"
 
-#include <memory>
-#include <cstdint>
+#include "Sound_Queue.h"
+
+
 
 class Emulator
 {
@@ -27,10 +30,14 @@ public:
 
 private:
 	bool m_running = true;
+
 	std::unique_ptr<EmulatorCore> m_emulatorCore;
 	const uint32_t* m_ColourLUT = nullptr;
 	size_t m_lutSize = 0;
 
 	std::vector<uint8_t> m_framebuffer;
 	EmulatorCore::framebufferInfo m_framebufferInfo{};
+
+	static constexpr auto kSampleBufferSize = 4096;
+	Sound_Queue* m_soundQueue;
 };

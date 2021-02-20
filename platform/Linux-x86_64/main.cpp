@@ -1,8 +1,14 @@
 #include <chrono>
 #include <unistd.h>
+
 #include "main.hpp"
 #include "VCS/AtariVCS.hpp"
 #include "NES/NES.hpp"
+
+namespace
+{
+	constexpr auto kSampleRate = 44100;
+}
 
 void Emulator::UpdateTexture(SDL_Texture* texture)
 {
@@ -58,6 +64,13 @@ void Emulator::InitSDL(SDL_Renderer** renderer, SDL_Texture** texture)
 								   m_framebufferInfo.height);
 	if (! *texture)
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create texture: %s\n", SDL_GetError());
+
+	m_soundQueue = new Sound_Queue;
+	if (! m_soundQueue )
+		exit( EXIT_FAILURE );
+
+	if ( m_soundQueue->init( kSampleRate ) )
+		exit( EXIT_FAILURE );
 }
 
 Emulator::Emulator()
@@ -76,7 +89,12 @@ Emulator::Emulator()
 
 void Emulator::RunToVBlank()
 {
-	m_emulatorCore->RunToVBlank(m_framebuffer, nullptr, nullptr);
+	int count = 0;
+	int16_t samples[kSampleBufferSize];
+
+	m_emulatorCore->RunToVBlank(m_framebuffer, samples, &count);
+
+	m_soundQueue->write(samples, count);
 }
 
 bool Emulator::LoadRom(const char *szFilePath)
