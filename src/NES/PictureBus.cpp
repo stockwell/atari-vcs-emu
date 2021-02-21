@@ -57,10 +57,15 @@ void PictureBus::Write(uint16_t addr, uint8_t value)
 	}
 	else if (addr < 0x3fff)
 	{
-		if (addr == 0x3f10)
+		if (addr == 0x3f10 || addr == 0x3f00)
+		{
 			m_palette[0] = value;
+			m_palette[0x10] = value;
+		}
 		else
+		{
 			m_palette[addr & 0x1f] = value;
+		}
 	}
 }
 
