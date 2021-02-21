@@ -361,7 +361,6 @@ void PPU::setDataAddress(uint8_t address)
 uint8_t PPU::getData()
 {
 	auto data = m_pBus->Read(m_dataAddress);
-	m_dataAddress += m_dataAddrIncrement;
 
 	//Reads are delayed by one byte/read when address is in this range
 	if (m_dataAddress < 0x3f00)
@@ -369,6 +368,12 @@ uint8_t PPU::getData()
 		//Return from the data buffer and store the current value in the buffer
 		std::swap(data, m_dataBuffer);
 	}
+	else
+	{
+		m_dataBuffer = m_pBus->Read(m_dataAddress & 0x2FFF);
+	}
+
+	m_dataAddress += m_dataAddrIncrement;
 
 	return data;
 }
