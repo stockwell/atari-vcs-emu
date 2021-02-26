@@ -78,7 +78,7 @@ void NES::Reset()
 
 bool NES::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t* pSampleBuffer, int* pSampleCount, int maxSampleCount)
 {
-	bool frameComplete = false;
+	bool frameComplete;
 	do
 	{
 		m_pProcessor->Tick();

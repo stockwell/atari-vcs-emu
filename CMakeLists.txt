@@ -10,6 +10,7 @@ add_subdirectory(vendor/SDL-mirror)
 
 add_executable(atari-vcs-emu
         platform/Linux-x86_64/main.cpp
+        platform/Linux-x86_64/Sound_Queue.cpp
         src/Cart.cpp
         src/MOS6502Core.cpp
         src/HexDump.cpp
