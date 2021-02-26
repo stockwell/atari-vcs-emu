@@ -38,6 +38,6 @@ private:
 	std::vector<uint8_t> m_framebuffer;
 	EmulatorCore::framebufferInfo m_framebufferInfo{};
 
-	static constexpr auto kSampleBufferSize = 4096;
+	static constexpr auto kSampleBufferSize = 2048;
 	Sound_Queue* m_soundQueue;
 };

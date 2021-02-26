@@ -76,22 +76,33 @@ void NES::Reset()
 	m_pProcessor->Reset();
 }
 
-void NES::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t* pSampleBuffer, int* pSampleCount)
+bool NES::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t* pSampleBuffer, int* pSampleCount, int maxSampleCount)
 {
-	bool frameComplete;
+	bool frameComplete = false;
 	do
 	{
 		m_pProcessor->Tick();
 		frameComplete = m_pPPU->Tick(framebuffer);
+
+		m_pAPU->run_until(m_pProcessor->GetCycleCount());
+
+		if (m_pBlipBuffer->samples_avail() >= maxSampleCount)
+		{
+			*pSampleCount = m_pBlipBuffer->read_samples(pSampleBuffer, maxSampleCount);
+			return frameComplete;
+		}
+
 	} while (! frameComplete);
 
 	m_pBlipBuffer->end_frame(m_pProcessor->GetCycleCount());
 	m_pAPU->end_frame(m_pProcessor->GetCycleCount());
 
-	if (m_pBlipBuffer->samples_avail() >= 4096)
-		*pSampleCount = m_pBlipBuffer->read_samples(pSampleBuffer, 4096);
+	if (m_pBlipBuffer->samples_avail() >= maxSampleCount)
+		*pSampleCount = m_pBlipBuffer->read_samples(pSampleBuffer, maxSampleCount);
 
 	m_pProcessor->ClearCycleCount();
+
+	return frameComplete;
 }
 
 void NES::KeypressEvent(keypress_event_t evt, bool pressed)

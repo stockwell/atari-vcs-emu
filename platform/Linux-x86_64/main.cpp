@@ -92,9 +92,15 @@ void Emulator::RunToVBlank()
 	int count = 0;
 	int16_t samples[kSampleBufferSize];
 
-	m_emulatorCore->RunToVBlank(m_framebuffer, samples, &count);
+	bool frameReady;
 
-	m_soundQueue->write(samples, count);
+	do {
+		frameReady = m_emulatorCore->RunToVBlank(m_framebuffer, samples, &count, kSampleBufferSize);
+
+		if (count == kSampleBufferSize)
+			m_soundQueue->write(samples, count);
+	}
+	while (! frameReady);
 }
 
 bool Emulator::LoadRom(const char *szFilePath)
@@ -225,13 +231,6 @@ int main()
 		if (! emulator->Draw(renderer, texture))
 			emulator->Stop();
 #endif
-
-		std::chrono::duration<double> elapsed_seconds = std::chrono::steady_clock::now() - start;
-
-		auto delay = static_cast<int32_t>(((1.0f/static_cast<float>(emulator->GetFramerate())) - elapsed_seconds.count()) * 1000000);
-
-		if (delay > 0)
-			usleep(delay);
 
 	} while (emulator->Running());
 

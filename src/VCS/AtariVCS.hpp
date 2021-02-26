@@ -20,7 +20,7 @@ public:
 	bool LoadROM(const std::vector<uint8_t>& romBuffer);
 	bool LoadROM(const char *szFilePath) override;
 
-	void RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t* pSampleBuffer, int* pSampleCount) override;
+	bool RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t* pSampleBuffer, int* pSampleCount, int maxSampleCount) override;
 	void Reset() override;
 	void KeypressEvent(keypress_event_t evt, bool pressed) override;
 

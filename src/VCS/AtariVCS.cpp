@@ -46,7 +46,7 @@ void AtariVCS::Reset()
 	m_pProcessor->Reset();
 }
 
-void AtariVCS::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBuffer, int *pSampleCount)
+void AtariVCS::RunToVBlank(std::vector<uint8_t>& framebuffer, int16_t *pSampleBuffer, int *pSampleCount, int maxSampleCount)
 {
 	bool frameFinished;
 
