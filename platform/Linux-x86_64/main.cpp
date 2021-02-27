@@ -43,12 +43,15 @@ void Emulator::InitSDL(SDL_Renderer** renderer, SDL_Texture** texture)
 		return;
 	}
 
+	const auto height = m_framebufferInfo.height * m_framebufferInfo.scale;
+	const auto width =  height * m_framebufferInfo.ratio;
+
 	/* Create the window and renderer */
 	window = SDL_CreateWindow("Emulator",
 							  SDL_WINDOWPOS_UNDEFINED,
 							  SDL_WINDOWPOS_UNDEFINED,
-							  m_framebufferInfo.width * m_framebufferInfo.scaleX,
-							  m_framebufferInfo.height * m_framebufferInfo.scaleY,
+							  width,
+							  height,
 							  SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
 	if (! window)
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't set create window: %s\n", SDL_GetError());
