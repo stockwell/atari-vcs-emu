@@ -23,7 +23,8 @@ public:
 	bool Tick(std::vector<uint8_t>& framebuffer);
 	void reset();
 
-	void SetInterruptCallback(std::function<void(void)> cb);
+	void SetInterruptCallback(std::function<void(bool)> cb);
+	void SetA12Callback(std::function<void(uint8_t v)> cb);
 
 	void doDMA(const uint8_t* page_ptr);
 
@@ -49,7 +50,8 @@ private:
 
 	std::shared_ptr<PictureBus> m_pBus;
 
-	std::function<void(void)> m_vblankCallback;
+	std::function<void(bool)> m_vblankCallback;
+	std::function<void(uint8_t v)> m_A12Callback;
 
 	std::vector<uint8_t> m_spriteMemory;
 	std::vector<uint8_t> m_scanlineSprites;

@@ -15,7 +15,8 @@ public:
 	void Tick();
 	void Halt(uint16_t cycles);
 	void Resume();
-	void NMI_IRQ();
+	void NMI_IRQ(bool state);
+	void IRQ(bool state);
 	int GetCycleCount() { return m_Cycles / 3; }
 	void ClearCycleCount() { m_Cycles = 0; }
 
@@ -57,6 +58,9 @@ public:
 private:
 	void (MOS6502Core::*m_OPCodes[0x100])();
 
+	bool m_pendingNMI = false;
+	bool m_pendingIRQ = false;
+
 	bool m_Running = false;
 	uint16_t m_HBlankCycles = 0;
 	uint32_t m_Cycles = 0;
@@ -65,6 +69,8 @@ private:
 
 	uint8_t FetchOPCode();
 	uint8_t ExecuteOPCode(uint8_t opcode);
+	uint8_t ExecuteIRQ();
+
 	void OPCodeInvalid();
 
 	void OPCode0x00();

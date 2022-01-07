@@ -55,7 +55,7 @@ add_executable(nes-emu
         src/NES/Mapper.cpp
         src/NES/Mappers/NROM.cpp
         src/NES/Mappers/AOROM.cpp
-        src/NES/Mappers/SxROM.cpp)
+        src/NES/Mappers/SxROM.cpp src/NES/Mappers/MMC3.cpp src/NES/Mappers/MMC3.hpp)
 
 target_include_directories(nes-emu PUBLIC src src/NES)
 target_compile_definitions(nes-emu PUBLIC NES_EMULATOR=1)

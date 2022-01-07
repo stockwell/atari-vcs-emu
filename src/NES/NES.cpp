@@ -5,6 +5,16 @@
 #include "NESMemory.hpp"
 #include "MOS6502Core.hpp"
 
+namespace
+{
+	void setIrq(void* data)
+	{
+		//printf("%d / %d\n", source, value);
+		auto func = static_cast<std::function<void()>*>(data);
+		(*func)();
+	}
+}
+
 NES::NES()
 {
 	m_pCartridge = std::make_unique<Cartridge>();
@@ -39,12 +49,15 @@ bool NES::LoadROM(const std::vector<uint8_t> &romBuffer)
 
 void NES::Reset()
 {
-	m_pMapper = Mapper::Create(m_pMemory, [&](NameTableMirroring& m) { return m_pPictureBus->UpdateMirroring(m); });
+	m_pMapper = Mapper::Create(m_pMemory,
+			[&](NameTableMirroring& m) { return m_pPictureBus->UpdateMirroring(m); },
+			[&](bool v) { m_pProcessor->IRQ(v); });
 
 	m_pPictureBus->SetMapper(m_pMapper, m_pMemory->GetNameTableMirroring());
 
 	m_pPPU->reset();
-	m_pPPU->SetInterruptCallback([&](){ m_pProcessor->NMI_IRQ(); });
+	m_pPPU->SetInterruptCallback([&](bool v){ m_pProcessor->NMI_IRQ(v); });
+	m_pPPU->SetA12Callback([&](uint8_t v) { m_pMapper->PPUA12(v); });
 
 	m_pMemory->SetMapper(m_pMapper);
 	m_pMemory->SetProcessor(m_pProcessor);
@@ -72,6 +85,7 @@ void NES::Reset()
 	m_pBlipBuffer->sample_rate(44100);
 	m_pBlipBuffer->clock_rate( 1789773 );
 	m_pAPU->output(m_pBlipBuffer.get());
+	m_pAPU->irq_notifier([&](bool v) { m_pProcessor->IRQ(v); } );
 
 	m_pProcessor->Reset();
 }
@@ -136,8 +150,6 @@ const uint32_t *NES::GetColourLut(size_t &lutSize) {
 		0xbcbe00, 0x88d800, 0x5ce430, 0x45e082, 0x48cdde, 0x4f4f4f, 0x000000, 0x000000,
 		0xfffeff, 0xc0dfff, 0xd3d2ff, 0xe8c8ff, 0xfbc2ff, 0xfec4ea, 0xfeccc5, 0xf7d8a5,
 		0xe4e594, 0xcfef96, 0xbdf4ab, 0xb3f3cc, 0xb5ebf2, 0xb8b8b8, 0x000000, 0x000000,
-
-
 	};
 
 	lutSize = std::size(kColourLUT);

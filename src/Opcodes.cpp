@@ -184,12 +184,14 @@ void MOS6502Core::OPCodeInvalid()
 	throw std::runtime_error("INVALID OPCODE!!");
 }
 
-void MOS6502Core::NMI_IRQ()
+void MOS6502Core::NMI_IRQ(bool state)
 {
-	StackPush(m_PC);
-	StackPush(m_SR);
-	m_SR |= statusRegs::interrupt;
-	m_PC = m_pMemory->Read(vectorAddresses::nmi) | (m_pMemory->Read(vectorAddresses::nmi + 1) << 8);
+	m_pendingNMI = state;
+}
+
+void MOS6502Core::IRQ(bool state)
+{
+	m_pendingIRQ = state;
 }
 
 /* BRK */
@@ -199,7 +201,8 @@ void MOS6502Core::OPCode0x00()
 	StackPush(m_PC);
 	StackPush((uint8_t) (m_SR | statusRegs::brk));
 
-	m_SR |= statusRegs::interrupt | statusRegs::brk;
+	m_SR |= statusRegs::interrupt;
+
 	m_PC = m_pMemory->Read(vectorAddresses::irq_brq) | (m_pMemory->Read(vectorAddresses::irq_brq + 1) << 8);
 }
 
@@ -471,6 +474,7 @@ void MOS6502Core::OPCode0x3E()
 void MOS6502Core::OPCode0x40()
 {
 	m_SR = StackPull8() | statusRegs::constant;
+	m_SR &= ~statusRegs::brk;
 	m_PC = StackPull16();
 }
 

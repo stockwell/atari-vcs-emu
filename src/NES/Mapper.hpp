@@ -31,5 +31,9 @@ public:
 
 	virtual const uint8_t* GetPagePtr(uint16_t addr) = 0;
 
-	static std::shared_ptr<Mapper> Create(const std::shared_ptr<NESMemory>& pMemory, std::function<void(NameTableMirroring&)> mirroring_cb);
+	virtual void PPUA12(uint8_t value) { };
+
+	static std::shared_ptr<Mapper> Create(const std::shared_ptr<NESMemory>& pMemory,
+			std::function<void(NameTableMirroring&)> mirroring_cb,
+			std::function<void(bool v)> IRQ_cb);
 };

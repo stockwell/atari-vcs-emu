@@ -66,6 +66,11 @@ void MOS6502Core::Tick()
 #endif
 
 	m_Delay = (ExecuteOPCode(FetchOPCode()));
+
+	if ((m_pendingIRQ && ((m_SR & statusRegs::interrupt) == 0x00)) || m_pendingNMI)
+		ExecuteIRQ();
+
+	m_pendingIRQ = m_pendingNMI = false;
 }
 
 void MOS6502Core::Halt(uint16_t cycles)
@@ -75,4 +80,19 @@ void MOS6502Core::Halt(uint16_t cycles)
 
 void MOS6502Core::Resume()
 {
+}
+
+uint8_t MOS6502Core::ExecuteIRQ()
+{
+	StackPush(m_PC);
+	StackPush(m_SR);
+
+	m_SR |= statusRegs::interrupt;
+
+	if (m_pendingNMI)
+		m_PC = m_pMemory->Read(vectorAddresses::nmi) | (m_pMemory->Read(vectorAddresses::nmi + 1) << 8);
+	else
+		m_PC = m_pMemory->Read(vectorAddresses::irq_brq) | (m_pMemory->Read(vectorAddresses::irq_brq + 1) << 8);
+
+	return cycletime[0x00];
 }

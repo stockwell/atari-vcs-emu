@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include "NES/Mapper.hpp"
 
 #include <cstdint>

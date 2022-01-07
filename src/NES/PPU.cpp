@@ -1,5 +1,7 @@
 #include "PPU.hpp"
 
+#include <utility>
+
 
 PPU::PPU(std::shared_ptr<PictureBus> pBus)
 : m_pBus(std::move(pBus))
@@ -21,14 +23,22 @@ void PPU::reset()
 	m_scanlineSprites.resize(0);
 }
 
-void PPU::SetInterruptCallback(std::function<void(void)> cb)
+void PPU::SetInterruptCallback(std::function<void(bool)> cb)
 {
-	m_vblankCallback = cb;
+	m_vblankCallback = std::move(cb);
+}
+
+void PPU::SetA12Callback(std::function<void(uint8_t v)> cb)
+{
+	m_A12Callback = std::move(cb);
 }
 
 bool PPU::Tick(std::vector<uint8_t>& framebuffer)
 {
 	bool ret = false;
+
+	if (m_cycle == 260)
+		m_A12Callback(1);
 
 	switch (m_pipelineState)
 	{
@@ -262,7 +272,7 @@ bool PPU::Tick(std::vector<uint8_t>& framebuffer)
 		{
 			m_vblank = true;
 			if (m_generateInterrupt)
-				m_vblankCallback();
+				m_vblankCallback(true);
 		}
 
 		if (m_cycle >= ScanlineEndCycle)
